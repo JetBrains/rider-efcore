@@ -1,5 +1,5 @@
 Param(
-    $RootSuffix = "RiderEFCore",
+    $RootSuffix = "RiderEfCore",
     $Version = "9999.0.0"
 )
 

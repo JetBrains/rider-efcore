@@ -142,7 +142,7 @@ rdgen {
         language = "kotlin"
         transform = "asis"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "com.jetbrains.rider.model"
+        namespace = "me.seclerp.rider.plugins.efcore.model"
         directory = "$ktOutput"
     }
 
@@ -150,7 +150,7 @@ rdgen {
         language = "csharp"
         transform = "reversed"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "JetBrains.Rider.Model"
+        namespace = "ReSharperPlugin.RiderEfCore"
         directory = "$csOutput"
     }
 }

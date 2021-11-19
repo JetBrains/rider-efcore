@@ -20,3 +20,7 @@ output
 .vs
 _ReSharper*
 _dotTrace*
+
+# rd-gen output
+*.Generated.cs
+*.Generated.kt

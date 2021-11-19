@@ -1,6 +1,6 @@
 <idea-plugin require-restart="true">
   <id>com.jetbrains.rider.plugins.riderefcore</id>
-  <name>RiderEFCore</name>
+  <name>RiderEfCore</name>
   <version>_PLACEHOLDER_</version>
   <vendor url="https://project-url">Author</vendor>
   <idea-version since-build="_PLACEHOLDER_" until-build="_PLACEHOLDER_" />
@@ -11,5 +11,21 @@
 <p>Sample description</p>
 ]]>
   </description>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable groupId="language" instance="me.seclerp.rider.plugins.efcore.SampleOptionsPage" id="SampleOptionsPage" />
+  </extensions>
+
+  <actions>
+    <group id="me.seclerp.rider.plugins.efcore.EfCoreTools" text="Entity Framework Core" popup="true">
+      <add-to-group group-id="ProjectViewPopupMenu"/>
+      <action id="me.seclerp.rider.plugins.efcore.actions.AddMigration" class="me.seclerp.rider.plugins.efcore.actions.AddMigration"
+              text="Add Migration" description="Add new code-first migration">
+      </action>
+      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabase" class="me.seclerp.rider.plugins.efcore.actions.AddMigration"
+              text="Update Database" description="Update database using current migrations">
+      </action>
+    </group>
+  </actions>
 
 </idea-plugin>

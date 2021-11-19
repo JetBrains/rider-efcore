@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ReSharperPlugin.RiderEFCore\ReSharperPlugin.RiderEFCore.csproj" />
+    <ProjectReference Include="..\ReSharperPlugin.RiderEfCore\ReSharperPlugin.RiderEfCore.Rider.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,11 +3,11 @@
   <PropertyGroup>
     <SdkVersion>2021.2.0</SdkVersion>
 
-    <Title>RiderEFCore</Title>
+    <Title>RiderEfCore</Title>
     <Description>Description</Description>
 
     <Authors>Author</Authors>
-    <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of RiderEFCore</Copyright>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of RiderEfCore</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
     <PackageProjectUrl></PackageProjectUrl>
