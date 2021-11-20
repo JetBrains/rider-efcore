@@ -172,6 +172,8 @@ prepareSandbox {
     def dllFiles = [
             "$outputFolder/${DotnetPluginId}.dll",
             "$outputFolder/${DotnetPluginId}.pdb",
+
+            "$outputFolder/CliWrap.dll",
             // TODO: add additional assemblies
     ]
 

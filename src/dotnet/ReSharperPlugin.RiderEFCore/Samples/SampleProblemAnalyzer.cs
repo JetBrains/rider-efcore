@@ -1,8 +1,7 @@
 ﻿using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
-using JetBrains.ReSharper.Psi.Tree;
 
-namespace ReSharperPlugin.RiderEfCore
+namespace ReSharperPlugin.RiderEfCore.Samples
 {
     // Types mentioned in this attribute are used for performance optimizations
     [ElementProblemAnalyzer(

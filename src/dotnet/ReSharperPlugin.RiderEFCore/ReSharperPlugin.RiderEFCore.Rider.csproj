@@ -15,7 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CliWrap" Version="3.3.3" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="bin\$(MSBuildProjectName)\$(Configuration)\CliWrap.dll" PackagePath="dotFiles" Pack="true" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

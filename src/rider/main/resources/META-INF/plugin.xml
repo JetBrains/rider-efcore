@@ -14,16 +14,20 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="language" instance="me.seclerp.rider.plugins.efcore.SampleOptionsPage" id="SampleOptionsPage" />
+    <notificationGroup id="EF Core Notifications Group" displayType="BALLOON"/>
   </extensions>
 
   <actions>
     <group id="me.seclerp.rider.plugins.efcore.EfCoreTools" text="Entity Framework Core" popup="true">
       <add-to-group group-id="ProjectViewPopupMenu"/>
-      <action id="me.seclerp.rider.plugins.efcore.actions.AddMigration" class="me.seclerp.rider.plugins.efcore.actions.AddMigration"
+      <action id="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction"
               text="Add Migration" description="Add new code-first migration">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabase" class="me.seclerp.rider.plugins.efcore.actions.AddMigration"
+      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabase" class="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction"
               text="Update Database" description="Update database using current migrations">
+      </action>
+      <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.RemoveLastMigrationAction"
+              text="Remove Last Migration" description="Removes last created migration">
       </action>
     </group>
   </actions>

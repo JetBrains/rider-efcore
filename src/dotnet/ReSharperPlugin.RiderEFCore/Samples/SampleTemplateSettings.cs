@@ -1,12 +1,10 @@
-using System;
 using System.IO;
-using System.Linq;
 using JetBrains.Application;
 using JetBrains.Application.Settings;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 
-namespace ReSharperPlugin.RiderEfCore
+namespace ReSharperPlugin.RiderEfCore.Samples
 {
     // Templates (or settings in general) that ship with the plugin
     [ShellComponent]

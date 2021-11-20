@@ -2,11 +2,8 @@ using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
-using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
-using ReSharperPlugin.RiderEfCore;
 
-namespace ReSharperPlugin.RiderEfCore
+namespace ReSharperPlugin.RiderEfCore.Samples
 {
     [RegisterConfigurableSeverity(
         SampleHighlighting.SeverityId,

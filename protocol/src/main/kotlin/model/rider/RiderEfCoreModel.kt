@@ -8,5 +8,6 @@ import com.jetbrains.rd.generator.nova.PredefinedType.*
 object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     init {
         call("getProjectNames", void, immutableList(string))
+        call("removeLastMigration", string, void)
     }
 }

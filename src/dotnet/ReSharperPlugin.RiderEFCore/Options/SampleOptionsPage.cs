@@ -10,6 +10,7 @@ using JetBrains.IDE.UI.Options;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Feature.Services.Daemon.OptionPages;
 using JetBrains.Rider.Model.UIAutomation;
+using ReSharperPlugin.RiderEfCore.Samples;
 
 namespace ReSharperPlugin.RiderEfCore.Options
 {
