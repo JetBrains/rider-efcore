@@ -9,6 +9,9 @@ using JetBrains.RdBackend.Common.Features;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using ReSharperPlugin.RiderEfCore.Cli;
+using ReSharperPlugin.RiderEfCore.Cli.Net6;
+using ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions;
+using ReSharperPlugin.RiderEfCore.Cli.Net6.Models;
 
 namespace ReSharperPlugin.RiderEfCore
 {
@@ -17,11 +20,13 @@ namespace ReSharperPlugin.RiderEfCore
     {
         private readonly ISolution _solution;
         private readonly ILogger _logger;
+        private readonly IEfCoreToolsClient _toolsClient;
 
         public EfCoreSolutionComponent(ISolution solution, ILogger logger)
         {
             _solution = solution;
             _logger = logger;
+            _toolsClient = EfCoreToolsClientFactory.CreateDefaultClient(_logger);
 
             var riderProjectOutputModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
             riderProjectOutputModel.GetProjectNames.Set(GetProjectNames);
@@ -59,18 +64,9 @@ namespace ReSharperPlugin.RiderEfCore
             }
 
             var projectFolder = project.ProjectFileLocation.Parent.FullPath;
-
-            var command = EfCoreCommandFactory
-                .CreateCommand(EfCoreCommandNames.Migrations.Remove, args => args
-                .AddEfCoreMigrationsProject(projectFolder))
-                | (output => _logger.Info($"dotnet ef: {output}"));
-
-            _logger.Info("Executing CLI command: {0}", command);
-
+            var commonOptions = new EfCoreCommonOptions(projectFolder, projectFolder);
             // TODO: How to async?
-            var commandResult = command.ExecuteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-            _logger.Info("Exit code: {0}", commandResult.ExitCode);
+            var commandResult = _toolsClient.Migrations.Remove(commonOptions, force: true);
 
             return commandResult.ExitCode == 0
                 ? RdTask<Unit>.Successful(Unit.Instance)
