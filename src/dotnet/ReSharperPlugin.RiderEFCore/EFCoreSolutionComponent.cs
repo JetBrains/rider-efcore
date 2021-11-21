@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CliWrap;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
@@ -10,17 +8,17 @@ using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
+using ReSharperPlugin.RiderEfCore.Cli;
 
 namespace ReSharperPlugin.RiderEfCore
 {
     [SolutionComponent]
-    // ReSharper disable once InconsistentNaming
-    public class EFCoreSolutionComponent
+    public class EfCoreSolutionComponent
     {
         private readonly ISolution _solution;
         private readonly ILogger _logger;
 
-        public EFCoreSolutionComponent(ISolution solution, ILogger logger)
+        public EfCoreSolutionComponent(ISolution solution, ILogger logger)
         {
             _solution = solution;
             _logger = logger;
@@ -32,8 +30,7 @@ namespace ReSharperPlugin.RiderEfCore
 
         private RdTask<List<string>> GetProjectNames(Lifetime lifetime, Unit _)
         {
-            var allProjectNames = _solution
-                .GetAllProjects()
+            var allProjectNames = EfCoreHelper.GetSupportedMigrationProjects(_solution)
                 .Select(project => project.Name)
                 .ToList();
 
@@ -63,10 +60,9 @@ namespace ReSharperPlugin.RiderEfCore
 
             var projectFolder = project.ProjectFileLocation.Parent.FullPath;
 
-            var command = Cli.Wrap("dotnet").WithArguments(args => args
-                .Add(new[] { "ef", "migrations", "remove" })
-                .Add("--project").Add(projectFolder))
-                .WithValidation(CommandResultValidation.ZeroExitCode)
+            var command = EfCoreCommandFactory
+                .CreateCommand(EfCoreCommandNames.Migrations.Remove, args => args
+                .AddEfCoreMigrationsProject(projectFolder))
                 | (output => _logger.Info($"dotnet ef: {output}"));
 
             _logger.Info("Executing CLI command: {0}", command);

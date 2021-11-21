@@ -5,7 +5,7 @@ using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace ReSharperPlugin.RiderEfCore
 {
-    public static class EFCoreHelper
+    public static class EfCoreHelper
     {
         public static IEnumerable<IProject> GetSupportedMigrationProjects(ISolution solution)
         {
