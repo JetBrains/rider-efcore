@@ -14,7 +14,12 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
         public EfCoreCommandResult Add(EfCoreCommonOptions options, string migrationName, string outputDirectory = default,
             string @namespace = default)
         {
-            throw new System.NotImplementedException();
+            var command = CreateEfCoreCommand(EfCoreCommandNames.Migrations.Add, options, args => args
+                .Add(migrationName)
+                .AddOptional("--output-dir", outputDirectory)
+                .AddOptional("--namespace", @namespace));
+
+            return ExecuteLogged(command);
         }
 
         public EfCoreCommandResult Bundle(EfCoreCommonOptions options, string output = default, bool? force = default,
@@ -31,7 +36,7 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
         public EfCoreCommandResult Remove(EfCoreCommonOptions options, bool? force = default)
         {
             var command = CreateEfCoreCommand(EfCoreCommandNames.Migrations.Remove, options, args => args
-                .AddKeyIfNotNull("--force", force));
+                .AddOptionalKey("--force", force));
 
             return ExecuteLogged(command);
         }

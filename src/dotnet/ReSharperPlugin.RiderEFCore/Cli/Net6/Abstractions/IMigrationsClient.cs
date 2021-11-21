@@ -5,9 +5,9 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions
 {
     public interface IMigrationsClient
     {
-        EfCoreCommandResult Add(EfCoreCommonOptions options, [CanBeNull] string migrationName,
+        EfCoreCommandResult Add(EfCoreCommonOptions options, string migrationName,
             [CanBeNull] string outputDirectory = default, [CanBeNull] string @namespace = default);
-        EfCoreCommandResult Bundle(EfCoreCommonOptions options, [CanBeNull] string output = default, bool? force = default,
+        EfCoreCommandResult Bundle(EfCoreCommonOptions options, [CanBeNull] string outputDirectory = default, bool? force = default,
             bool? selfContained = default, [CanBeNull] string targetRuntime = default);
         EfCoreCommandResult List(EfCoreCommonOptions options, [CanBeNull] string connectionString = default, bool? noConnect = default);
         EfCoreCommandResult Remove(EfCoreCommonOptions options, bool? force = default);
