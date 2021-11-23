@@ -10,10 +10,13 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6.Models
         [NotNull]
         public string StartupProject { get; }
 
-        public EfCoreCommonOptions([NotNull] string migrationsProject, [NotNull] string startupProject)
+        public bool NoBuild { get; }
+
+        public EfCoreCommonOptions([NotNull] string migrationsProject, [NotNull] string startupProject, bool noBuild = false)
         {
             MigrationsProject = migrationsProject;
             StartupProject = startupProject;
+            NoBuild = noBuild;
         }
     }
 }

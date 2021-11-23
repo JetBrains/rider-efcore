@@ -22,8 +22,13 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
 
             var sb = new StringBuilder();
 
-            command |= sb;
-            command |= output => Logger.Info($"dotnet ef: {output}");
+            var stdOutTarget = PipeTarget.Merge(
+                PipeTarget.ToDelegate(output => Logger.Info($"dotnet ef: {output}")),
+                PipeTarget.ToStringBuilder(sb)
+            );
+
+            // Use the same target for stdErr too
+            command |= (stdOutTarget, stdOutTarget);
 
             var cliCommand = command.ToString();
             var commandResult = command.ExecuteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -37,8 +42,7 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
         protected Command CreateEfCoreCommand(
             EfCoreCommandName commandName,
             EfCoreCommonOptions options,
-            Action<ArgumentsBuilder> argsBuilder = null,
-            bool requireZeroStatusCode = true)
+            Action<ArgumentsBuilder> argsBuilder = null)
         {
             var command = CliWrap.Cli.Wrap("dotnet").WithArguments(args =>
             {
@@ -56,9 +60,10 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
                 argsBuilder?.Invoke(args);
             });
 
-            return requireZeroStatusCode
-                ? command.WithValidation(CommandResultValidation.ZeroExitCode)
-                : command;
+            return command.WithValidation(CommandResultValidation.None);
+            // return requireZeroStatusCode
+            //     ? command.WithValidation(CommandResultValidation.ZeroExitCode)
+            //     : command;
         }
     }
 }

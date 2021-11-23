@@ -30,21 +30,34 @@ namespace ReSharperPlugin.RiderEfCore
 
             var riderProjectOutputModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
 
-            riderProjectOutputModel.GetProjectNames.Set(GetProjectNames);
+            riderProjectOutputModel.GetAvailableMigrationsProjects.Set(GetAvailableMigrationsProjects);
+            riderProjectOutputModel.GetAvailableStartupProjects.Set(GetAvailableStartupProjects);
 
             riderProjectOutputModel.AddMigration.Set(AddMigration);
             riderProjectOutputModel.RemoveLastMigration.Set(RemoveLastMigration);
         }
 
-        private RdTask<List<string>> GetProjectNames(Lifetime lifetime, Unit _)
+        private RdTask<List<ProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
         {
             using (ReadLockCookie.Create())
             {
                 var allProjectNames = EfCoreHelper.GetSupportedMigrationProjects(_solution)
-                    .Select(project => project.Name)
+                    .Select(project => new ProjectInfo(project.Name))
                     .ToList();
 
-                return RdTask<List<string>>.Successful(allProjectNames);
+                return RdTask<List<ProjectInfo>>.Successful(allProjectNames);
+            }
+        }
+
+        private RdTask<List<ProjectInfo>> GetAvailableStartupProjects(Lifetime lifetime, Unit _)
+        {
+            using (ReadLockCookie.Create())
+            {
+                var allProjectNames = EfCoreHelper.GetSupportedStartupProjects(_solution)
+                    .Select(project => new ProjectInfo(project.Name))
+                    .ToList();
+
+                return RdTask<List<ProjectInfo>>.Successful(allProjectNames);
             }
         }
 
@@ -61,12 +74,13 @@ namespace ReSharperPlugin.RiderEfCore
             }
         }
 
-        private RdTask<OperationResult> RemoveLastMigration(Lifetime lifetime, string projectName)
+        private RdTask<OperationResult> RemoveLastMigration(Lifetime lifetime, CommonOptions options)
         {
             using (ReadLockCookie.Create())
             {
-                var projectFolder = GetProjectPath(projectName);
-                var commonOptions = new EfCoreCommonOptions(projectFolder, projectFolder);
+                var migrationsProjectFolder = GetProjectPath(options.MigrationsProject);
+                var startupProjectFolder = GetProjectPath(options.StartupProject);
+                var commonOptions = new EfCoreCommonOptions(migrationsProjectFolder, startupProjectFolder);
                 var commandResult = _toolsClient.Migrations.Remove(commonOptions, force: true);
 
                 return MapCommandResult(commandResult);
@@ -98,9 +112,10 @@ namespace ReSharperPlugin.RiderEfCore
         }
 
         private static RdTask<OperationResult> MapCommandResult(EfCoreCommandResult commandResult) =>
-            commandResult.ExitCode == 0
-                ? RdTask<OperationResult>.Successful(commandResult.ToOperationResult())
-                : RdTask<OperationResult>.Faulted(
-                    new Exception($"Exit code of dotnet ef was not successful: {commandResult.ExitCode}"));
+            RdTask<OperationResult>.Successful(commandResult.ToOperationResult());
+        // commandResult.ExitCode == 0
+        //     ? RdTask<OperationResult>.Successful(commandResult.ToOperationResult())
+        //     : RdTask<OperationResult>.Faulted(
+        //         new Exception($"Exit code of dotnet ef was not successful: {commandResult.ExitCode}"));
     }
 }

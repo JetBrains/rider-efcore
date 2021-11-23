@@ -1,3 +1,4 @@
+using JetBrains.ReSharper.Psi.Search;
 using JetBrains.Util;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Models;
