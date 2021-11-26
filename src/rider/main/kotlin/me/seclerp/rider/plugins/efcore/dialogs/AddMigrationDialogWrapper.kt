@@ -1,7 +1,10 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
@@ -32,7 +35,9 @@ class AddMigrationDialogWrapper(
 
     private fun migrationNameRow(it: LayoutBuilder) =
         it.row("Migration name:") {
-            textField(::migrationName).focused()
+            textField(::migrationName)
+                .constraints(CCFlags.pushX, CCFlags.growX)
+                .focused()
                 .withValidationOnInput(migrationNameValidation())
                 .withValidationOnApply(migrationNameValidation())
         }

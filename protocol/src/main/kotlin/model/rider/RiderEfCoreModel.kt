@@ -30,13 +30,24 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("output", string)
     }
 
+    private val UpdateDatabaseOptions = structdef {
+        field("targetMigration", string)
+        field("migrationsProject", string)
+        field("startupProject", string)
+        field("noBuild", bool)
+    }
+
     init {
         // Internal
         call("getAvailableMigrationsProjects", void, immutableList(ProjectInfo))
         call("getAvailableStartupProjects", void, immutableList(ProjectInfo))
+        call("getAvailableMigrations", string, immutableList(string))
 
         // Migrations
         call("addMigration", AddMigrationOptions, OperationResult)
         call("removeLastMigration", CommonOptions, OperationResult)
+
+        // Database
+        call("updateDatabase", UpdateDatabaseOptions, OperationResult)
     }
 }

@@ -16,7 +16,7 @@ class RemoveLastMigrationAction: EFCoreAction() {
         val projectName = actionEvent.getDotnetProjectName()
         val dialog = RemoveLastMigrationDialogWrapper(projectName, migrationsProject, startupProject)
         if (dialog.showAndGet()) {
-            val options = CommonOptions(dialog.migrationsProjectName, dialog.startupProjectName, dialog.noBuild)
+            val options = CommonOptions(dialog.migrationsProjectName ?: "", dialog.startupProjectName ?: "", dialog.noBuild)
             execute(actionEvent, "Last migration has been removed") {
                 model.removeLastMigration.runUnderProgress(options, intellijProject, "Removing migration...",
                     isCancelable = false,

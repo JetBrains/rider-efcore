@@ -1,6 +1,6 @@
 package me.seclerp.rider.plugins.efcore.components
 
-import me.seclerp.rider.plugins.efcore.ProjectIconResolver
+import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import java.awt.Component
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
@@ -19,7 +19,7 @@ class ProjectInfoComboBoxRendererAdapter: ListCellRenderer<String?> {
         trueRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
         trueRenderer.text = value!!
         // TODO Replace with actual project file name
-        trueRenderer.icon = ProjectIconResolver.resolve("ToDo.csproj")
+        trueRenderer.icon = DotnetIconResolver.resolveForExtension("csproj")
 
         return trueRenderer
     }

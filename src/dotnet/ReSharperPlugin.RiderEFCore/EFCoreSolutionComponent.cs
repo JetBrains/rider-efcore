@@ -6,6 +6,8 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
@@ -13,6 +15,7 @@ using ReSharperPlugin.RiderEfCore.Cli.Extensions;
 using ReSharperPlugin.RiderEfCore.Cli.Net6;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Models;
+using ReSharperPlugin.RiderEfCore.Extensions;
 using OperationResult = JetBrains.Rider.Model.OperationResult;
 
 namespace ReSharperPlugin.RiderEfCore
@@ -32,9 +35,12 @@ namespace ReSharperPlugin.RiderEfCore
 
             riderProjectOutputModel.GetAvailableMigrationsProjects.Set(GetAvailableMigrationsProjects);
             riderProjectOutputModel.GetAvailableStartupProjects.Set(GetAvailableStartupProjects);
+            riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
 
             riderProjectOutputModel.AddMigration.Set(AddMigration);
             riderProjectOutputModel.RemoveLastMigration.Set(RemoveLastMigration);
+
+            riderProjectOutputModel.UpdateDatabase.Set(UpdateDatabase);
         }
 
         private RdTask<List<ProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
@@ -61,6 +67,28 @@ namespace ReSharperPlugin.RiderEfCore
             }
         }
 
+        private RdTask<List<string>> GetAvailableMigrations(Lifetime lifetime, string projectName)
+        {
+            // using (CompilationContextCookie.GetOrCreate(new PsiModuleResolveContext()))
+            using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
+            using (ReadLockCookie.Create())
+            {
+                var project = _solution.GetProjectByName(projectName);
+
+                // TODO: Refactor to simplify
+                var foundMigrations = project
+                    .GetPsiModules()
+                    .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
+                    .Select(occurence => occurence.GetAttributeInstances(AttributesSource.All)
+                        .SingleOrDefault(attribute => attribute.GetAttributeShortName() == "MigrationAttribute"))
+                    .Where(a => a != null)
+                    .Select(a => a.PositionParameter(0).ConstantValue.Value as string)
+                    .ToList();
+
+                return RdTask<List<string>>.Successful(foundMigrations);
+            }
+        }
+
         private RdTask<OperationResult> AddMigration(Lifetime lifetime, AddMigrationOptions options)
         {
             using (ReadLockCookie.Create())
@@ -82,6 +110,19 @@ namespace ReSharperPlugin.RiderEfCore
                 var startupProjectFolder = GetProjectPath(options.StartupProject);
                 var commonOptions = new EfCoreCommonOptions(migrationsProjectFolder, startupProjectFolder);
                 var commandResult = _toolsClient.Migrations.Remove(commonOptions, force: true);
+
+                return MapCommandResult(commandResult);
+            }
+        }
+
+        private RdTask<OperationResult> UpdateDatabase(Lifetime lifetime, UpdateDatabaseOptions options)
+        {
+            using (ReadLockCookie.Create())
+            {
+                var migrationsProjectFolder = GetProjectPath(options.MigrationsProject);
+                var startupProjectFolder = GetProjectPath(options.StartupProject);
+                var commonOptions = new EfCoreCommonOptions(migrationsProjectFolder, startupProjectFolder);
+                var commandResult = _toolsClient.Database.Update(commonOptions, options.TargetMigration);
 
                 return MapCommandResult(commandResult);
             }

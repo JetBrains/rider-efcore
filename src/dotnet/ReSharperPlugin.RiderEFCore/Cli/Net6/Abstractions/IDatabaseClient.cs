@@ -6,6 +6,6 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions
     public interface IDatabaseClient
     {
         EfCoreCommandResult Drop(EfCoreCommonOptions options, bool? force = default, bool? dryRun = default);
-        EfCoreCommandResult Update(EfCoreCommonOptions options, [CanBeNull] string migration = default, [CanBeNull] string connectionString = default);
+        EfCoreCommandResult Update(EfCoreCommonOptions options, string migration, [CanBeNull] string connectionString = default);
     }
 }

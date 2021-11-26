@@ -1,4 +1,3 @@
-using JetBrains.ReSharper.Psi.Search;
 using JetBrains.Util;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Abstractions;
 using ReSharperPlugin.RiderEfCore.Cli.Net6.Models;
@@ -16,9 +15,13 @@ namespace ReSharperPlugin.RiderEfCore.Cli.Net6
             throw new System.NotImplementedException();
         }
 
-        public EfCoreCommandResult Update(EfCoreCommonOptions options, string migration = default, string connectionString = default)
+        public EfCoreCommandResult Update(EfCoreCommonOptions options, string migration, string connectionString = default)
         {
-            throw new System.NotImplementedException();
+            // TODO: Support connection strings
+            var command = CreateEfCoreCommand(EfCoreCommandNames.Database.Update, options, args => args
+                .Add(migration));
+
+            return ExecuteLogged(command);
         }
     }
 }
