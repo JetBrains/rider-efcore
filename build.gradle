@@ -173,7 +173,6 @@ prepareSandbox {
             "$outputFolder/${DotnetPluginId}.dll",
             "$outputFolder/${DotnetPluginId}.pdb",
 
-            "$outputFolder/CliWrap.dll",
             // TODO: add additional assemblies
     ]
 

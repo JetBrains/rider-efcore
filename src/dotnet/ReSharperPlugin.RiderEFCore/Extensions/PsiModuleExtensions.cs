@@ -14,6 +14,7 @@ namespace ReSharperPlugin.RiderEfCore.Extensions
     {
         public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project, IClrTypeName clrTypeName)
         {
+            var searchDescriptor = project.ToProjectSearchDescriptor();
             var psiServices = module.GetPsiServices();
             var symbolScope = psiServices.Symbols.GetSymbolScope(module, true, true); // caseSensitive should probably come the project language service
             var typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName);

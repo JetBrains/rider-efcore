@@ -1,10 +1,12 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
+import com.jetbrains.rd.ide.model.ProjectInfo
+
 class RemoveLastMigrationDialogWrapper(
-    currentProjectName: String,
-    migrationsProjects: Array<String>,
-    startupProjects: Array<String>
-) : EfCoreCommandDialogWrapper("Remove Last Migration", currentProjectName, migrationsProjects, startupProjects) {
+    currentProject: ProjectInfo,
+    migrationsProjects: Array<ProjectInfo>,
+    startupProjects: Array<ProjectInfo>
+) : BaseEfCoreDialogWrapper("Remove Last Migration", currentProject, migrationsProjects, startupProjects) {
 
     init {
         init()

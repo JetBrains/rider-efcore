@@ -1,20 +1,21 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
+import com.jetbrains.rd.ide.model.ProjectInfo
 import javax.swing.JTextField
 
 class AddMigrationDialogWrapper(
-    currentProjectName: String,
-    migrationsProjects: Array<String>,
-    startupProjects: Array<String>
-) : EfCoreCommandDialogWrapper("Add Migration", currentProjectName, migrationsProjects, startupProjects) {
+    currentProject: ProjectInfo,
+    migrationsProjects: Array<ProjectInfo>,
+    startupProjects: Array<ProjectInfo>
+) : BaseEfCoreDialogWrapper("Add Migration", currentProject,
+    migrationsProjects,
+    startupProjects) {
 
     var migrationName = ""
         private set

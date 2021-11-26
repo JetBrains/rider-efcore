@@ -6,28 +6,29 @@ import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.Row
 import com.intellij.ui.layout.panel
+import com.jetbrains.rd.ide.model.ProjectInfo
 import me.seclerp.rider.plugins.efcore.Event
 import me.seclerp.rider.plugins.efcore.components.ProjectInfoComboBoxRendererAdapter
 import java.awt.event.ItemEvent
 import javax.swing.DefaultComboBoxModel
 
-abstract class EfCoreCommandDialogWrapper(
+abstract class BaseEfCoreDialogWrapper(
     title: String,
-    private val currentProjectName: String,
-    private val migrationsProjects: Array<String>,
-    private val startupProjects: Array<String>
+    private val currentProject: ProjectInfo,
+    private val migrationsProjects: Array<ProjectInfo>,
+    private val startupProjects: Array<ProjectInfo>
 ): DialogWrapper(true) {
-    var migrationsProjectName: String? = null
+    var migrationsProject: ProjectInfo? = null
         private set
 
-    var startupProjectName: String? = null
+    var startupProject: ProjectInfo? = null
         private set
 
     var noBuild = false
         private set
 
-    protected val migrationsProjectNameChangedEvent: Event<String> = Event()
-    protected val startupProjectNameChangedEvent: Event<String> = Event()
+    protected val migrationsProjectNameChangedEvent: Event<ProjectInfo> = Event()
+    protected val startupProjectNameChangedEvent: Event<ProjectInfo> = Event()
 
     init {
         this.title = title
@@ -64,19 +65,19 @@ abstract class EfCoreCommandDialogWrapper(
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun migrationsProjectRow(it: LayoutBuilder): Row {
         val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
-        migrationsProjectName = currentProjectName
+        migrationsProject = currentProject
 
         return it.row("Migrations project:") {
             cell(isFullWidth = true) {
                 comboBox(migrationsBoxModel,
-                    { migrationsProjectName },
+                    { migrationsProject },
                     ::migrationsProjectNameSetter,
                     ProjectInfoComboBoxRendererAdapter())
                     .constraints(CCFlags.pushX, CCFlags.growX)
                     // Setter provided above called only on submit, so we need additional change detection
                     .component.addItemListener {
                         if (it.stateChange == ItemEvent.SELECTED) {
-                            migrationsProjectNameSetter(it.item as String)
+                            migrationsProjectNameSetter(it.item as ProjectInfo)
                         }
                     }
             }
@@ -86,19 +87,19 @@ abstract class EfCoreCommandDialogWrapper(
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun startupProjectRow(it: LayoutBuilder): Row {
         val startupBoxModel = DefaultComboBoxModel(startupProjects)
-        startupProjectName = currentProjectName
+        startupProject = currentProject
 
         return it.row("Startup project:") {
             cell(isFullWidth = true) {
                 comboBox(startupBoxModel,
-                    { startupProjectName },
+                    { startupProject },
                     ::startupProjectNameSetter,
                     ProjectInfoComboBoxRendererAdapter())
                     .constraints(CCFlags.pushX, CCFlags.growX)
                     // Setter provided above called only on submit, so we need additional change detection
                     .component.addItemListener {
                         if (it.stateChange == ItemEvent.SELECTED) {
-                            startupProjectNameSetter(it.item as String)
+                            startupProjectNameSetter(it.item as ProjectInfo)
                         }
                     }
             }
@@ -111,17 +112,17 @@ abstract class EfCoreCommandDialogWrapper(
             checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it })
         }
 
-    private fun migrationsProjectNameSetter(it: String?) {
-        if (it == migrationsProjectName) return
+    private fun migrationsProjectNameSetter(it: ProjectInfo?) {
+        if (it == migrationsProject) return
 
-        migrationsProjectName = it
-        migrationsProjectNameChangedEvent.invoke(migrationsProjectName!!)
+        migrationsProject = it
+        migrationsProjectNameChangedEvent.invoke(migrationsProject!!)
     }
 
-    private fun startupProjectNameSetter(it: String?) {
-        if (it == startupProjectName) return
+    private fun startupProjectNameSetter(it: ProjectInfo?) {
+        if (it == startupProject) return
 
-        startupProjectName = it
-        startupProjectNameChangedEvent.invoke(startupProjectName!!)
+        startupProject = it
+        startupProjectNameChangedEvent.invoke(startupProject!!)
     }
 }

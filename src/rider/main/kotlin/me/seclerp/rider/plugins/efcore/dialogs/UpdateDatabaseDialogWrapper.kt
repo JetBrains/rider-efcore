@@ -2,26 +2,24 @@ package me.seclerp.rider.plugins.efcore.dialogs
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
-import com.intellij.openapi.options.ConfigurableProvider
-import com.intellij.openapi.options.ex.ConfigurableExtensionPointUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.layout.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
+import com.jetbrains.rd.ide.model.ProjectInfo
 import com.jetbrains.rd.ide.model.RiderEfCoreModel
-import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 
 class UpdateDatabaseDialogWrapper(
     private val project: Project,
     private val model: RiderEfCoreModel,
-    currentProjectName: String,
-    migrationsProjects: Array<String>,
-    startupProjects: Array<String>
-) : EfCoreCommandDialogWrapper("Update Database", currentProjectName, migrationsProjects, startupProjects) {
+    currentProject: ProjectInfo,
+    migrationsProjects: Array<ProjectInfo>,
+    startupProjects: Array<ProjectInfo>
+) : BaseEfCoreDialogWrapper("Update Database", currentProject, migrationsProjects, startupProjects) {
 
     var targetMigration: String = ""
         private set
@@ -69,8 +67,8 @@ class UpdateDatabaseDialogWrapper(
         else null
     }
 
-    private fun refreshCompletion(migrationsProject: String) {
-        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject, project, "Loading migrations...",
+    private fun refreshCompletion(migrationsProject: ProjectInfo) {
+        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, project, "Loading migrations...",
             isCancelable = true,
             throwFault = true
         );

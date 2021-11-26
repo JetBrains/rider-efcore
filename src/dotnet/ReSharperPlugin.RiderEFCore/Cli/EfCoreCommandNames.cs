@@ -1,13 +1,18 @@
+using System;
+
 namespace ReSharperPlugin.RiderEfCore.Cli
 {
+    [Obsolete("Remove when all commands will be implemented on frontend")]
     public static class EfCoreCommandNames
     {
+        [Obsolete]
         public static class Database
         {
             public static readonly EfCoreCommandName Update = new EfCoreCommandName(new[] { "database", "update" });
             public static readonly EfCoreCommandName Drop = new EfCoreCommandName(new[] { "database", "drop" });
         }
 
+        [Obsolete]
         public static class Migrations
         {
             public static readonly EfCoreCommandName Add = new EfCoreCommandName(new[] { "migrations", "add" });
@@ -17,6 +22,7 @@ namespace ReSharperPlugin.RiderEfCore.Cli
             public static readonly EfCoreCommandName Script = new EfCoreCommandName(new[] { "migrations", "script" });
         }
 
+        [Obsolete]
         public static class DbContext
         {
             public static readonly EfCoreCommandName Info = new EfCoreCommandName(new[] { "dbcontext", "info" });
