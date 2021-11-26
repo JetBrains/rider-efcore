@@ -4,11 +4,11 @@
 
 ## Commands support roadmap
 ### Migrations
-- [ ] Add migration (`dotnet ef migrations add`)
+- [x] Add migration (`dotnet ef migrations add`)
 - [x] Remove last migration (`dotnet ef migrations remove`)
 
 ### Database
-- [ ] Update database (`dotnet ef database update`)
+- [x] Update database (`dotnet ef database update`)
 - [ ] Drop database (`dotnet ef database drop`)
 
 ### Other
