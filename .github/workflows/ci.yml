@@ -1,0 +1,43 @@
+name: Build Backend and Frontend
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    branches: [ master ]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v2
+
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+
+      - name: Generate RD protocol data
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: rdgen
+
+      - name: Setup .NET CLI
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+
+      - name: Build Plugin Backend
+        working-directory: ./src/dotnet/ReSharperPlugin.RiderEfCore
+        run: dotnet build
+
+      - name: Build Plugin Frontend
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: buildPlugin
