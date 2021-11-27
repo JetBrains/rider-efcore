@@ -1,4 +1,4 @@
-name: Build Backend and Frontend
+name: Build
 on:
   push:
     branches: [ master ]
@@ -23,21 +23,17 @@ jobs:
           java-version: 11
           distribution: 'adopt'
 
-      - name: Generate RD protocol data
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: rdgen
-
       - name: Setup .NET CLI
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
 
-      - name: Build Plugin Backend
-        working-directory: ./src/dotnet/ReSharperPlugin.RiderEfCore
-        run: dotnet build
+      - name: Generate RD protocol data
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: rdgen
 
-      - name: Build Plugin Frontend
+      - name: Build Plugin
         uses: gradle/gradle-build-action@v2
         with:
           arguments: buildPlugin
