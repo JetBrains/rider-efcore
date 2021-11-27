@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.jetbrains.rd.ide.model.ProjectInfo
 import com.jetbrains.rd.ide.model.RiderEfCoreModel
 import com.jetbrains.rd.ide.model.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
@@ -56,6 +57,23 @@ abstract class BaseEfCoreAction: AnAction() {
 
         return actionEvent.project?.solution?.riderEfCoreModel!!
     }
+
+    protected fun <R> buildDialogInstance(actionEvent: AnActionEvent, intellijProject: Project, dialogFactory: DialogBuildParameters.() -> R): R {
+        val model = getEfCoreRiderModel(actionEvent)
+        val migrationsProjects = model.getAvailableMigrationsProjects.sync(Unit).toTypedArray()
+        val startupProjects = model.getAvailableStartupProjects.sync(Unit).toTypedArray()
+        // TODO: Handle case when there is no appropriate projects
+        val dotnetProject = migrationsProjects.find { it.name == actionEvent.getDotnetProjectName() } ?: migrationsProjects.first()
+        val params = DialogBuildParameters(dotnetProject, migrationsProjects, startupProjects)
+
+        return dialogFactory(params)
+    }
+
+    @Suppress("ArrayInDataClass")
+    data class DialogBuildParameters(
+        val currentProject: ProjectInfo,
+        val migrationsProjects: Array<ProjectInfo>,
+        val startupProjects: Array<ProjectInfo>)
 
     private fun refreshSolution() {
         FileDocumentManager.getInstance().saveAllDocuments()

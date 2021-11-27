@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.CCFlags
@@ -10,12 +11,11 @@ import com.jetbrains.rd.ide.model.ProjectInfo
 import javax.swing.JTextField
 
 class AddMigrationDialogWrapper(
+    intellijProject: Project,
     currentProject: ProjectInfo,
     migrationsProjects: Array<ProjectInfo>,
     startupProjects: Array<ProjectInfo>
-) : BaseEfCoreDialogWrapper("Add Migration", currentProject,
-    migrationsProjects,
-    startupProjects) {
+) : BaseEfCoreDialogWrapper("Add Migration", intellijProject, currentProject, migrationsProjects, startupProjects) {
 
     var migrationName = ""
         private set

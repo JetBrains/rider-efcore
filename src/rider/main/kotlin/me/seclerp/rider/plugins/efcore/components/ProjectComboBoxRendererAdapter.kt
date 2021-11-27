@@ -8,7 +8,7 @@ import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
 import javax.swing.ListCellRenderer
 
-class ProjectInfoComboBoxRendererAdapter: ListCellRenderer<ProjectInfo?> {
+class ProjectComboBoxRendererAdapter: ListCellRenderer<ProjectInfo?> {
     private val trueRenderer = DefaultListCellRenderer()
 
     override fun getListCellRendererComponent(

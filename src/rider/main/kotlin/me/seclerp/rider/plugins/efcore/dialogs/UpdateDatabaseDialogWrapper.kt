@@ -16,12 +16,12 @@ import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
-    private val project: Project,
+    private val intellijProject: Project,
     private val model: RiderEfCoreModel,
     currentProject: ProjectInfo,
     migrationsProjects: Array<ProjectInfo>,
     startupProjects: Array<ProjectInfo>
-) : BaseEfCoreDialogWrapper("Update Database", currentProject, migrationsProjects, startupProjects) {
+) : BaseEfCoreDialogWrapper("Update Database", intellijProject, currentProject, migrationsProjects, startupProjects) {
 
     var targetMigration: String = ""
         private set
@@ -38,7 +38,6 @@ class UpdateDatabaseDialogWrapper(
 
     init {
         migrationsProjectNameChangedEvent += ::refreshCompletion
-        super.init()
         init()
     }
 
@@ -62,7 +61,7 @@ class UpdateDatabaseDialogWrapper(
     private fun targetMigrationRow(parent: LayoutBuilder): Row {
         val completionItemsIcon = DotnetIconResolver.resolveForExtension("cs")
         val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(availableMigrationsList, completionItemsIcon)
-        val targetMigrationTextField = TextFieldWithCompletion(project, provider, "Initial", true, true, false, false)
+        val targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
         targetMigrationTextField.document.addDocumentListener(object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
                 targetMigration = event.document.text
@@ -91,7 +90,7 @@ class UpdateDatabaseDialogWrapper(
     }
 
     private fun refreshCompletion(migrationsProject: ProjectInfo) {
-        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, project, "Loading migrations...",
+        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
         );

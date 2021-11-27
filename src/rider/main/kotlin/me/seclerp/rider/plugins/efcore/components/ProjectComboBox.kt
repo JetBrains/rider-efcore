@@ -10,7 +10,7 @@ fun Cell.projectComboBox(model: ComboBoxModel<ProjectInfo>, getter: () -> Projec
     comboBox(model,
         getter,
         setter,
-        ProjectInfoComboBoxRendererAdapter())
+        ProjectComboBoxRendererAdapter())
         .constraints(CCFlags.pushX, CCFlags.growX)
         // Setter provided above called only on submit, so we need additional change detection
         .component.addItemListener {

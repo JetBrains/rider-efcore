@@ -8,7 +8,9 @@ import me.seclerp.rider.plugins.efcore.dialogs.RemoveLastMigrationDialogWrapper
 class RemoveLastMigrationAction : BaseEfCoreAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val intellijProject = actionEvent.project!!
-        val dialog = getDialogInstance(actionEvent)
+        val dialog = buildDialogInstance(actionEvent, intellijProject) {
+            RemoveLastMigrationDialogWrapper(intellijProject, currentProject, migrationsProjects, startupProjects)
+        }
 
         if (dialog.showAndGet()) {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
@@ -18,15 +20,5 @@ class RemoveLastMigrationAction : BaseEfCoreAction() {
                 migrationsClient.removeLast(commonOptions)
             }
         }
-    }
-
-    private fun getDialogInstance(actionEvent: AnActionEvent): RemoveLastMigrationDialogWrapper {
-        val model = getEfCoreRiderModel(actionEvent)
-        val migrationsProject = model.getAvailableMigrationsProjects.sync(Unit).toTypedArray()
-        val startupProject = model.getAvailableStartupProjects.sync(Unit).toTypedArray()
-        // TODO: Handle case when there is no appropriate projects
-        val dotnetProject = migrationsProject.find { it.name == actionEvent.getDotnetProjectName() } ?: migrationsProject.first()
-
-        return RemoveLastMigrationDialogWrapper(dotnetProject, migrationsProject, startupProject)
     }
 }
