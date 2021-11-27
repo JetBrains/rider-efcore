@@ -27,7 +27,7 @@ class AddMigrationDialogWrapper(
     override fun createCenterPanel(): DialogPanel {
         return panel {
             primaryOptions(this) {
-                migrationNameRow(it)
+                migrationNameRow(this)
             }
 
             additionalOptions(this)

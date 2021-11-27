@@ -2,14 +2,12 @@ package me.seclerp.rider.plugins.efcore.dialogs
 
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.Row
 import com.intellij.ui.layout.panel
 import com.jetbrains.rd.ide.model.ProjectInfo
 import me.seclerp.rider.plugins.efcore.Event
-import me.seclerp.rider.plugins.efcore.components.ProjectInfoComboBoxRendererAdapter
-import java.awt.event.ItemEvent
+import me.seclerp.rider.plugins.efcore.components.projectComboBox
 import javax.swing.DefaultComboBoxModel
 
 abstract class BaseEfCoreDialogWrapper(
@@ -42,87 +40,63 @@ abstract class BaseEfCoreDialogWrapper(
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun primaryOptions(it: LayoutBuilder, customOptions: (LayoutBuilder) -> Unit) {
-        customOptions(it)
-        migrationsProjectRow(it)
-        startupProjectRow(it)
+    fun primaryOptions(parent: LayoutBuilder, customOptions: LayoutBuilder.() -> Unit) {
+        customOptions(parent)
+        migrationsProjectRow(parent)
+        startupProjectRow(parent)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun primaryOptions(it: LayoutBuilder) = primaryOptions(it) { }
+    fun primaryOptions(parent: LayoutBuilder) = primaryOptions(parent) { }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun additionalOptions(it: LayoutBuilder, customOptions: (LayoutBuilder) -> Unit) {
-        it.titledRow("Additional") {
-            customOptions(it)
-            noBuildRow(it)
+    fun additionalOptions(parent: LayoutBuilder, customOptions: Row.() -> Unit) {
+        parent.titledRow("Additional Options") {
+            customOptions(this)
+            noBuildRow(this)
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun additionalOptions(it: LayoutBuilder) = additionalOptions(it) { }
+    fun additionalOptions(parent: LayoutBuilder) = additionalOptions(parent) { }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun migrationsProjectRow(it: LayoutBuilder): Row {
+    protected fun migrationsProjectRow(parent: LayoutBuilder): Row {
         val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
-        migrationsProject = currentProject
+        migrationsProjectSetter(currentProject)
 
-        return it.row("Migrations project:") {
-            cell(isFullWidth = true) {
-                comboBox(migrationsBoxModel,
-                    { migrationsProject },
-                    ::migrationsProjectNameSetter,
-                    ProjectInfoComboBoxRendererAdapter())
-                    .constraints(CCFlags.pushX, CCFlags.growX)
-                    // Setter provided above called only on submit, so we need additional change detection
-                    .component.addItemListener {
-                        if (it.stateChange == ItemEvent.SELECTED) {
-                            migrationsProjectNameSetter(it.item as ProjectInfo)
-                        }
-                    }
-            }
+        return parent.row("Migrations project:") {
+            projectComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun startupProjectRow(it: LayoutBuilder): Row {
+    protected fun startupProjectRow(parent: LayoutBuilder): Row {
         val startupBoxModel = DefaultComboBoxModel(startupProjects)
-        startupProject = currentProject
+        startupProjectSetter(currentProject)
 
-        return it.row("Startup project:") {
-            cell(isFullWidth = true) {
-                comboBox(startupBoxModel,
-                    { startupProject },
-                    ::startupProjectNameSetter,
-                    ProjectInfoComboBoxRendererAdapter())
-                    .constraints(CCFlags.pushX, CCFlags.growX)
-                    // Setter provided above called only on submit, so we need additional change detection
-                    .component.addItemListener {
-                        if (it.stateChange == ItemEvent.SELECTED) {
-                            startupProjectNameSetter(it.item as ProjectInfo)
-                        }
-                    }
-            }
+        return parent.row("Startup project:") {
+            projectComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun noBuildRow(it: LayoutBuilder) =
-        it.row {
+    protected fun noBuildRow(parent: Row) =
+        parent.row {
             checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it })
         }
 
-    private fun migrationsProjectNameSetter(it: ProjectInfo?) {
-        if (it == migrationsProject) return
+    private fun migrationsProjectSetter(project: ProjectInfo?) {
+        if (project == migrationsProject) return
 
-        migrationsProject = it
+        migrationsProject = project
         migrationsProjectNameChangedEvent.invoke(migrationsProject!!)
     }
 
-    private fun startupProjectNameSetter(it: ProjectInfo?) {
-        if (it == startupProject) return
+    private fun startupProjectSetter(project: ProjectInfo?) {
+        if (project == startupProject) return
 
-        startupProject = it
+        startupProject = project
         startupProjectNameChangedEvent.invoke(startupProject!!)
     }
 }

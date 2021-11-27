@@ -6,11 +6,12 @@ import me.seclerp.rider.plugins.efcore.commands.CommonOptions
 
 abstract class BaseEfCoreClient {
     protected fun createCommand(command: String, commonOptions: CommonOptions): CliCommand {
-        return createCommand(command, commonOptions) { it }
+        return createCommand(command, commonOptions) { }
     }
 
-    protected fun createCommand(command: String, commonOptions: CommonOptions, customOptionsApplier: (CliCommandBuilder) -> CliCommandBuilder): CliCommand {
-        val commandBuilder = customOptionsApplier(CliCommandBuilder(command, commonOptions))
+    protected fun createCommand(command: String, commonOptions: CommonOptions, customOptionsApplier: CliCommandBuilder.() -> Unit): CliCommand {
+        val commandBuilder = CliCommandBuilder(command, commonOptions)
+        customOptionsApplier(commandBuilder)
 
         return commandBuilder.build()
     }
