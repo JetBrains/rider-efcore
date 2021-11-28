@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rd.ide.model.ProjectInfo
@@ -33,6 +32,7 @@ class UpdateDatabaseDialogWrapper(
     private val availableMigrationsList = mutableListOf<String>()
 
     private lateinit var useDefaultConnectionCheckbox: JCheckBox
+    private lateinit var targetMigrationTextField: TextFieldWithCompletion
 
     init {
         migrationsProjectChangedEvent += ::refreshCompletion
@@ -59,7 +59,7 @@ class UpdateDatabaseDialogWrapper(
     private fun targetMigrationRow(parent: LayoutBuilder): Row {
         val completionItemsIcon = DotnetIconResolver.resolveForExtension("cs")
         val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(availableMigrationsList, completionItemsIcon)
-        val targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
+        targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
         targetMigrationTextField.document.addDocumentListener(object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
                 targetMigration = event.document.text
@@ -81,18 +81,31 @@ class UpdateDatabaseDialogWrapper(
         else null
     }
 
-    private fun connectionValidation(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-        if (it.text.isEmpty())
-            error("Connection could not be empty")
-        else null
-    }
+    // TODO: Investigate why validation not worked properly for disabled fields
+
+    //    private fun connectionValidation(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
+    //        if (it.text.isEmpty())
+    //            error("Connection could not be empty")
+    //        else null
+    //    }
 
     private fun refreshCompletion(migrationsProject: ProjectInfo) {
         val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
-        )
+        )?.map { it.longName }?.sorted()
+
         availableMigrationsList.clear()
-        availableMigrationsList.addAll(0, migrations!!.map { it.longName })
+
+        if (migrations == null || migrations.isEmpty()) {
+            targetMigration = ""
+        } else {
+            val lastMigration = migrations.last()
+            targetMigration = lastMigration
+
+            availableMigrationsList.addAll(0, migrations)
+        }
+
+        targetMigrationTextField.text = targetMigration
     }
 }
