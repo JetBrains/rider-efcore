@@ -10,14 +10,15 @@ using JetBrains.ReSharper.Psi.Modules;
 
 namespace ReSharperPlugin.RiderEfCore.Extensions
 {
-    public static class PsiModuleExtensions
+    public static class PsiExtensions
     {
         public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project, IClrTypeName clrTypeName)
         {
-            var searchDescriptor = project.ToProjectSearchDescriptor();
             var psiServices = module.GetPsiServices();
             var symbolScope = psiServices.Symbols.GetSymbolScope(module, true, true); // caseSensitive should probably come the project language service
             var typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName);
+
+            var a = symbolScope.GetTypeElementsByCLRName(EfCoreKnownTypeNames.MigrationBaseClass);
 
             if (typeElement == null)
             {
@@ -26,6 +27,7 @@ namespace ReSharperPlugin.RiderEfCore.Extensions
 
             var consumer = new SearchResultsConsumer();
             var pi = NullProgressIndicator.Create();
+
             psiServices.Finder.FindInheritors(typeElement, symbolScope, consumer, pi);
 
             return consumer
@@ -36,5 +38,10 @@ namespace ReSharperPlugin.RiderEfCore.Extensions
                 .Where(element => element.GetSourceFiles().All(file => Equals(file.GetProject(), project)))
                 .Cast<IClass>();
         }
+
+        public static IAttributeInstance GetAttributeInstance(this IClass @class, string attributeShortName) =>
+            @class
+                .GetAttributeInstances(AttributesSource.All)
+                .SingleOrDefault(attribute => attribute.GetAttributeShortName() == attributeShortName);
     }
 }

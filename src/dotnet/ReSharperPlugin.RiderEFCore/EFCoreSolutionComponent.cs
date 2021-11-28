@@ -55,9 +55,8 @@ namespace ReSharperPlugin.RiderEfCore
             }
         }
 
-        private RdTask<List<string>> GetAvailableMigrations(Lifetime lifetime, string projectName)
+        private RdTask<List<MigrationInfo>> GetAvailableMigrations(Lifetime lifetime, string projectName)
         {
-            // using (CompilationContextCookie.GetOrCreate(new PsiModuleResolveContext()))
             using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
             using (ReadLockCookie.Create())
             {
@@ -67,13 +66,13 @@ namespace ReSharperPlugin.RiderEfCore
                 var foundMigrations = project
                     .GetPsiModules()
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
-                    .Select(occurence => occurence.GetAttributeInstances(AttributesSource.All)
-                        .SingleOrDefault(attribute => attribute.GetAttributeShortName() == "MigrationAttribute"))
-                    .Where(a => a != null)
-                    .Select(a => a.PositionParameter(0).ConstantValue.Value as string)
+                    .Select(cl => (className: cl.ShortName, attribute: cl.GetAttributeInstance("MigrationAttribute")))
+                    .Where(items => items.attribute != null)
+                    .Select(items => (shortName: items.className, longName: items.attribute.PositionParameter(0).ConstantValue.Value as string))
+                    .Select(migration => new MigrationInfo(migration.shortName, migration.longName))
                     .ToList();
 
-                return RdTask<List<string>>.Successful(foundMigrations);
+                return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
             }
         }
     }

@@ -8,10 +8,13 @@ import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
 import com.jetbrains.rd.ide.model.ProjectInfo
+import com.jetbrains.rd.ide.model.RiderEfCoreModel
+import com.jetbrains.rider.util.idea.runUnderProgress
 import javax.swing.JTextField
 
 class AddMigrationDialogWrapper(
-    intellijProject: Project,
+    private val model: RiderEfCoreModel,
+    private val intellijProject: Project,
     currentProject: ProjectInfo,
     migrationsProjects: Array<ProjectInfo>,
     startupProjects: Array<ProjectInfo>
@@ -20,7 +23,10 @@ class AddMigrationDialogWrapper(
     var migrationName = ""
         private set
 
+    private var existedMigrations: List<String> = listOf()
+
     init {
+        migrationsProjectNameChangedEvent += ::refreshMigrations
         init()
     }
 
@@ -46,7 +52,16 @@ class AddMigrationDialogWrapper(
     private fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
         if (it.text.isEmpty())
             error("Migration name could not be empty")
+        if (existedMigrations.contains(it.text.trim()))
+            error("Migration with such name already exist")
         else
             null
+    }
+
+    private fun refreshMigrations(migrationsProject: ProjectInfo) {
+        existedMigrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
+            isCancelable = true,
+            throwFault = true
+        )!!.map { it.shortName }
     }
 }

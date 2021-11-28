@@ -11,9 +11,14 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("fullPath", string)
     }
 
+    private val MigrationInfo = structdef {
+        field("shortName", string)
+        field("longName", string)
+    }
+
     init {
         call("getAvailableMigrationsProjects", void, immutableList(ProjectInfo))
         call("getAvailableStartupProjects", void, immutableList(ProjectInfo))
-        call("getAvailableMigrations", string, immutableList(string))
+        call("getAvailableMigrations", string, immutableList(MigrationInfo))
     }
 }

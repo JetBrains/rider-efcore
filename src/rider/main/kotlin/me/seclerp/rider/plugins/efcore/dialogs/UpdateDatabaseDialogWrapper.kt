@@ -93,8 +93,8 @@ class UpdateDatabaseDialogWrapper(
         val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
-        );
+        )
         availableMigrationsList.clear()
-        availableMigrationsList.addAll(0, migrations!!)
+        availableMigrationsList.addAll(0, migrations!!.map { it.longName })
     }
 }
