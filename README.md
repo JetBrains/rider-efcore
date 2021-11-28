@@ -24,6 +24,7 @@ There are a couple of UI stuff for:
 
 1. Open solution that contains EF Core related projects (migrations and startup projects)
 2. Navigate to <kbd>Tools</kbd>/<kbd>Entity Framework Core</kbd> under project context menu:
+
    ![Logo](img/how-to-use-1.png)
 
    You could use context menu of either your migrations or startup project.
