@@ -15,10 +15,8 @@ import javax.swing.JTextField
 class AddMigrationDialogWrapper(
     private val model: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentProject: ProjectInfo,
-    migrationsProjects: Array<ProjectInfo>,
-    startupProjects: Array<ProjectInfo>
-) : BaseEfCoreDialogWrapper("Add Migration", intellijProject, currentProject, migrationsProjects, startupProjects) {
+    currentDotnetProjectName: String,
+) : BaseEfCoreDialogWrapper("Add Migration", model, intellijProject, currentDotnetProjectName, false) {
 
     var migrationName = ""
         private set
@@ -26,7 +24,7 @@ class AddMigrationDialogWrapper(
     private var existedMigrations: List<String> = listOf()
 
     init {
-        migrationsProjectNameChangedEvent += ::refreshMigrations
+        migrationsProjectChangedEvent += ::refreshMigrations
         init()
     }
 

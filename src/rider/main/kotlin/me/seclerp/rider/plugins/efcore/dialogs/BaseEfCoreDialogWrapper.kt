@@ -1,12 +1,17 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.Row
+import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
 import com.jetbrains.rd.ide.model.ProjectInfo
+import com.jetbrains.rd.ide.model.RiderEfCoreModel
+import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.Event
 import me.seclerp.rider.plugins.efcore.components.projectComboBox
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
@@ -14,10 +19,10 @@ import javax.swing.DefaultComboBoxModel
 
 abstract class BaseEfCoreDialogWrapper(
     title: String,
+    private val model: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val currentProject: ProjectInfo,
-    private val migrationsProjects: Array<ProjectInfo>,
-    private val startupProjects: Array<ProjectInfo>
+    private val currentDotnetProjectName: String,
+    private val shouldHaveMigrationsInProject: Boolean = false
 ): DialogWrapper(true) {
     var migrationsProject: ProjectInfo? = null
         private set
@@ -28,9 +33,15 @@ abstract class BaseEfCoreDialogWrapper(
     var noBuild = false
         private set
 
-    protected val migrationsProjectNameChangedEvent: Event<ProjectInfo> = Event()
+    private val migrationsProjects: Array<ProjectInfo> = model.getAvailableMigrationsProjects.sync(Unit).toTypedArray()
+    private val startupProjects: Array<ProjectInfo> = model.getAvailableStartupProjects.sync(Unit).toTypedArray()
+    private val dotnetProject = migrationsProjects.find { it.name == currentDotnetProjectName } ?: migrationsProjects.first()
 
-    protected val startupProjectNameChangedEvent: Event<ProjectInfo> = Event()
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val migrationsProjectChangedEvent: Event<ProjectInfo> = Event()
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val startupProjectChangedEvent: Event<ProjectInfo> = Event()
 
     init {
         this.title = title
@@ -76,7 +87,12 @@ abstract class BaseEfCoreDialogWrapper(
         val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
 
         return parent.row("Migrations project:") {
-            projectComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
+            val migrationsProjectBox = projectComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
+            if (shouldHaveMigrationsInProject) {
+                migrationsProjectBox
+                    .withValidationOnInput(migrationsProjectValidation())
+                    .withValidationOnApply(migrationsProjectValidation())
+            }
         }
     }
 
@@ -96,7 +112,7 @@ abstract class BaseEfCoreDialogWrapper(
         }
 
     private fun loadPreferredProjects() {
-        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(currentProject.name)
+        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProject.name)
         if (preferredProjects != null) {
             val (migrationsProjectName, startupProjectName) = preferredProjects
             val migrationsProject = migrationsProjects.find { it.name == migrationsProjectName } ?: migrationsProjects.first()
@@ -105,8 +121,25 @@ abstract class BaseEfCoreDialogWrapper(
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
         } else {
-            migrationsProjectSetter(migrationsProjects.find { it.name == currentProject.name } ?: migrationsProjects.first())
-            startupProjectSetter(startupProjects.find { it.name == currentProject.name } ?: startupProjects.first())
+            migrationsProjectSetter(migrationsProjects.find { it.name == dotnetProject.name } ?: migrationsProjects.first())
+            startupProjectSetter(startupProjects.find { it.name == dotnetProject.name } ?: startupProjects.first())
+        }
+    }
+
+    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<ProjectInfo>) -> ValidationInfo? = {
+        if (migrationsProject == null)
+            null
+
+        else {
+            val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.name, intellijProject, "Checking migrations...",
+                isCancelable = true,
+                throwFault = true
+            )
+
+            if (hasMigrations == null || !hasMigrations)
+                error("Selected migrations project doesn't have migrations")
+            else
+                null
         }
     }
 
@@ -114,13 +147,13 @@ abstract class BaseEfCoreDialogWrapper(
         if (project == migrationsProject) return
 
         migrationsProject = project
-        migrationsProjectNameChangedEvent.invoke(migrationsProject!!)
+        migrationsProjectChangedEvent.invoke(migrationsProject!!)
     }
 
     private fun startupProjectSetter(project: ProjectInfo?) {
         if (project == startupProject) return
 
         startupProject = project
-        startupProjectNameChangedEvent.invoke(startupProject!!)
+        startupProjectChangedEvent.invoke(startupProject!!)
     }
 }

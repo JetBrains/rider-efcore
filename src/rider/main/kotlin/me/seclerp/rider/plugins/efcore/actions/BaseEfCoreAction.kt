@@ -58,22 +58,19 @@ abstract class BaseEfCoreAction: AnAction() {
         return actionEvent.project?.solution?.riderEfCoreModel!!
     }
 
-    protected fun <R> buildDialogInstance(actionEvent: AnActionEvent, intellijProject: Project, dialogFactory: DialogBuildParameters.() -> R): R {
+    protected fun <R> buildDialogInstance(actionEvent: AnActionEvent, dialogFactory: DialogBuildParameters.() -> R): R {
         val model = getEfCoreRiderModel(actionEvent)
-        val migrationsProjects = model.getAvailableMigrationsProjects.sync(Unit).toTypedArray()
-        val startupProjects = model.getAvailableStartupProjects.sync(Unit).toTypedArray()
+        val currentDotnetProjectName = actionEvent.getDotnetProjectName()
         // TODO: Handle case when there is no appropriate projects
-        val dotnetProject = migrationsProjects.find { it.name == actionEvent.getDotnetProjectName() } ?: migrationsProjects.first()
-        val params = DialogBuildParameters(dotnetProject, migrationsProjects, startupProjects)
+        val params = DialogBuildParameters(model, currentDotnetProjectName)
 
         return dialogFactory(params)
     }
 
     @Suppress("ArrayInDataClass")
     data class DialogBuildParameters(
-        val currentProject: ProjectInfo,
-        val migrationsProjects: Array<ProjectInfo>,
-        val startupProjects: Array<ProjectInfo>)
+        val model: RiderEfCoreModel,
+        val currentDotnetProjectName: String)
 
     private fun refreshSolution() {
         FileDocumentManager.getInstance().saveAllDocuments()

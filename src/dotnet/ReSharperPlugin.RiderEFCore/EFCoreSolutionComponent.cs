@@ -28,6 +28,7 @@ namespace ReSharperPlugin.RiderEfCore
 
             riderProjectOutputModel.GetAvailableMigrationsProjects.Set(GetAvailableMigrationsProjects);
             riderProjectOutputModel.GetAvailableStartupProjects.Set(GetAvailableStartupProjects);
+            riderProjectOutputModel.HasAvailableMigrations.Set(HasAvailableMigrations);
             riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
         }
 
@@ -52,6 +53,21 @@ namespace ReSharperPlugin.RiderEfCore
                     .ToList();
 
                 return RdTask<List<ProjectInfo>>.Successful(allProjectNames);
+            }
+        }
+
+        private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, string projectName)
+        {
+            using (ReadLockCookie.Create())
+            {
+                var project = _solution.GetProjectByName(projectName);
+
+                var projectHasMigrations = project
+                    ?.GetPsiModules()
+                    ?.SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
+                    .Any();
+
+                return RdTask<bool>.Successful(projectHasMigrations ?? false);
             }
         }
 

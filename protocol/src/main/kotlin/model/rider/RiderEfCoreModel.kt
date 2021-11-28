@@ -19,6 +19,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     init {
         call("getAvailableMigrationsProjects", void, immutableList(ProjectInfo))
         call("getAvailableStartupProjects", void, immutableList(ProjectInfo))
+        call("hasAvailableMigrations", string, bool)
         call("getAvailableMigrations", string, immutableList(MigrationInfo))
     }
 }

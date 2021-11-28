@@ -16,12 +16,10 @@ import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
-    private val intellijProject: Project,
     private val model: RiderEfCoreModel,
-    currentProject: ProjectInfo,
-    migrationsProjects: Array<ProjectInfo>,
-    startupProjects: Array<ProjectInfo>
-) : BaseEfCoreDialogWrapper("Update Database", intellijProject, currentProject, migrationsProjects, startupProjects) {
+    private val intellijProject: Project,
+    currentDotnetProjectName: String,
+) : BaseEfCoreDialogWrapper("Update Database", model, intellijProject, currentDotnetProjectName, true) {
 
     var targetMigration: String = ""
         private set
@@ -37,7 +35,7 @@ class UpdateDatabaseDialogWrapper(
     private lateinit var useDefaultConnectionCheckbox: JCheckBox
 
     init {
-        migrationsProjectNameChangedEvent += ::refreshCompletion
+        migrationsProjectChangedEvent += ::refreshCompletion
         init()
     }
 

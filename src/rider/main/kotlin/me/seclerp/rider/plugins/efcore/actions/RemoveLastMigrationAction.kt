@@ -8,8 +8,8 @@ import me.seclerp.rider.plugins.efcore.dialogs.RemoveLastMigrationDialogWrapper
 class RemoveLastMigrationAction : BaseEfCoreAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val intellijProject = actionEvent.project!!
-        val dialog = buildDialogInstance(actionEvent, intellijProject) {
-            RemoveLastMigrationDialogWrapper(intellijProject, currentProject, migrationsProjects, startupProjects)
+        val dialog = buildDialogInstance(actionEvent) {
+            RemoveLastMigrationDialogWrapper(model, intellijProject, currentDotnetProjectName)
         }
 
         if (dialog.showAndGet()) {

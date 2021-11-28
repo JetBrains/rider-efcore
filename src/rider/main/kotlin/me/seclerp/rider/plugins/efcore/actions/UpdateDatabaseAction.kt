@@ -8,9 +8,8 @@ import me.seclerp.rider.plugins.efcore.dialogs.UpdateDatabaseDialogWrapper
 class UpdateDatabaseAction : BaseEfCoreAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val intellijProject = actionEvent.project!!
-        val dialog = buildDialogInstance(actionEvent, intellijProject) {
-            val model = getEfCoreRiderModel(actionEvent)
-            UpdateDatabaseDialogWrapper(intellijProject, model, currentProject, migrationsProjects, startupProjects)
+        val dialog = buildDialogInstance(actionEvent) {
+            UpdateDatabaseDialogWrapper(model, intellijProject, currentDotnetProjectName)
         }
 
         if (dialog.showAndGet()) {
