@@ -14,6 +14,11 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         myState = state
     }
 
+    fun clearPreferredProjects(prevMigrationsProject: String, prevStartupProject: String) {
+        myState.migrationsToStartupProjects.remove(prevMigrationsProject)
+        myState.startupToMigrationsProjects.remove(prevStartupProject)
+    }
+
     fun setPreferredProjectsPair(migrationsProject: String, startupProject: String) {
         myState.migrationsToStartupProjects[migrationsProject] = startupProject
         myState.startupToMigrationsProjects[startupProject] = migrationsProject

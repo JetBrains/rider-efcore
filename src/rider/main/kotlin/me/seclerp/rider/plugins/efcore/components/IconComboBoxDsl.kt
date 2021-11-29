@@ -4,26 +4,27 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.Cell
 import com.intellij.ui.layout.CellBuilder
-import com.jetbrains.rd.ide.model.ProjectInfo
 import java.awt.event.ItemEvent
 import javax.swing.ComboBoxModel
 
-fun Cell.projectComboBox(model: ComboBoxModel<ProjectInfo>,
-                         getter: () -> ProjectInfo?,
-                         setter: (ProjectInfo?) -> Unit): CellBuilder<ComboBox<ProjectInfo>> {
-    val projectComboBoxBuilder =
+fun <T> Cell.iconComboBox(
+    model: ComboBoxModel<IconItem<T>>,
+    getter: () -> IconItem<T>?,
+    setter: (IconItem<T>?) -> Unit): CellBuilder<ComboBox<IconItem<T>>> {
+
+    val comboBoxBuilder =
         comboBox(model,
             getter,
             setter,
-            ProjectComboBoxRendererAdapter())
+            IconComboBoxRendererAdapter())
             .constraints(CCFlags.pushX, CCFlags.growX)
 
     // Setter provided above called only on submit, so we need additional change detection
-    projectComboBoxBuilder.component.addItemListener {
+    comboBoxBuilder.component.addItemListener {
         if (it.stateChange == ItemEvent.SELECTED) {
-            setter(it.item as ProjectInfo)
+            setter(it.item as IconItem<T>)
         }
     }
 
-    return projectComboBoxBuilder
+    return comboBoxBuilder
 }

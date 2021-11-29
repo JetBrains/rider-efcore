@@ -5,15 +5,18 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.ui.layout.LayoutBuilder
-import com.intellij.ui.layout.Row
-import com.intellij.ui.layout.ValidationInfoBuilder
-import com.intellij.ui.layout.panel
-import com.jetbrains.rd.ide.model.ProjectInfo
-import com.jetbrains.rd.ide.model.RiderEfCoreModel
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.layout.*
+import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.rider.plugins.efcore.DotnetIconResolver
+import me.seclerp.rider.plugins.efcore.DotnetIconType
 import me.seclerp.rider.plugins.efcore.Event
-import me.seclerp.rider.plugins.efcore.components.projectComboBox
+import me.seclerp.rider.plugins.efcore.components.IconItem
+import me.seclerp.rider.plugins.efcore.components.iconComboBox
+import me.seclerp.rider.plugins.efcore.models.StartupProjectData
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.toIconItem
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
 import javax.swing.DefaultComboBoxModel
 
@@ -24,27 +27,56 @@ abstract class BaseEfCoreDialogWrapper(
     private val currentDotnetProjectName: String,
     private val shouldHaveMigrationsInProject: Boolean = false
 ): DialogWrapper(true) {
-    var migrationsProject: ProjectInfo? = null
+    var migrationsProject: IconItem<String>? = null
         private set
 
-    var startupProject: ProjectInfo? = null
+    var startupProject: IconItem<StartupProjectData>? = null
+        private set
+
+    var buildConfiguration: IconItem<Unit>? = null
+        private set
+
+    var targetFramework: IconItem<Unit>? = null
         private set
 
     var noBuild = false
         private set
 
-    private val migrationsProjects: Array<ProjectInfo> = model.getAvailableMigrationsProjects.sync(Unit).toTypedArray()
-    private val startupProjects: Array<ProjectInfo> = model.getAvailableStartupProjects.sync(Unit).toTypedArray()
-    private val dotnetProject = migrationsProjects.find { it.name == currentDotnetProjectName } ?: migrationsProjects.first()
+    private val migrationsProjects: Array<IconItem<String>>
+    private val startupProjects: Array<IconItem<StartupProjectData>>
+    private val dotnetProject: IconItem<String>
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val migrationsProjectChangedEvent: Event<ProjectInfo> = Event()
+    protected val migrationsProjectChangedEvent: Event<IconItem<String>> = Event()
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val startupProjectChangedEvent: Event<ProjectInfo> = Event()
+    protected val startupProjectChangedEvent: Event<IconItem<StartupProjectData>> = Event()
+
+    private lateinit var noBuildCheckbox: JBCheckBox
+    private lateinit var buildConfigurationModel: DefaultComboBoxModel<IconItem<Unit>>
+    private lateinit var targetFrameworkModel: DefaultComboBoxModel<IconItem<Unit>>
+
+    private var prevPreferredMigrationsProjectName: String? = null
+    private var prevPreferredStartupProjectName: String? = null
 
     init {
         this.title = title
+
+        migrationsProjects = model.getAvailableMigrationsProjects
+            .sync(Unit)
+            .map { it.toIconItem() }
+            .toTypedArray()
+
+        startupProjects = model.getAvailableStartupProjects
+            .sync(Unit)
+            .map { it.toIconItem() }
+            .toTypedArray()
+
+        dotnetProject = migrationsProjects.find { it.displayName == currentDotnetProjectName } ?: migrationsProjects.first()
+
+        startupProjectChangedEvent += ::startupProjectChanged
+
+        targetFrameworkModel = DefaultComboBoxModel<IconItem<Unit>>()
     }
 
     override fun createCenterPanel(): DialogPanel {
@@ -57,7 +89,12 @@ abstract class BaseEfCoreDialogWrapper(
     override fun doOKAction() {
         super.doOKAction()
 
-        CommonOptionsStateService.getInstance(intellijProject).setPreferredProjectsPair(migrationsProject!!.name, startupProject!!.name)
+        val commonOptionsService = CommonOptionsStateService.getInstance(intellijProject)
+
+        if (prevPreferredMigrationsProjectName != null && prevPreferredStartupProjectName != null)
+            commonOptionsService.clearPreferredProjects(prevPreferredMigrationsProjectName!!, prevPreferredStartupProjectName!!)
+
+        commonOptionsService.setPreferredProjectsPair(migrationsProject!!.displayName, startupProject!!.displayName)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -75,19 +112,22 @@ abstract class BaseEfCoreDialogWrapper(
     fun additionalOptions(parent: LayoutBuilder, customOptions: Row.() -> Unit) {
         parent.titledRow("Additional Options") {
             customOptions(this)
-            noBuildRow(this)
         }
+
+        buildOptionsRow(parent)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    fun additionalOptions(parent: LayoutBuilder) = additionalOptions(parent) { }
+    fun additionalOptions(parent: LayoutBuilder) {
+        buildOptionsRow(parent)
+    }
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun migrationsProjectRow(parent: LayoutBuilder): Row {
         val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
 
         return parent.row("Migrations project:") {
-            val migrationsProjectBox = projectComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
+            val migrationsProjectBox = iconComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
             if (shouldHaveMigrationsInProject) {
                 migrationsProjectBox
                     .withValidationOnInput(migrationsProjectValidation())
@@ -101,37 +141,76 @@ abstract class BaseEfCoreDialogWrapper(
         val startupBoxModel = DefaultComboBoxModel(startupProjects)
 
         return parent.row("Startup project:") {
-            projectComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
+            iconComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun noBuildRow(parent: Row) =
-        parent.row {
-            checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it })
+    protected fun buildOptionsRow(parent: LayoutBuilder) =
+        parent.titledRow("Build Options") {
+            noBuildRow(this)
+
+            buildConfigurationRow(this)
+                .enableIf(noBuildCheckbox.selected.not())
+
+            targetFrameworkRow(this)
+                .enableIf(noBuildCheckbox.selected.not())
         }
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun noBuildRow(parent: Row) =
+        parent.row {
+            noBuildCheckbox = checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it }).component
+        }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun buildConfigurationRow(parent: Row): Row {
+        val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value!!
+
+        val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection.valueOrNull!!
+            .map { IconItem(it.configuration, DotnetIconResolver.resolveForType(DotnetIconType.BUILD_CONFIGURATION), Unit) }
+            .toTypedArray()
+
+        buildConfigurationModel = DefaultComboBoxModel(availableConfigurations)
+        buildConfiguration = availableConfigurations.find { it.displayName == currentConfiguration.configuration }
+            ?: availableConfigurations.first()
+
+        return parent.row("Build configuration:") {
+            iconComboBox(buildConfigurationModel, { buildConfiguration }, ::buildConfigurationSetter)
+        }
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun targetFrameworkRow(parent: Row): Row {
+
+        return parent.row("Target framework:") {
+            iconComboBox(targetFrameworkModel, { targetFramework }, ::targetFrameworkSetter)
+        }
+    }
+
     private fun loadPreferredProjects() {
-        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProject.name)
+        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProject.displayName)
         if (preferredProjects != null) {
             val (migrationsProjectName, startupProjectName) = preferredProjects
-            val migrationsProject = migrationsProjects.find { it.name == migrationsProjectName } ?: migrationsProjects.first()
-            val startupProject = startupProjects.find { it.name == startupProjectName } ?: startupProjects.first()
+            prevPreferredMigrationsProjectName = migrationsProjectName
+            prevPreferredStartupProjectName = startupProjectName
+            val migrationsProject = migrationsProjects.find { it.displayName == migrationsProjectName } ?: migrationsProjects.first()
+            val startupProject = startupProjects.find { it.displayName == startupProjectName } ?: startupProjects.first()
 
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
         } else {
-            migrationsProjectSetter(migrationsProjects.find { it.name == dotnetProject.name } ?: migrationsProjects.first())
-            startupProjectSetter(startupProjects.find { it.name == dotnetProject.name } ?: startupProjects.first())
+            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProject.displayName } ?: migrationsProjects.first())
+            startupProjectSetter(startupProjects.find { it.displayName == dotnetProject.displayName } ?: startupProjects.first())
         }
     }
 
-    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<ProjectInfo>) -> ValidationInfo? = {
+    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<IconItem<String>>) -> ValidationInfo? = {
         if (migrationsProject == null)
             null
 
         else {
-            val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.name, intellijProject, "Checking migrations...",
+            val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Checking migrations...",
                 isCancelable = true,
                 throwFault = true
             )
@@ -143,17 +222,43 @@ abstract class BaseEfCoreDialogWrapper(
         }
     }
 
-    private fun migrationsProjectSetter(project: ProjectInfo?) {
+    private fun migrationsProjectSetter(project: IconItem<String>?) {
         if (project == migrationsProject) return
 
         migrationsProject = project
         migrationsProjectChangedEvent.invoke(migrationsProject!!)
     }
 
-    private fun startupProjectSetter(project: ProjectInfo?) {
+    private fun startupProjectSetter(project: IconItem<StartupProjectData>?) {
         if (project == startupProject) return
 
         startupProject = project
         startupProjectChangedEvent.invoke(startupProject!!)
+    }
+
+    private fun buildConfigurationSetter(configuration: IconItem<Unit>?) {
+        if (configuration == buildConfiguration) return
+
+        buildConfiguration = configuration
+    }
+
+    private fun targetFrameworkSetter(framework: IconItem<Unit>?) {
+        if (framework == targetFramework) return
+
+        targetFramework = framework
+    }
+
+    private fun startupProjectChanged(project: IconItem<StartupProjectData>?) {
+        targetFrameworkModel.removeAllElements()
+
+        if (project == null) return
+
+        val configurationIconItems = project.data.targetFrameworks
+            .map { IconItem(it, DotnetIconResolver.resolveForType(DotnetIconType.TARGET_FRAMEWORK), Unit) }
+
+        targetFrameworkModel.addAll(configurationIconItems)
+
+        // TODO: Handle if there is 0 build configurations
+        targetFramework = configurationIconItems.first()
     }
 }

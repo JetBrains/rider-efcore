@@ -5,12 +5,14 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
+using JetBrains.RdBackend.Common.Features.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Model;
 using JetBrains.Util;
+using Microsoft.CodeAnalysis;
 using Rider.Plugins.EfCore.Extensions;
+using Rider.Plugins.EfCore.Rd;
 
 namespace Rider.Plugins.EfCore
 {
@@ -31,27 +33,30 @@ namespace Rider.Plugins.EfCore
             riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
         }
 
-        private RdTask<List<ProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
+        private RdTask<List<MigrationsProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
         {
             using (ReadLockCookie.Create())
             {
                 var allProjectNames = EfCoreHelper.GetSupportedMigrationProjects(_solution)
-                    .Select(project => new ProjectInfo(project.Name, project.ProjectFileLocation.FullPath))
+                    .Select(project => new MigrationsProjectInfo(project.Name, project.ProjectFileLocation.FullPath))
                     .ToList();
 
-                return RdTask<List<ProjectInfo>>.Successful(allProjectNames);
+                return RdTask<List<MigrationsProjectInfo>>.Successful(allProjectNames);
             }
         }
 
-        private RdTask<List<ProjectInfo>> GetAvailableStartupProjects(Lifetime lifetime, Unit _)
+        private RdTask<List<StartupProjectInfo>> GetAvailableStartupProjects(Lifetime lifetime, Unit _)
         {
             using (ReadLockCookie.Create())
             {
                 var allProjectNames = EfCoreHelper.GetSupportedStartupProjects(_solution)
-                    .Select(project => new ProjectInfo(project.Name, project.ProjectFileLocation.FullPath))
+                    .Select(project => new StartupProjectInfo(
+                        project.Name,
+                        project.ProjectFileLocation.FullPath,
+                        project.TargetFrameworkIds.Select(fr => fr.PresentableString).ToList()))
                     .ToList();
 
-                return RdTask<List<ProjectInfo>>.Successful(allProjectNames);
+                return RdTask<List<StartupProjectInfo>>.Successful(allProjectNames);
             }
         }
 

@@ -10,9 +10,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.jetbrains.rd.ide.model.ProjectInfo
-import com.jetbrains.rd.ide.model.RiderEfCoreModel
-import com.jetbrains.rd.ide.model.riderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.commands.CliCommandResult
 import me.seclerp.rider.plugins.efcore.dialogs.BaseEfCoreDialogWrapper
@@ -25,8 +24,8 @@ abstract class BaseEfCoreAction: AnAction() {
 
     fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions =
         CommonOptions(
-            dialog.migrationsProject!!.fullPath,
-            dialog.startupProject!!.fullPath,
+            dialog.migrationsProject!!.data,
+            dialog.startupProject!!.data.fullPath,
             dialog.noBuild
         )
 

@@ -9,11 +9,6 @@ class CliCommand(private val fullCommand: String) {
             val runtime = Runtime.getRuntime()
             val proc = runtime.exec(fullCommand)
 
-//            val proc = ProcessBuilder(fullCommand)
-//                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-//                .redirectError(ProcessBuilder.Redirect.PIPE)
-//                .start()
-
             proc.waitFor(60, TimeUnit.MINUTES)
 
             val output = proc.inputStream.bufferedReader().readText()

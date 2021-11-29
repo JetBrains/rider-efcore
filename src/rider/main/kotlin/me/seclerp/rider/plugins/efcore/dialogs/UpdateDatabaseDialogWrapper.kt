@@ -8,10 +8,10 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.layout.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
-import com.jetbrains.rd.ide.model.ProjectInfo
-import com.jetbrains.rd.ide.model.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
+import me.seclerp.rider.plugins.efcore.components.IconItem
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
@@ -77,7 +77,7 @@ class UpdateDatabaseDialogWrapper(
         if (it.text.isEmpty())
             error("Target migration could not be empty")
         else if (!availableMigrationsList.contains(it.text))
-            warning("Migration with such name doesn't exist")
+            error("Migration with such name doesn't exist")
         else null
     }
 
@@ -89,8 +89,8 @@ class UpdateDatabaseDialogWrapper(
     //        else null
     //    }
 
-    private fun refreshCompletion(migrationsProject: ProjectInfo) {
-        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
+    private fun refreshCompletion(migrationsProject: IconItem<String>) {
+        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.displayName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
         )?.map { it.longName }?.sorted()

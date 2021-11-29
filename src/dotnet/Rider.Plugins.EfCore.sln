@@ -6,11 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rider.Plugins.EfCore.Tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{4A9ABB95-3762-448B-B5BF-099E46DB22DE}"
 ProjectSection(SolutionItems) = preProject
-	src\dotnet\Plugin.props = src\dotnet\Plugin.props
-	README.md = README.md
-	CHANGELOG.md = CHANGELOG.md
-	src\rider\main\resources\META-INF\plugin.xml = src\rider\main\resources\META-INF\plugin.xml
-	gradle.properties = gradle.properties
+	Plugin.props = Plugin.props
+	..\..\README.md = ..\..\README.md
+	..\..\CHANGELOG.md = ..\..\CHANGELOG.md
+	..\rider\main\resources\META-INF\plugin.xml = ..\rider\main\resources\META-INF\plugin.xml
+	..\..\gradle.properties = ..\..\gradle.properties
 EndProjectSection
 EndProject
 Global

@@ -1,7 +1,7 @@
 package me.seclerp.rider.plugins.efcore.dialogs
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rd.ide.model.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
 class RemoveLastMigrationDialogWrapper(
     model: RiderEfCoreModel,

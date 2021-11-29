@@ -7,9 +7,9 @@ import com.intellij.ui.layout.CCFlags
 import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
-import com.jetbrains.rd.ide.model.ProjectInfo
-import com.jetbrains.rd.ide.model.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.rider.plugins.efcore.components.IconItem
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import javax.swing.JTextField
 
 class AddMigrationDialogWrapper(
@@ -48,16 +48,16 @@ class AddMigrationDialogWrapper(
         }
 
     private fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
-        if (it.text.isEmpty())
+        if (it.text.trim().isEmpty())
             error("Migration name could not be empty")
-        if (existedMigrations.contains(it.text.trim()))
+        else if (existedMigrations.contains(it.text.trim()))
             error("Migration with such name already exist")
         else
             null
     }
 
-    private fun refreshMigrations(migrationsProject: ProjectInfo) {
-        existedMigrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.name, intellijProject, "Loading migrations...",
+    private fun refreshMigrations(migrationsProjectItem: IconItem<String>) {
+        existedMigrations = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
         )!!.map { it.shortName }
