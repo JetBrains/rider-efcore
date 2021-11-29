@@ -3,7 +3,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     [RegisterConfigurableSeverity(
         SampleHighlighting.SeverityId,

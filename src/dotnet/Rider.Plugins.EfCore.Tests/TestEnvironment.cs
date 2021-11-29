@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 [assembly: Apartment(ApartmentState.STA)]
 
-namespace ReSharperPlugin.RiderEfCore.Tests
+namespace Rider.Plugins.EfCore.Tests
 {
 
     [ZoneDefinition]

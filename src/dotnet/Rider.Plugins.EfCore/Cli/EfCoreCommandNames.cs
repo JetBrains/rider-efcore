@@ -1,6 +1,6 @@
 using System;
 
-namespace ReSharperPlugin.RiderEfCore.Cli
+namespace Rider.Plugins.EfCore.Cli
 {
     [Obsolete("Remove when all commands will be implemented on frontend")]
     public static class EfCoreCommandNames

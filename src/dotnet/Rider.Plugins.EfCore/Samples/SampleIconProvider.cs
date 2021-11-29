@@ -4,7 +4,7 @@ using JetBrains.ReSharper.ExternalSources.Resources;
 using JetBrains.ReSharper.Psi;
 using JetBrains.UI.Icons;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     [SolutionComponent]
     public class SampleIconProvider : IDeclaredElementIconProvider

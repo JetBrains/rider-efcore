@@ -6,7 +6,7 @@ using JetBrains.ProjectModel.DataContext;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     [Action("SampleAction", "Do Something")]
     public class SampleAction : IActionWithExecuteRequirement, IExecutableAction

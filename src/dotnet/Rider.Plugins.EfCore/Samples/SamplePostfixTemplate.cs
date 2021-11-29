@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     [PostfixTemplate("writeLine", "WriteLine an expression", "Console.WriteLine(expr)")]
     public class SamplePostfixTemplate : CSharpPostfixTemplate

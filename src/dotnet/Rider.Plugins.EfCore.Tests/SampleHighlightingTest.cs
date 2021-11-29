@@ -4,9 +4,9 @@ using JetBrains.ReSharper.FeaturesTestFramework.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.TestFramework;
 using NUnit.Framework;
-using ReSharperPlugin.RiderEfCore.Samples;
+using Rider.Plugins.EfCore.Samples;
 
-namespace ReSharperPlugin.RiderEfCore.Tests
+namespace Rider.Plugins.EfCore.Tests
 {
   public class SampleHighlightingTest : CSharpHighlightingTestBase
   {

@@ -3,11 +3,11 @@
   <PropertyGroup>
     <SdkVersion>2021.2.0</SdkVersion>
 
-    <Title>RiderEfCore</Title>
-    <Description>Description</Description>
+    <Title>Entity Framework Core</Title>
+    <Description>JetBrains Rider plugin for Entity Framework Core</Description>
 
-    <Authors>Author</Authors>
-    <Copyright>Copyright $([System.DateTime]::Now.Year) Maintainers of RiderEfCore</Copyright>
+    <Authors>seclerp</Authors>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) seclerp</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
     <PackageProjectUrl></PackageProjectUrl>

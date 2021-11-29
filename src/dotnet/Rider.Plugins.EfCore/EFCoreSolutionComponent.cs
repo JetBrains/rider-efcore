@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Core;
@@ -11,9 +10,9 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
-using ReSharperPlugin.RiderEfCore.Extensions;
+using Rider.Plugins.EfCore.Extensions;
 
-namespace ReSharperPlugin.RiderEfCore
+namespace Rider.Plugins.EfCore
 {
     [SolutionComponent]
     public class EfCoreSolutionComponent

@@ -2,7 +2,7 @@
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     [ShellComponent]
     internal class SampleQuickFixRegistrarComponent

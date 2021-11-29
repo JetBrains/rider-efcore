@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Search;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
-namespace ReSharperPlugin.RiderEfCore
+namespace Rider.Plugins.EfCore
 {
     public static class EfCoreHelper
     {

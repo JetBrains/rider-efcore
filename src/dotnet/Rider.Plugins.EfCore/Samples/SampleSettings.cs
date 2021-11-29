@@ -1,7 +1,7 @@
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.WellKnownRootKeys;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     // Settings that can persist in dotSettings files
     [SettingsKey(

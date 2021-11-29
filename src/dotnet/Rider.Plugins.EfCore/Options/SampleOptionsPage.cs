@@ -10,9 +10,9 @@ using JetBrains.IDE.UI.Options;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Feature.Services.Daemon.OptionPages;
 using JetBrains.Rider.Model.UIAutomation;
-using ReSharperPlugin.RiderEfCore.Samples;
+using Rider.Plugins.EfCore.Samples;
 
-namespace ReSharperPlugin.RiderEfCore.Options
+namespace Rider.Plugins.EfCore.Options
 {
     [OptionsPage(Id, PageTitle, typeof(OptionsThemedIcons.EnvironmentGeneral),
         ParentId = CodeInspectionPage.PID

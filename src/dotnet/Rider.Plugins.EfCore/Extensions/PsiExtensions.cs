@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Feature.Services.Occurrences;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 
-namespace ReSharperPlugin.RiderEfCore.Extensions
+namespace Rider.Plugins.EfCore.Extensions
 {
     public static class PsiExtensions
     {

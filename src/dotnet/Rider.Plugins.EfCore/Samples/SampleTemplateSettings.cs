@@ -4,7 +4,7 @@ using JetBrains.Application.Settings;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 
-namespace ReSharperPlugin.RiderEfCore.Samples
+namespace Rider.Plugins.EfCore.Samples
 {
     // Templates (or settings in general) that ship with the plugin
     [ShellComponent]
