@@ -18,4 +18,12 @@ class DatabaseClient : BaseEfCoreClient() {
 
         return command.execute()
     }
+
+    fun drop(options: CommonOptions): CliCommandResult {
+        val command = createCommand(KnownEfCommands.Database.drop, options) {
+            add("--force")
+        }
+
+        return command.execute()
+    }
 }

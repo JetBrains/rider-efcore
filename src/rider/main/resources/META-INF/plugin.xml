@@ -23,11 +23,15 @@
       <action id="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction"
               text="Add Migration" description="Add new code-first migration">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabase" class="me.seclerp.rider.plugins.efcore.actions.UpdateDatabaseAction"
-              text="Update Database" description="Update database using one of migration as a target">
-      </action>
       <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.RemoveLastMigrationAction"
               text="Remove Last Migration" description="Removes last created migration">
+      </action>
+      <separator />
+      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.UpdateDatabaseAction"
+              text="Update Database" description="Update database using one of migration as a target">
+      </action>
+      <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.DropDatabaseAction"
+              text="Drop Database" description="Drop database used by a DbContext">
       </action>
     </group>
   </actions>
