@@ -33,6 +33,9 @@ abstract class BaseEfCoreDialogWrapper(
     var startupProject: IconItem<StartupProjectData>? = null
         private set
 
+    var dbContext: IconItem<String>? = null
+        private set
+
     var buildConfiguration: IconItem<Unit>? = null
         private set
 
@@ -55,6 +58,9 @@ abstract class BaseEfCoreDialogWrapper(
     private lateinit var noBuildCheckbox: JBCheckBox
     private lateinit var buildConfigurationModel: DefaultComboBoxModel<IconItem<Unit>>
     private lateinit var targetFrameworkModel: DefaultComboBoxModel<IconItem<Unit>>
+    private lateinit var dbContextModel: DefaultComboBoxModel<IconItem<String>>
+
+    private lateinit var dbContextBox: ComboBox<IconItem<String>>
 
     private var prevPreferredMigrationsProjectName: String? = null
     private var prevPreferredStartupProjectName: String? = null
@@ -74,9 +80,11 @@ abstract class BaseEfCoreDialogWrapper(
 
         dotnetProject = migrationsProjects.find { it.displayName == currentDotnetProjectName } ?: migrationsProjects.first()
 
+        migrationsProjectChangedEvent += ::migrationsProjectChanged
         startupProjectChangedEvent += ::startupProjectChanged
 
         targetFrameworkModel = DefaultComboBoxModel<IconItem<Unit>>()
+        dbContextModel = DefaultComboBoxModel<IconItem<String>>()
     }
 
     override fun createCenterPanel(): DialogPanel {
@@ -103,6 +111,7 @@ abstract class BaseEfCoreDialogWrapper(
         loadPreferredProjects()
         migrationsProjectRow(parent)
         startupProjectRow(parent)
+        dbContextRow(parent)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -142,6 +151,16 @@ abstract class BaseEfCoreDialogWrapper(
 
         return parent.row("Startup project:") {
             iconComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
+        }
+    }
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun dbContextRow(parent: LayoutBuilder): Row {
+        return parent.row("DbContext class:") {
+            dbContextBox = iconComboBox(dbContextModel, { dbContext }, ::dbContextSetter)
+                .withValidationOnInput(dbContextValidation())
+                .withValidationOnApply(dbContextValidation())
+                .component
         }
     }
 
@@ -208,7 +227,6 @@ abstract class BaseEfCoreDialogWrapper(
     private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<IconItem<String>>) -> ValidationInfo? = {
         if (migrationsProject == null)
             null
-
         else {
             val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Checking migrations...",
                 isCancelable = true,
@@ -220,6 +238,13 @@ abstract class BaseEfCoreDialogWrapper(
             else
                 null
         }
+    }
+
+    private fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<IconItem<String>>) -> ValidationInfo? = {
+        if (dbContext == null || dbContextModel.size == 0)
+            error("Migrations project should have at least 1 DbContext")
+        else
+            null
     }
 
     private fun migrationsProjectSetter(project: IconItem<String>?) {
@@ -236,6 +261,12 @@ abstract class BaseEfCoreDialogWrapper(
         startupProjectChangedEvent.invoke(startupProject!!)
     }
 
+    private fun dbContextSetter(context: IconItem<String>?) {
+        if (context == dbContext) return
+
+        dbContext = context
+    }
+
     private fun buildConfigurationSetter(configuration: IconItem<Unit>?) {
         if (configuration == buildConfiguration) return
 
@@ -246,6 +277,26 @@ abstract class BaseEfCoreDialogWrapper(
         if (framework == targetFramework) return
 
         targetFramework = framework
+    }
+
+    private fun migrationsProjectChanged(project: IconItem<String>?) {
+        dbContextModel.removeAllElements()
+
+        if (project == null) return
+
+        val dbContexts = model.getAvailableDbContexts.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
+            isCancelable = true,
+            throwFault = true
+        )
+
+        val dbContextIconItems = dbContexts!!.map { IconItem(it.name, DotnetIconResolver.resolveForType(DotnetIconType.CLASS), it.fullName) }
+
+        dbContextModel.addAll(dbContextIconItems)
+
+        dbContext = dbContextIconItems.firstOrNull()
+
+        if (::dbContextBox.isInitialized)
+            dbContextBox.item = dbContext
     }
 
     private fun startupProjectChanged(project: IconItem<StartupProjectData>?) {

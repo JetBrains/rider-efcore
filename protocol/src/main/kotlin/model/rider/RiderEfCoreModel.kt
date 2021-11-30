@@ -24,6 +24,11 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("longName", string)
     }
 
+    private val DbContextInfo = structdef {
+        field("name", string)
+        field("fullName", string)
+    }
+
     init {
         setting(CSharp50Generator.Namespace, "Rider.Plugins.EfCore.Rd")
         setting(Kotlin11Generator.Namespace, "me.seclerp.rider.plugins.efcore.rd")
@@ -32,5 +37,6 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         call("getAvailableStartupProjects", void, immutableList(StartupProjectInfo))
         call("hasAvailableMigrations", string, bool)
         call("getAvailableMigrations", string, immutableList(MigrationInfo))
+        call("getAvailableDbContexts", string, immutableList(DbContextInfo))
     }
 }

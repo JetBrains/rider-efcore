@@ -11,6 +11,7 @@ import com.intellij.util.textCompletion.TextFieldWithCompletion
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
+import me.seclerp.rider.plugins.efcore.DotnetIconType
 import me.seclerp.rider.plugins.efcore.components.IconItem
 import javax.swing.JCheckBox
 
@@ -57,7 +58,7 @@ class UpdateDatabaseDialogWrapper(
     }
 
     private fun targetMigrationRow(parent: LayoutBuilder): Row {
-        val completionItemsIcon = DotnetIconResolver.resolveForExtension("cs")
+        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CLASS)
         val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(availableMigrationsList, completionItemsIcon)
         targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
         targetMigrationTextField.document.addDocumentListener(object : DocumentListener {

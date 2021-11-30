@@ -16,8 +16,13 @@ class IconComboBoxRendererAdapter<T>: ListCellRenderer<IconItem<T>?> {
         cellHasFocus: Boolean
     ): Component {
         delegatingRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
-        delegatingRenderer.text = value!!.displayName
-        delegatingRenderer.icon = value.icon
+
+        if (value != null) {
+            delegatingRenderer.text = value.displayName
+            delegatingRenderer.icon = value.icon
+        } else {
+            delegatingRenderer.text = "<none>"
+        }
 
         return delegatingRenderer
     }

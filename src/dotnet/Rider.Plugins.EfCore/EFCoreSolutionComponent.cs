@@ -5,12 +5,11 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
-using JetBrains.RdBackend.Common.Features.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
-using Microsoft.CodeAnalysis;
 using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Rd;
 
@@ -31,6 +30,7 @@ namespace Rider.Plugins.EfCore
             riderProjectOutputModel.GetAvailableStartupProjects.Set(GetAvailableStartupProjects);
             riderProjectOutputModel.HasAvailableMigrations.Set(HasAvailableMigrations);
             riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
+            riderProjectOutputModel.GetAvailableDbContexts.Set(GetAvailableDbContexts);
         }
 
         private RdTask<List<MigrationsProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
@@ -93,6 +93,23 @@ namespace Rider.Plugins.EfCore
                     .ToList();
 
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
+            }
+        }
+
+        private RdTask<List<DbContextInfo>> GetAvailableDbContexts(Lifetime lifetime, string projectName)
+        {
+            using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
+            using (ReadLockCookie.Create())
+            {
+                var project = _solution.GetProjectByName(projectName);
+
+                var foundDbContexts = project
+                    .GetPsiModules()
+                    .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
+                    .Select(dbContextClass => new DbContextInfo(dbContextClass.ShortName, dbContextClass.GetFullClrName()))
+                    .ToList();
+
+                return RdTask<List<DbContextInfo>>.Successful(foundDbContexts);
             }
         }
     }
