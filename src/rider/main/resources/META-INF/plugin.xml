@@ -15,6 +15,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="language" instance="me.seclerp.rider.plugins.efcore.SampleOptionsPage" id="SampleOptionsPage" />
     <notificationGroup id="EF Core Notifications Group" displayType="BALLOON"/>
+    <postStartupActivity implementation="me.seclerp.rider.plugins.efcore.startup.EfCoreStartupActivity" />
   </extensions>
 
   <actions>

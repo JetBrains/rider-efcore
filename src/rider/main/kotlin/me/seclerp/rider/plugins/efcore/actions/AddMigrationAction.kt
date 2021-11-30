@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.jetbrains.rider.util.idea.getService
 import me.seclerp.rider.plugins.efcore.clients.MigrationsClient
 import me.seclerp.rider.plugins.efcore.dialogs.AddMigrationDialogWrapper
+import me.seclerp.rider.plugins.efcore.commands.executeCommandUnderProgress
 
 class AddMigrationAction : BaseEfCoreAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {

@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.jetbrains.rider.util.idea.getService
 import me.seclerp.rider.plugins.efcore.clients.DatabaseClient
 import me.seclerp.rider.plugins.efcore.dialogs.UpdateDatabaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.commands.executeCommandUnderProgress
 
 class UpdateDatabaseAction : BaseEfCoreAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
