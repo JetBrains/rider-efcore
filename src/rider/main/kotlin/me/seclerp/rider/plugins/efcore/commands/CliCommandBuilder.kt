@@ -8,6 +8,8 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
 
         addNamed("--project", commonOptions.migrationsProject)
         addNamed("--startup-project", commonOptions.startupProject)
+        addNamed("--configuration", commonOptions.buildConfiguration)
+        addNamed("--framework", commonOptions.targetFramework)
         addIf("--no-build", commonOptions.noBuild)
     }
 
