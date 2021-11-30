@@ -9,12 +9,14 @@ import com.jetbrains.rd.generator.nova.kotlin.Kotlin11Generator
 @Suppress("unused")
 object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     private val StartupProjectInfo = structdef {
+        field("id", guid)
         field("name", string)
         field("fullPath", string)
         field("targetFrameworks", immutableList(string))
     }
 
     private val MigrationsProjectInfo = structdef {
+        field("id", guid)
         field("name", string)
         field("fullPath", string)
     }

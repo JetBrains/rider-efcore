@@ -12,7 +12,7 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.DotnetIconType
-import me.seclerp.rider.plugins.efcore.components.IconItem
+import me.seclerp.rider.plugins.efcore.components.items.MigrationsProjectItem
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
@@ -90,8 +90,8 @@ class UpdateDatabaseDialogWrapper(
     //        else null
     //    }
 
-    private fun refreshCompletion(migrationsProject: IconItem<String>) {
-        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProject.displayName, intellijProject, "Loading migrations...",
+    private fun refreshCompletion(migrationsProjectItem: MigrationsProjectItem) {
+        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
         )?.map { it.longName }?.sorted()

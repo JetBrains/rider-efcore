@@ -2,11 +2,12 @@ package me.seclerp.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
+import java.util.*
 
 @Service
 @State(name = "EfCoreCommonOptions", storages = [Storage("efCoreCommonOptions.xml")])
 class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
-    var myState = CommonOptionsState()
+    private var myState = CommonOptionsState()
 
     override fun getState(): CommonOptionsState = myState
 
@@ -14,26 +15,29 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         myState = state
     }
 
-    fun clearPreferredProjects(prevMigrationsProject: String, prevStartupProject: String) {
-        myState.migrationsToStartupProjects.remove(prevMigrationsProject)
-        myState.startupToMigrationsProjects.remove(prevStartupProject)
+    fun clearPreferredProjectsPair(prevMigrationsProjectId: UUID, prevStartupProjectId: UUID) {
+        myState.migrationsToStartupProjects.remove(prevMigrationsProjectId.toString())
+        myState.startupToMigrationsProjects.remove(prevStartupProjectId.toString())
     }
 
-    fun setPreferredProjectsPair(migrationsProject: String, startupProject: String) {
-        myState.migrationsToStartupProjects[migrationsProject] = startupProject
-        myState.startupToMigrationsProjects[startupProject] = migrationsProject
+    fun setPreferredProjectsPair(migrationsProjectId: UUID, startupProjectId: UUID) {
+        val migrationsProjectString = migrationsProjectId.toString()
+        val startupProjectString = startupProjectId.toString()
+
+        myState.migrationsToStartupProjects[migrationsProjectString] = startupProjectString
+        myState.startupToMigrationsProjects[startupProjectString] = migrationsProjectString
     }
 
-    fun getPreferredProjectPair(project: String): Pair<String, String>? {
-        return if (myState.migrationsToStartupProjects.containsKey(project)) {
-            val startupProject = myState.migrationsToStartupProjects[project]!!
-            Pair(project, startupProject)
-        } else if (myState.startupToMigrationsProjects.containsKey(project)) {
-            val migrationsProject = myState.startupToMigrationsProjects[project]!!
-            Pair(migrationsProject, project)
-        } else {
-            null
-        }
+    fun getPreferredProjectPair(projectId: UUID): Pair<UUID, UUID>? {
+        val projectIdString = projectId.toString()
+
+        return if (myState.migrationsToStartupProjects.containsKey(projectIdString)) {
+            val startupProject = myState.migrationsToStartupProjects[projectIdString]!!
+            Pair(UUID.fromString(projectIdString), UUID.fromString(startupProject))
+        } else if (myState.startupToMigrationsProjects.containsKey(projectIdString)) {
+            val migrationsProject = myState.startupToMigrationsProjects[projectIdString]!!
+            Pair(UUID.fromString(migrationsProject), UUID.fromString(projectIdString))
+        } else null
     }
 
     companion object {

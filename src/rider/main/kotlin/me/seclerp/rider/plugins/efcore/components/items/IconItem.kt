@@ -1,8 +1,8 @@
-package me.seclerp.rider.plugins.efcore.components
+package me.seclerp.rider.plugins.efcore.components.items
 
 import javax.swing.Icon
 
-data class IconItem<T>(
+open class IconItem<T>(
     val displayName: String,
     val icon: Icon,
     val data: T

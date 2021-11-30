@@ -9,89 +9,91 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.layout.*
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.DotnetIconResolver
-import me.seclerp.rider.plugins.efcore.DotnetIconType
 import me.seclerp.rider.plugins.efcore.Event
-import me.seclerp.rider.plugins.efcore.components.IconItem
 import me.seclerp.rider.plugins.efcore.components.iconComboBox
+import me.seclerp.rider.plugins.efcore.components.items.*
+import me.seclerp.rider.plugins.efcore.models.MigrationsProjectData
 import me.seclerp.rider.plugins.efcore.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.rd.toIconItem
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
+import java.util.*
 import javax.swing.DefaultComboBoxModel
 
 abstract class BaseEfCoreDialogWrapper(
     title: String,
     private val model: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val currentDotnetProjectName: String,
+    private val actionDotnetProjectName: String,
     private val shouldHaveMigrationsInProject: Boolean = false
 ): DialogWrapper(true) {
-    var migrationsProject: IconItem<String>? = null
+    var migrationsProject: MigrationsProjectItem? = null
         private set
 
-    var startupProject: IconItem<StartupProjectData>? = null
+    var startupProject: StartupProjectItem? = null
         private set
 
-    var dbContext: IconItem<String>? = null
+    var dbContext: DbContextItem? = null
         private set
 
-    var buildConfiguration: IconItem<Unit>? = null
+    var buildConfiguration: BuildConfigurationItem? = null
         private set
 
-    var targetFramework: IconItem<Unit>? = null
+    var targetFramework: TargetFrameworkItem? = null
         private set
 
     var noBuild = false
         private set
 
-    private val migrationsProjects: Array<IconItem<String>>
-    private val startupProjects: Array<IconItem<StartupProjectData>>
-    private val dotnetProject: IconItem<String>
+    private val migrationsProjects: Array<MigrationsProjectItem>
+    private val startupProjects: Array<StartupProjectItem>
+    private val dotnetProjectName: String
+    private val dotnetProjectId: UUID
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val migrationsProjectChangedEvent: Event<IconItem<String>> = Event()
+    protected val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val startupProjectChangedEvent: Event<IconItem<StartupProjectData>> = Event()
+    protected val startupProjectChangedEvent: Event<StartupProjectItem> = Event()
+
+    private var targetFrameworkModel: DefaultComboBoxModel<TargetFrameworkItem>
+    private var dbContextModel: DefaultComboBoxModel<DbContextItem>
 
     private lateinit var noBuildCheckbox: JBCheckBox
-    private lateinit var buildConfigurationModel: DefaultComboBoxModel<IconItem<Unit>>
-    private lateinit var targetFrameworkModel: DefaultComboBoxModel<IconItem<Unit>>
-    private lateinit var dbContextModel: DefaultComboBoxModel<IconItem<String>>
+    private lateinit var dbContextBox: ComboBox<DbContextItem>
+    private lateinit var buildConfigurationModel: DefaultComboBoxModel<BuildConfigurationItem>
 
-    private lateinit var dbContextBox: ComboBox<IconItem<String>>
-
-    private var prevPreferredMigrationsProjectName: String? = null
-    private var prevPreferredStartupProjectName: String? = null
+    private var prevPreferredMigrationsProjectId: UUID? = null
+    private var prevPreferredStartupProjectId: UUID? = null
 
     init {
         this.title = title
 
         migrationsProjects = model.getAvailableMigrationsProjects
             .sync(Unit)
-            .map { it.toIconItem() }
+            .map { MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath)) }
             .toTypedArray()
 
         startupProjects = model.getAvailableStartupProjects
             .sync(Unit)
-            .map { it.toIconItem() }
+            .map { StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks)) }
             .toTypedArray()
 
-        dotnetProject = migrationsProjects.find { it.displayName == currentDotnetProjectName } ?: migrationsProjects.first()
+        val dotnetProject = migrationsProjects.find { it.displayName == actionDotnetProjectName }
+            ?: migrationsProjects.first()
+
+        dotnetProjectName = dotnetProject.displayName
+        dotnetProjectId = dotnetProject.data.id
 
         migrationsProjectChangedEvent += ::migrationsProjectChanged
         startupProjectChangedEvent += ::startupProjectChanged
 
-        targetFrameworkModel = DefaultComboBoxModel<IconItem<Unit>>()
-        dbContextModel = DefaultComboBoxModel<IconItem<String>>()
+        targetFrameworkModel = DefaultComboBoxModel<TargetFrameworkItem>()
+        dbContextModel = DefaultComboBoxModel<DbContextItem>()
     }
 
-    override fun createCenterPanel(): DialogPanel {
-        return panel {
-            primaryOptions(this)
-            additionalOptions(this)
-        }
+    override fun createCenterPanel(): DialogPanel = panel {
+        primaryOptions(this)
+        additionalOptions(this)
     }
 
     override fun doOKAction() {
@@ -99,10 +101,10 @@ abstract class BaseEfCoreDialogWrapper(
 
         val commonOptionsService = CommonOptionsStateService.getInstance(intellijProject)
 
-        if (prevPreferredMigrationsProjectName != null && prevPreferredStartupProjectName != null)
-            commonOptionsService.clearPreferredProjects(prevPreferredMigrationsProjectName!!, prevPreferredStartupProjectName!!)
+        if (prevPreferredMigrationsProjectId != null && prevPreferredStartupProjectId != null)
+            commonOptionsService.clearPreferredProjectsPair(prevPreferredMigrationsProjectId!!, prevPreferredStartupProjectId!!)
 
-        commonOptionsService.setPreferredProjectsPair(migrationsProject!!.displayName, startupProject!!.displayName)
+        commonOptionsService.setPreferredProjectsPair(migrationsProject!!.data.id, startupProject!!.data.id)
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -187,7 +189,7 @@ abstract class BaseEfCoreDialogWrapper(
         val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value!!
 
         val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection.valueOrNull!!
-            .map { IconItem(it.configuration, DotnetIconResolver.resolveForType(DotnetIconType.BUILD_CONFIGURATION), Unit) }
+            .map { BuildConfigurationItem(it.configuration) }
             .toTypedArray()
 
         buildConfigurationModel = DefaultComboBoxModel(availableConfigurations)
@@ -208,23 +210,23 @@ abstract class BaseEfCoreDialogWrapper(
     }
 
     private fun loadPreferredProjects() {
-        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProject.displayName)
+        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProjectId)
         if (preferredProjects != null) {
-            val (migrationsProjectName, startupProjectName) = preferredProjects
-            prevPreferredMigrationsProjectName = migrationsProjectName
-            prevPreferredStartupProjectName = startupProjectName
-            val migrationsProject = migrationsProjects.find { it.displayName == migrationsProjectName } ?: migrationsProjects.first()
-            val startupProject = startupProjects.find { it.displayName == startupProjectName } ?: startupProjects.first()
+            val (migrationsProjectId, startupProjectId) = preferredProjects
+            prevPreferredMigrationsProjectId = migrationsProjectId
+            prevPreferredStartupProjectId = startupProjectId
+            val migrationsProject = migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.first()
+            val startupProject = startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.first()
 
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
         } else {
-            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProject.displayName } ?: migrationsProjects.first())
-            startupProjectSetter(startupProjects.find { it.displayName == dotnetProject.displayName } ?: startupProjects.first())
+            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.first())
+            startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.first())
         }
     }
 
-    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<IconItem<String>>) -> ValidationInfo? = {
+    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {
         if (migrationsProject == null)
             null
         else {
@@ -240,46 +242,46 @@ abstract class BaseEfCoreDialogWrapper(
         }
     }
 
-    private fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<IconItem<String>>) -> ValidationInfo? = {
+    private fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
         if (dbContext == null || dbContextModel.size == 0)
             error("Migrations project should have at least 1 DbContext")
         else
             null
     }
 
-    private fun migrationsProjectSetter(project: IconItem<String>?) {
+    private fun migrationsProjectSetter(project: MigrationsProjectItem?) {
         if (project == migrationsProject) return
 
         migrationsProject = project
         migrationsProjectChangedEvent.invoke(migrationsProject!!)
     }
 
-    private fun startupProjectSetter(project: IconItem<StartupProjectData>?) {
+    private fun startupProjectSetter(project: StartupProjectItem?) {
         if (project == startupProject) return
 
         startupProject = project
         startupProjectChangedEvent.invoke(startupProject!!)
     }
 
-    private fun dbContextSetter(context: IconItem<String>?) {
+    private fun dbContextSetter(context: DbContextItem?) {
         if (context == dbContext) return
 
         dbContext = context
     }
 
-    private fun buildConfigurationSetter(configuration: IconItem<Unit>?) {
+    private fun buildConfigurationSetter(configuration: BuildConfigurationItem?) {
         if (configuration == buildConfiguration) return
 
         buildConfiguration = configuration
     }
 
-    private fun targetFrameworkSetter(framework: IconItem<Unit>?) {
+    private fun targetFrameworkSetter(framework: TargetFrameworkItem?) {
         if (framework == targetFramework) return
 
         targetFramework = framework
     }
 
-    private fun migrationsProjectChanged(project: IconItem<String>?) {
+    private fun migrationsProjectChanged(project: MigrationsProjectItem?) {
         dbContextModel.removeAllElements()
 
         if (project == null) return
@@ -289,7 +291,7 @@ abstract class BaseEfCoreDialogWrapper(
             throwFault = true
         )
 
-        val dbContextIconItems = dbContexts!!.map { IconItem(it.name, DotnetIconResolver.resolveForType(DotnetIconType.CLASS), it.fullName) }
+        val dbContextIconItems = dbContexts!!.map { DbContextItem(it.name, it.fullName) }
 
         dbContextModel.addAll(dbContextIconItems)
 
@@ -305,7 +307,7 @@ abstract class BaseEfCoreDialogWrapper(
         if (project == null) return
 
         val configurationIconItems = project.data.targetFrameworks
-            .map { IconItem(it, DotnetIconResolver.resolveForType(DotnetIconType.TARGET_FRAMEWORK), Unit) }
+            .map { TargetFrameworkItem(it) }
 
         targetFrameworkModel.addAll(configurationIconItems)
 

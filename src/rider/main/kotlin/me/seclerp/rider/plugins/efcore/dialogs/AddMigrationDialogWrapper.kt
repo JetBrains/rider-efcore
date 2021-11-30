@@ -8,7 +8,8 @@ import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.components.IconItem
+import me.seclerp.rider.plugins.efcore.components.items.IconItem
+import me.seclerp.rider.plugins.efcore.components.items.MigrationsProjectItem
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import javax.swing.JTextField
 
@@ -56,7 +57,7 @@ class AddMigrationDialogWrapper(
             null
     }
 
-    private fun refreshMigrations(migrationsProjectItem: IconItem<String>) {
+    private fun refreshMigrations(migrationsProjectItem: MigrationsProjectItem) {
         existedMigrations = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true

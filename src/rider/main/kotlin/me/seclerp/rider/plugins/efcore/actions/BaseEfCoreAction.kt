@@ -24,7 +24,7 @@ abstract class BaseEfCoreAction: AnAction() {
 
     fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions =
         CommonOptions(
-            dialog.migrationsProject!!.data,
+            dialog.migrationsProject!!.data.fullPath,
             dialog.startupProject!!.data.fullPath,
             dialog.dbContext!!.data,
             dialog.buildConfiguration!!.displayName,
@@ -48,7 +48,7 @@ abstract class BaseEfCoreAction: AnAction() {
                     .notify(project)
             }
 
-            ApplicationManager.getApplication().invokeLater {
+            ApplicationManager.getApplication().invokeAndWait {
                 refreshSolution()
             }
         }

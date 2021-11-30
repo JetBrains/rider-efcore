@@ -38,7 +38,10 @@ namespace Rider.Plugins.EfCore
             using (ReadLockCookie.Create())
             {
                 var allProjectNames = EfCoreHelper.GetSupportedMigrationProjects(_solution)
-                    .Select(project => new MigrationsProjectInfo(project.Name, project.ProjectFileLocation.FullPath))
+                    .Select(project => new MigrationsProjectInfo(
+                        project.Guid,
+                        project.Name,
+                        project.ProjectFileLocation.FullPath))
                     .ToList();
 
                 return RdTask<List<MigrationsProjectInfo>>.Successful(allProjectNames);
@@ -51,6 +54,7 @@ namespace Rider.Plugins.EfCore
             {
                 var allProjectNames = EfCoreHelper.GetSupportedStartupProjects(_solution)
                     .Select(project => new StartupProjectInfo(
+                        project.Guid,
                         project.Name,
                         project.ProjectFileLocation.FullPath,
                         project.TargetFrameworkIds.Select(fr => fr.PresentableString).ToList()))
@@ -62,6 +66,7 @@ namespace Rider.Plugins.EfCore
 
         private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, string projectName)
         {
+            using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
             using (ReadLockCookie.Create())
             {
                 var project = _solution.GetProjectByName(projectName);
