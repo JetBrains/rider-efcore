@@ -8,6 +8,9 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.layout.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
+import com.intellij.util.ui.JBFont
+import com.intellij.util.ui.UIUtil
+import com.jetbrains.rd.ui.bedsl.dsl.label
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
@@ -69,6 +72,7 @@ class UpdateDatabaseDialogWrapper(
 
         return parent.row("Target migration:") {
             targetMigrationTextField(CCFlags.pushX, CCFlags.growX)
+                .comment("Use '0' as a target migration to undo all applied migrations")
                 .focused()
                 .withValidationOnApply(targetMigrationValidation())
         }
@@ -106,6 +110,8 @@ class UpdateDatabaseDialogWrapper(
 
             availableMigrationsList.addAll(0, migrations)
         }
+
+        availableMigrationsList.add("0")
 
         targetMigrationTextField.text = targetMigration
     }
