@@ -9,8 +9,13 @@
 
 ### 1.1.0
 - DB-first scaffolding with all available customization options
-- (?) Pop-up with quick access to actions related to last used project pair
 - Add ability to specify folder for migrations on "Add migration"
-- (?) Support .NET Core 3.1 and .NET Standard 2.1 projects
 
-> Items marked with `?` sign are not submitted completely and need to be discussed/revisited
+## Suggestions
+
+> Suggestions are not submitted completely and need to be discussed/revisited
+
+- Add "Remove All Migrations" action
+- Add "Squash Migrations", something similar to git squash for commits on merge
+- Support .NET Core 3.1 and .NET Standard 2.1 projects
+- Pop-up with quick access to actions related to last used project pair
