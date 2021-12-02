@@ -138,12 +138,9 @@ abstract class BaseEfCoreDialogWrapper(
         val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
 
         return parent.row("Migrations project:") {
-            val migrationsProjectBox = iconComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
-            if (shouldHaveMigrationsInProject) {
-                migrationsProjectBox
-                    .withValidationOnInput(migrationsProjectValidation())
-                    .withValidationOnApply(migrationsProjectValidation())
-            }
+            iconComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
+                .withValidationOnInput(migrationsProjectValidation())
+                .withValidationOnApply(migrationsProjectValidation())
         }
     }
 
@@ -153,6 +150,8 @@ abstract class BaseEfCoreDialogWrapper(
 
         return parent.row("Startup project:") {
             iconComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
+                .withValidationOnInput(startupProjectValidation())
+                .withValidationOnApply(startupProjectValidation())
         }
     }
 
@@ -198,6 +197,8 @@ abstract class BaseEfCoreDialogWrapper(
 
         return parent.row("Build configuration:") {
             iconComboBox(buildConfigurationModel, { buildConfiguration }, ::buildConfigurationSetter)
+                .withValidationOnInput(buildConfigurationValidation())
+                .withValidationOnApply(buildConfigurationValidation())
         }
     }
 
@@ -206,6 +207,8 @@ abstract class BaseEfCoreDialogWrapper(
 
         return parent.row("Target framework:") {
             iconComboBox(targetFrameworkModel, { targetFramework }, ::targetFrameworkSetter)
+                .withValidationOnInput(targetFrameworkValidation())
+                .withValidationOnApply(targetFrameworkValidation())
         }
     }
 
@@ -215,21 +218,21 @@ abstract class BaseEfCoreDialogWrapper(
             val (migrationsProjectId, startupProjectId) = preferredProjects
             prevPreferredMigrationsProjectId = migrationsProjectId
             prevPreferredStartupProjectId = startupProjectId
-            val migrationsProject = migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.first()
-            val startupProject = startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.first()
+            val migrationsProject = migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
+            val startupProject = startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.firstOrNull()
 
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
         } else {
-            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.first())
-            startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.first())
+            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.firstOrNull())
+            startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.firstOrNull())
         }
     }
 
     private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {
         if (migrationsProject == null)
-            null
-        else {
+            error("You should selected valid migrations project")
+        else if (shouldHaveMigrationsInProject) {
             val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Checking migrations...",
                 isCancelable = true,
                 throwFault = true
@@ -239,12 +242,33 @@ abstract class BaseEfCoreDialogWrapper(
                 error("Selected migrations project doesn't have migrations")
             else
                 null
-        }
+        } else null
+    }
+
+    private fun startupProjectValidation(): ValidationInfoBuilder.(ComboBox<StartupProjectItem>) -> ValidationInfo? = {
+        if (startupProject == null)
+            error("You should selected valid startup project")
+        else
+            null
     }
 
     private fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
         if (dbContext == null || dbContextModel.size == 0)
             error("Migrations project should have at least 1 DbContext")
+        else
+            null
+    }
+
+    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
+        if (buildConfiguration == null || buildConfigurationModel.size == 0)
+            error("Solution doesn't have any build configurations")
+        else
+            null
+    }
+
+    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<TargetFrameworkItem>) -> ValidationInfo? = {
+        if (targetFramework == null || targetFrameworkModel.size == 0)
+            error("Startup project should have at least 1 supported target framework")
         else
             null
     }
@@ -294,7 +318,6 @@ abstract class BaseEfCoreDialogWrapper(
         val dbContextIconItems = dbContexts!!.map { DbContextItem(it.name, it.fullName) }
 
         dbContextModel.addAll(dbContextIconItems)
-
         dbContext = dbContextIconItems.firstOrNull()
 
         if (::dbContextBox.isInitialized)
@@ -310,8 +333,7 @@ abstract class BaseEfCoreDialogWrapper(
             .map { TargetFrameworkItem(it) }
 
         targetFrameworkModel.addAll(configurationIconItems)
-
-        // TODO: Handle if there is 0 build configurations
-        targetFramework = configurationIconItems.first()
+        targetFramework = configurationIconItems.firstOrNull()
+        targetFrameworkModel.selectedItem = targetFramework
     }
 }

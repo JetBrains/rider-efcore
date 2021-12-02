@@ -1,11 +1,11 @@
-# JetBrains Rider plugin for Entity Framework Core
+# Entity Framework Core UI plugin for JetBrains Rider 
 ![Logo](img/rider-plus-efcore-128.png)
 
 [![Build](https://github.com/seclerp/rider-efcore/actions/workflows/ci.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/ci.yml)
 
 ---
 
-This plugin introduces support for Entity Framework Core inside JetBrains Rider.
+This plugin introduces `dotnet ef` actions' UI inside JetBrains Rider.
 
 ### Features
 
@@ -18,7 +18,12 @@ There are a couple of UI stuff for:
 
 ### How to install
 
-**TODO**
+There are 2 options of how plugin could be installed:
+1. Using JetBrains Plugin Registry:
+   - TODO
+2. Using manual install:
+   1. Download the latest plugin `.zip` file from Releases section at the right
+   2. Open Rider's <kbd>File</kbd> / <kbd>Settings</kbd> and proceed to <kbd>Plugins</kbd> / <kbd>⚙</kbd> / <kbd>Install plugin from disk</kbd>, select downloaded `.zip` and here you go
 
 ### How to use
 

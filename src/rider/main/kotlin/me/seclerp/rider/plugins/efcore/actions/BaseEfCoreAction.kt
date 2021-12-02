@@ -10,7 +10,7 @@ import me.seclerp.rider.plugins.efcore.commands.CommonOptions
 
 abstract class BaseEfCoreAction: AnAction() {
     override fun update(actionEvent: AnActionEvent) {
-        actionEvent.presentation.isVisible = actionEvent.isProjectFile()
+        actionEvent.presentation.isVisible = actionEvent.isLoadedProjectFile()
     }
 
     fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions =

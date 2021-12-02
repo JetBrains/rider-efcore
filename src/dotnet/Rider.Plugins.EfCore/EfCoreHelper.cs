@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Resources;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace Rider.Plugins.EfCore
@@ -10,7 +11,8 @@ namespace Rider.Plugins.EfCore
         private static readonly string EfCoreToolsNugetId = "Microsoft.EntityFrameworkCore.Design";
 
         public static IEnumerable<IProject> GetSupportedMigrationProjects(ISolution solution) =>
-            GetSupportedDotnetProjects(solution);
+            GetSupportedDotnetProjects(solution)
+                .Where(project => project.ProjectFileLocation.ExtensionNoDot == "csproj");
 
         public static IEnumerable<IProject> GetSupportedStartupProjects(ISolution solution) =>
             GetSupportedDotnetProjects(solution)
