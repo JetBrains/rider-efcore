@@ -9,6 +9,7 @@
 
 ### 1.1.0
 - DB-first scaffolding with all available customization options
+- (?) Pop-up with quick access to actions related to last used project pair
 - (?) Support .NET Core 3.1 and .NET Standard 2.1 projects
 
 > Items marked with `?` sign are not submitted completely and need to be discussed/revisited
