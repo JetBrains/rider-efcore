@@ -1,5 +1,5 @@
 <idea-plugin require-restart="true">
-  <id>com.jetbrains.rider.plugins.riderefcore</id>
+  <id>me.seclerp.rider.plugins.efcore</id>
   <name>Entity Framework Core</name>
   <version>0.9.0</version>
   <vendor url="https://github.com/seclerp">seclerp</vendor>
