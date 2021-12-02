@@ -5,7 +5,7 @@
 
 ---
 
-This plugin introduces `dotnet ef` actions' UI inside JetBrains Rider.
+This plugin introduces Entity Framework Core commands' UI inside JetBrains Rider.
 
 ### Features
 
@@ -50,7 +50,9 @@ There are 2 options of how plugin could be installed:
 
 ### Building
 
-You should have JDK 11 and .NET SDK 5.0+ installed and configured.
+You should have JDK 11 and .NET SDK 5.0+ installed and configured. Then, execute:
+
+`./gradlew rdgen` - generates RD protocol data for plugin internal communication
 
 Then you could build a plugin with:
 
@@ -58,9 +60,9 @@ Then you could build a plugin with:
 
 It will build both frontend and backend parts.
 
-To run JetBrains Rider with plugin:
+Or to run JetBrains Rider with plugin:
 
-`./gradlew runIde`
+`./gradlew runIde` - runs a Rider instance with plugin attached to it
 
 ### Contributing
 
