@@ -8,7 +8,7 @@ class DropDatabaseDialogWrapper(
     model: RiderEfCoreModel,
     private val intellijProject: Project,
     currentDotnetProjectName: String,
-) : BaseEfCoreDialogWrapper("Drop Database", model, intellijProject, currentDotnetProjectName, true) {
+) : BaseEfCoreDialogWrapper("Drop Database", model, intellijProject, currentDotnetProjectName, false) {
 
     init {
         init()
