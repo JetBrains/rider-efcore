@@ -24,7 +24,7 @@ fun executeCommandUnderProgress(
             NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
                 .createNotification(
                     "EF Core command failed",
-                    "Command: ${result.command}\n\nOutput:\n${result.output}\n\nError:${result.error}\n\nExit code: ${result.exitCode}",
+                    "Command: ${result.command}\n\nOutput:\n${result.output}\n\nError:\n${result.error}\n\nExit code: ${result.exitCode}",
                     NotificationType.ERROR)
                 .notify(project)
         }
