@@ -8,8 +8,8 @@ on:
     branches: [ develop ]
 
 jobs:
-  windows:
-    runs-on: windows-latest
+  build-ubuntu:
+    runs-on: ubuntu-latest
     steps:
       - name: 📝 Fetch Sources
         uses: actions/checkout@v2

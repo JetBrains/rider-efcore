@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 jobs:
-  windows:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: 📝 Fetch Sources
@@ -62,7 +62,7 @@ jobs:
       - name: 🚀 Create Release
         uses: ncipollo/release-action@v1
         with:
-          commit: ${GITHUB_REF##*/} # Branch name extracted from ref
+          commit: ${{ github.sha }} # Commit SHA
           tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
           draft: true
           artifacts: "output/*.zip"
