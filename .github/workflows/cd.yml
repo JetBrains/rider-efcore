@@ -65,5 +65,6 @@ jobs:
           commit: ${{ github.sha }} # Commit SHA
           tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
           draft: true
+          generateReleaseNotes: true
           artifacts: "output/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
