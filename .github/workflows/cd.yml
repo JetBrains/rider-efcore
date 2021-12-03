@@ -9,7 +9,7 @@ on:
 
 jobs:
   windows:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: 📝 Fetch Sources
         uses: actions/checkout@v2
@@ -50,10 +50,10 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: buildPlugin -PRiderSdkVersion=2021.2.0 -PProductVersion=2021.2
-      
+
       - name: Rename intermediate plugin dist for 2021.2
         run: mv output/riderefcore-${{ steps.version.outputs.value }}.zip output/rider-212-efcore-${{ steps.version.outputs.value }}.zip
-          
+
       - name: 🏗 Build Plugin for 2021.3 EAP 10
         uses: gradle/gradle-build-action@v2
         with:
