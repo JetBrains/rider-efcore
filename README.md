@@ -18,12 +18,17 @@ There are a couple of UI stuff for:
 
 ### How to install
 
-There are 2 options of how plugin could be installed:
-1. Using JetBrains Plugin Registry:
-   - TODO
-2. Using manual install:
-   1. Download the latest plugin `.zip` file from Releases section at the right
-   2. Open Rider's <kbd>File</kbd> / <kbd>Settings</kbd> and proceed to <kbd>Plugins</kbd> / <kbd>⚙</kbd> / <kbd>Install plugin from disk</kbd>, select downloaded `.zip` and here you go
+> **Note:** Marketplace has plugin only for stable (currently 2021.2) Rider version. If you are looking for installing plugin on EAP version of Rider, use Manual installation. 
+
+#### Using JetBrains Plugin Marketplace:
+   1. Go to <kbd>Settings</kbd> / <kbd>Plugins</kbd> / <kbd>Marketplace</kbd>
+   2. Search for "Entity Framework Core UI"
+   3. Click <kbd>Install</kbd>
+   4. After installing restart Rider
+
+#### Using `.zip` file with plugin:
+   1. Download the latest plugin `.zip` file from Releases section at the right for your version of Rider
+   2. Open Rider's <kbd>File</kbd> / <kbd>Settings</kbd> and proceed to <kbd>Plugins</kbd> / <kbd>⚙</kbd> / <kbd>Install plugin from disk</kbd>, select downloaded `.zip` and restart Rider
 
 ### How to use
 
