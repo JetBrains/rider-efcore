@@ -86,6 +86,7 @@ buildPlugin {
         arguments << "/t:Pack"
         arguments << "/p:PackageOutputPath=${rootDir}/output"
         arguments << "/p:PackageReleaseNotes=${changeNotes}"
+        arguments << "/p:SdkVersion=${RiderSdkVersion}"
         arguments << "/p:PackageVersion=${version}"
         exec {
             executable setBuildTool.executable
@@ -183,12 +184,4 @@ prepareSandbox {
 publishPlugin {
     dependsOn buildPlugin
     token = "${PublishToken}"
-
-    doLast {
-        exec {
-            executable "dotnet"
-            args "nuget","push","output/${DotnetPluginId}.${version}.nupkg","--api-key","${PublishToken}","--source","https://plugins.jetbrains.com"
-            workingDir rootDir
-        }
-    }
 }
