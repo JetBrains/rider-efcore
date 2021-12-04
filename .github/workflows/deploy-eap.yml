@@ -10,9 +10,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: 📝 Fetch Sources
+        uses: actions/checkout@v2
 
-      - uses: ./.github/workflows/prepare-build-env
+      - name: 🛠 Prepare Build Environment
+        uses: ./.github/workflows/prepare-build-env
 
       - name: 🔍 Extract Version
         id: version

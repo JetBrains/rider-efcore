@@ -1,7 +1,8 @@
-# Entity Framework Core UI plugin for JetBrains Rider 
+# Entity Framework Core UI plugin for JetBrains Rider
 ![Logo](img/rider-plus-efcore-128.png)
 
-[![Build](https://github.com/seclerp/rider-efcore/actions/workflows/ci.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/ci.yml)
+[![Build (Stable)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml)
+[![Build (EAP)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml)
 
 ---
 
@@ -28,7 +29,7 @@ There are a couple of UI stuff for:
 
 #### Using `.zip` file
 1. Go to [**Releases**](https://github.com/seclerp/rider-efcore/releases)
-2. Download the latest release of plugin for your edition of JetBrains Rider (Stable or EAP) 
+2. Download the latest release of plugin for your edition of JetBrains Rider (Stable or EAP)
 3. Proceed to `Settings` / `Plugins` / `⚙` / `Install plugin from disk`
 4. Click `Save`
 5. After saving restart Rider
@@ -97,7 +98,7 @@ It's better to create an issue with description of your bug/feature before creat
 
 #### About branching
 
-This project uses modified version of **trunk-based git strategy**. 
+This project uses modified version of **trunk-based git strategy**.
 
 - `develop` branch play main development branch role. When creating any feature or bugfix, please make your branch from `develop`.
 
