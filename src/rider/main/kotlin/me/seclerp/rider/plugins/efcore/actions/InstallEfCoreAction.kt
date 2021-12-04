@@ -11,7 +11,7 @@ class InstallEfCoreAction : AnAction("Fix") {
         executeCommandUnderProgress(
             actionEvent.project!!,
             "Installing EF Core global tools...",
-            "EF Core global tools has been successfully installed",
+            "EF Core global tools have been successfully installed",
             false
         ) {
             val managementClient = actionEvent.project!!.service<ManagementClient>()

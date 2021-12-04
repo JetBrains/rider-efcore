@@ -52,6 +52,7 @@ task setBuildTool {
         ext.args << "${DotnetSolution}"
         ext.args << "/p:Configuration=${BuildConfiguration}"
         ext.args << "/p:HostFullIdentifier="
+        ext.args << "/p:SdkVersion=${RiderSdkVersion}"
     }
 }
 
@@ -86,7 +87,6 @@ buildPlugin {
         arguments << "/t:Pack"
         arguments << "/p:PackageOutputPath=${rootDir}/output"
         arguments << "/p:PackageReleaseNotes=${changeNotes}"
-        arguments << "/p:SdkVersion=${RiderSdkVersion}"
         arguments << "/p:PackageVersion=${version}"
         exec {
             executable setBuildTool.executable

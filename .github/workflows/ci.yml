@@ -33,7 +33,12 @@ jobs:
         with:
           arguments: rdgen
 
-      - name: 🏗 Build Plugin
+      - name: 🏗 Build Plugin (Stable)
         uses: gradle/gradle-build-action@v2
         with:
           arguments: buildPlugin
+
+      - name: 🏗 Build Plugin (EAP)
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: buildPlugin -PRiderSdkVersion=2021.3.0-eap10 -PProductVersion=2021.3-EAP10-SNAPSHOT
