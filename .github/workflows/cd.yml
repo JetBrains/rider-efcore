@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 jobs:
-  windows:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: 📝 Fetch Sources
@@ -34,12 +34,9 @@ jobs:
           arguments: rdgen
 
       - name: 🔍 Extract Version
-        uses: madhead/read-java-properties@latest
         id: version
-        with:
-          file: gradle.properties
-          property: PluginVersion
-          default: 0.0.1
+        run: |
+          echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=PluginVersion: ).*')" >> $GITHUB_ENV
 
 #       - name: 🚀 Publish Plugin
 #         uses: gradle/gradle-build-action@v2
@@ -50,23 +47,24 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: buildPlugin -PRiderSdkVersion=2021.2.0 -PProductVersion=2021.2
-      
+
       - name: Rename intermediate plugin dist for 2021.2
-        run: mv output/riderefcore-${{ steps.version.outputs.value }}.zip output/rider-212-efcore-${{ steps.version.outputs.value }}.zip
-          
+        run: mv output/riderefcore-${{ env.PLUGIN_VERSION }}.zip output/rider-212-efcore-${{ env.PLUGIN_VERSION }}.zip
+
       - name: 🏗 Build Plugin for 2021.3 EAP 10
         uses: gradle/gradle-build-action@v2
         with:
           arguments: buildPlugin -PRiderSdkVersion=2021.3.0-eap10 -PProductVersion=2021.3-EAP10-SNAPSHOT
 
       - name: Rename intermediate plugin dist for 2021.3 EAP 10
-        run: mv output/riderefcore-${{ steps.version.outputs.value }}.zip output/rider-213-efcore-${{ steps.version.outputs.value }}.zip
+        run: mv output/riderefcore-${{ env.PLUGIN_VERSION }}.zip output/rider-213-efcore-${{ env.PLUGIN_VERSION }}.zip
 
       - name: 🚀 Create Release
         uses: ncipollo/release-action@v1
         with:
-          commit: ${GITHUB_REF##*/} # Branch name extracted from ref
-          tag: v${{ steps.version.outputs.value }} # 'v' + version from gradle.properties
+          commit: ${{ github.sha }} # Commit SHA
+          tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
           draft: true
+          generateReleaseNotes: true
           artifacts: "output/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
