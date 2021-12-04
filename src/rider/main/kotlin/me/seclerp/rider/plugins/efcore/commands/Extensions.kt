@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
+import me.seclerp.rider.plugins.efcore.actions.notifications.TryCommandAgainAction
 
 fun executeCommandUnderProgress(
     project: Project, taskTitle: String, succeedText: String, shouldRefreshSolution: Boolean = true,
@@ -21,11 +22,23 @@ fun executeCommandUnderProgress(
                 .createNotification(succeedText, NotificationType.INFORMATION)
                 .notify(project)
         } else {
+            val errorTextBuilder = StringBuilder()
+            errorTextBuilder.append("Command: ${result.command}")
+
+            if (result.output.trim().isNotEmpty())
+                errorTextBuilder.append("\n\nOutput:\n${result.output}")
+
+            if (result.error?.trim()?.isNotEmpty() == true)
+                errorTextBuilder.append("\n\nError:\n${result.error}")
+
+            errorTextBuilder.append("\n\nExit code: ${result.exitCode}")
+
             NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
                 .createNotification(
                     "EF Core command failed",
-                    "Command: ${result.command}\n\nOutput:\n${result.output}\n\nError:\n${result.error}\n\nExit code: ${result.exitCode}",
+                    errorTextBuilder.toString(),
                     NotificationType.ERROR)
+                .addAction(TryCommandAgainAction(project, taskTitle, succeedText, shouldRefreshSolution, what))
                 .notify(project)
         }
 

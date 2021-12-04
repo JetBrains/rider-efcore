@@ -1,10 +1,12 @@
-package me.seclerp.rider.plugins.efcore.actions
+package me.seclerp.rider.plugins.efcore.actions.projects
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
+import me.seclerp.rider.plugins.efcore.actions.getDotnetProjectName
+import me.seclerp.rider.plugins.efcore.actions.isLoadedProjectFile
 import me.seclerp.rider.plugins.efcore.dialogs.BaseEfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.commands.CommonOptions
 

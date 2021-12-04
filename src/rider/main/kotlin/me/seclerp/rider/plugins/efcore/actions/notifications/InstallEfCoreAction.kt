@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.actions
+package me.seclerp.rider.plugins.efcore.actions.notifications
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent

@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
-import me.seclerp.rider.plugins.efcore.actions.InstallEfCoreAction
+import me.seclerp.rider.plugins.efcore.actions.notifications.InstallEfCoreAction
 import me.seclerp.rider.plugins.efcore.clients.ManagementClient
 import me.seclerp.rider.plugins.efcore.rd.StartupProjectInfo
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel

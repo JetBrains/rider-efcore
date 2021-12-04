@@ -37,17 +37,17 @@
   <actions>
     <group id="me.seclerp.rider.plugins.efcore.EfCoreTools" text="Entity Framework Core" popup="true">
       <add-to-group group-id="ProjectViewPopupMenu"/>
-      <action id="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.AddMigrationAction"
+      <action id="me.seclerp.rider.plugins.efcore.actions.projects.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.projects.AddMigrationAction"
               text="Add Migration" description="Add new code-first migration">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.RemoveLastMigrationAction"
+      <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.projects.RemoveLastMigrationAction"
               text="Remove Last Migration" description="Removes last created migration">
       </action>
       <separator />
-      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.UpdateDatabaseAction"
+      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.UpdateDatabaseAction"
               text="Update Database" description="Update database using one of migration as a target">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.DropDatabaseAction"
+      <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.DropDatabaseAction"
               text="Drop Database" description="Drop database used by a DbContext">
       </action>
     </group>
