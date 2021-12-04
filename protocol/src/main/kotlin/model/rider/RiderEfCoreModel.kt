@@ -21,7 +21,13 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("fullPath", string)
     }
 
+    private val MigrationsIdentity = structdef {
+        field("projectName", string)
+        field("dbContextClass", string)
+    }
+
     private val MigrationInfo = structdef {
+        field("dbContextClass", string)
         field("shortName", string)
         field("longName", string)
     }
@@ -37,7 +43,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
 
         call("getAvailableMigrationsProjects", void, immutableList(MigrationsProjectInfo))
         call("getAvailableStartupProjects", void, immutableList(StartupProjectInfo))
-        call("hasAvailableMigrations", string, bool)
+        call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", string, immutableList(MigrationInfo))
         call("getAvailableDbContexts", string, immutableList(DbContextInfo))
     }

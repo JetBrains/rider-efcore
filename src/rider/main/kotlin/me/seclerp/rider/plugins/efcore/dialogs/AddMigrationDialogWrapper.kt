@@ -9,7 +9,9 @@ import com.intellij.ui.layout.LayoutBuilder
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.ui.layout.panel
 import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.rider.plugins.efcore.components.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.components.items.MigrationsProjectItem
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
@@ -24,7 +26,8 @@ class AddMigrationDialogWrapper(
     var migrationName = ""
         private set
 
-    private var existedMigrations: List<String> = listOf()
+    private var availableMigrationsList = listOf<MigrationInfo>()
+    private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
 
     private lateinit var migrationNameTextField: JBTextField
@@ -45,6 +48,7 @@ class AddMigrationDialogWrapper(
 
     init {
         migrationsProjectChangedEvent += ::onMigrationsProjectChanged
+        dbContextChangedEvent += ::onDbContextChanged
         init()
     }
 
@@ -73,28 +77,45 @@ class AddMigrationDialogWrapper(
     private fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
             error("Migration name could not be empty")
-        else if (existedMigrations.contains(it.text.trim()))
+        else if (currentDbContextMigrationsList.contains(it.text.trim()))
             error("Migration with such name already exist")
         else
             null
     }
 
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        refreshMigrations(migrationsProjectItem.displayName)
-        setInitialMigrationNameIfNeeded()
+        refreshAvailableMigrations(migrationsProjectItem.displayName)
+        refreshCurrentDbContextMigrations(dbContext)
     }
 
-    private fun refreshMigrations(migrationsProjectName: String) {
-        existedMigrations = model.getAvailableMigrations.runUnderProgress(migrationsProjectName, intellijProject, "Loading migrations...",
+    private fun refreshAvailableMigrations(migrationsProjectName: String) {
+        availableMigrationsList = model.getAvailableMigrations.runUnderProgress(migrationsProjectName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
-        )!!.map { it.shortName }
+        )!!
+    }
+
+    private fun onDbContextChanged(dbContext: DbContextItem?) {
+        refreshCurrentDbContextMigrations(dbContext)
+    }
+
+    private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
+        currentDbContextMigrationsList =
+            if (dbContext == null)
+                listOf()
+            else
+                availableMigrationsList
+                    .filter { it.dbContextClass == dbContext.data }
+                    .map { it.shortName }
+                    .toList()
+
+        setInitialMigrationNameIfNeeded()
     }
 
     private fun setInitialMigrationNameIfNeeded() {
         if (userInputReceived) return
 
-        val migrationsExist = existedMigrations.isNotEmpty()
+        val migrationsExist = currentDbContextMigrationsList.isNotEmpty()
 
         migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
         migrationNameTextField.text = if (migrationsExist) "" else "Initial"

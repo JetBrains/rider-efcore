@@ -8,14 +8,13 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.layout.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
-import com.intellij.util.ui.JBFont
-import com.intellij.util.ui.UIUtil
-import com.jetbrains.rd.ui.bedsl.dsl.label
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.DotnetIconType
+import me.seclerp.rider.plugins.efcore.components.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.components.items.MigrationsProjectItem
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
@@ -33,13 +32,15 @@ class UpdateDatabaseDialogWrapper(
     var connection: String = ""
         private set
 
-    private val availableMigrationsList = mutableListOf<String>()
+    private var availableMigrationsList = listOf<MigrationInfo>()
+    private val currentDbContextMigrationsList = mutableListOf<String>()
 
     private lateinit var useDefaultConnectionCheckbox: JCheckBox
     private lateinit var targetMigrationTextField: TextFieldWithCompletion
 
     init {
-        migrationsProjectChangedEvent += ::refreshCompletion
+        migrationsProjectChangedEvent += ::onMigrationsProjectChanged
+        dbContextChangedEvent += ::refreshCurrentDbContextMigrations
         init()
     }
 
@@ -62,7 +63,7 @@ class UpdateDatabaseDialogWrapper(
 
     private fun targetMigrationRow(parent: LayoutBuilder): Row {
         val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CLASS)
-        val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(availableMigrationsList, completionItemsIcon)
+        val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(currentDbContextMigrationsList, completionItemsIcon)
         targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
         targetMigrationTextField.document.addDocumentListener(object : DocumentListener {
             override fun documentChanged(event: DocumentEvent) {
@@ -81,7 +82,7 @@ class UpdateDatabaseDialogWrapper(
     private fun targetMigrationValidation(): ValidationInfoBuilder.(TextFieldWithCompletion) -> ValidationInfo? = {
         if (it.text.isEmpty())
             error("Target migration could not be empty")
-        else if (!availableMigrationsList.contains(it.text))
+        else if (!currentDbContextMigrationsList.contains(it.text))
             error("Migration with such name doesn't exist")
         else null
     }
@@ -94,24 +95,35 @@ class UpdateDatabaseDialogWrapper(
     //        else null
     //    }
 
-    private fun refreshCompletion(migrationsProjectItem: MigrationsProjectItem) {
-        val migrations = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
+    private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
+        availableMigrationsList = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
             isCancelable = true,
             throwFault = true
-        )?.map { it.longName }?.sorted()
+        )?.sortedByDescending { it.longName } ?: listOf()
 
-        availableMigrationsList.clear()
+        refreshCurrentDbContextMigrations(dbContext)
+    }
 
-        if (migrations == null || migrations.isEmpty()) {
-            targetMigration = ""
-        } else {
-            val lastMigration = migrations.last()
-            targetMigration = lastMigration
+    private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
+        currentDbContextMigrationsList.clear()
 
-            availableMigrationsList.addAll(0, migrations)
+        if (dbContext == null) {
+            return
         }
 
-        availableMigrationsList.add("0")
+        val availableDbContextMigrations = availableMigrationsList
+            .filter { it.dbContextClass == dbContext!!.data }
+            .map { it.longName }
+
+        if (availableDbContextMigrations.isEmpty())
+            targetMigration = ""
+        else {
+            val lastMigration = availableDbContextMigrations.last()
+            targetMigration = lastMigration
+            currentDbContextMigrationsList.addAll(0, availableDbContextMigrations)
+        }
+
+        currentDbContextMigrationsList.add("0")
 
         targetMigrationTextField.text = targetMigration
     }

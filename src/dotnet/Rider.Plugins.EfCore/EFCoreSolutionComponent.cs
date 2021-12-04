@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
+using Rider.Plugins.EfCore.Exceptions;
 using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Rd;
 
@@ -64,17 +65,22 @@ namespace Rider.Plugins.EfCore
             }
         }
 
-        private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, string projectName)
+        private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
         {
             using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
             using (ReadLockCookie.Create())
             {
-                var project = _solution.GetProjectByName(projectName);
+                var project = _solution.GetProjectByName(identity.ProjectName);
+                if (project is null)
+                {
+                    return RdTask<bool>.Faulted(new ProjectNotFoundException(identity.ProjectName));
+                }
 
                 var projectHasMigrations = project
                     ?.GetPsiModules()
                     ?.SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
-                    .Any();
+                    .Select(cl => cl.ToMigrationInfo())
+                    .Any(migrationInfo => migrationInfo != null && migrationInfo.DbContextClass == identity.DbContextClass);
 
                 return RdTask<bool>.Successful(projectHasMigrations ?? false);
             }
@@ -86,15 +92,15 @@ namespace Rider.Plugins.EfCore
             using (ReadLockCookie.Create())
             {
                 var project = _solution.GetProjectByName(projectName);
+                if (project is null)
+                {
+                    return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(projectName));
+                }
 
-                // TODO: Refactor to simplify
                 var foundMigrations = project
                     .GetPsiModules()
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
-                    .Select(cl => (className: cl.ShortName, attribute: cl.GetAttributeInstance("MigrationAttribute")))
-                    .Where(items => items.attribute != null)
-                    .Select(items => (shortName: items.className, longName: items.attribute.PositionParameter(0).ConstantValue.Value as string))
-                    .Select(migration => new MigrationInfo(migration.shortName, migration.longName))
+                    .Select(cl => cl.ToMigrationInfo())
                     .ToList();
 
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
@@ -107,6 +113,10 @@ namespace Rider.Plugins.EfCore
             using (ReadLockCookie.Create())
             {
                 var project = _solution.GetProjectByName(projectName);
+                if (project is null)
+                {
+                    return RdTask<List<DbContextInfo>>.Faulted(new ProjectNotFoundException(projectName));
+                }
 
                 var foundDbContexts = project
                     .GetPsiModules()

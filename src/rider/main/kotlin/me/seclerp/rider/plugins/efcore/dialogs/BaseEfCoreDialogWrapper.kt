@@ -14,6 +14,7 @@ import me.seclerp.rider.plugins.efcore.components.iconComboBox
 import me.seclerp.rider.plugins.efcore.components.items.*
 import me.seclerp.rider.plugins.efcore.models.MigrationsProjectData
 import me.seclerp.rider.plugins.efcore.models.StartupProjectData
+import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
 import java.util.*
@@ -54,6 +55,9 @@ abstract class BaseEfCoreDialogWrapper(
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected val startupProjectChangedEvent: Event<StartupProjectItem> = Event()
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val dbContextChangedEvent: Event<DbContextItem?> = Event()
 
     private var targetFrameworkModel: DefaultComboBoxModel<TargetFrameworkItem>
     private var dbContextModel: DefaultComboBoxModel<DbContextItem>
@@ -233,15 +237,20 @@ abstract class BaseEfCoreDialogWrapper(
         if (migrationsProject == null)
             error("You should selected valid migrations project")
         else if (shouldHaveMigrationsInProject) {
-            val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Checking migrations...",
-                isCancelable = true,
-                throwFault = true
-            )
-
-            if (hasMigrations == null || !hasMigrations)
-                error("Selected migrations project doesn't have migrations")
-            else
+            if (dbContext == null)
                 null
+            else {
+                val migrationsIdentity = MigrationsIdentity(migrationsProject!!.displayName, dbContext!!.data)
+                val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsIdentity, intellijProject, "Checking migrations...",
+                    isCancelable = true,
+                    throwFault = true
+                )
+
+                if (hasMigrations == null || !hasMigrations)
+                    error("Selected migrations project doesn't have migrations")
+                else
+                    null
+            }
         } else null
     }
 
@@ -291,6 +300,7 @@ abstract class BaseEfCoreDialogWrapper(
         if (context == dbContext) return
 
         dbContext = context
+        dbContextChangedEvent.invoke(dbContext)
     }
 
     private fun buildConfigurationSetter(configuration: BuildConfigurationItem?) {
@@ -318,7 +328,8 @@ abstract class BaseEfCoreDialogWrapper(
         val dbContextIconItems = dbContexts!!.map { DbContextItem(it.name, it.fullName) }
 
         dbContextModel.addAll(dbContextIconItems)
-        dbContext = dbContextIconItems.firstOrNull()
+        val firstDbContext = dbContextIconItems.firstOrNull()
+        dbContextSetter(firstDbContext)
 
         if (::dbContextBox.isInitialized)
             dbContextBox.item = dbContext
