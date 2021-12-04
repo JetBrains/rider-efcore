@@ -18,17 +18,20 @@ There are a couple of UI stuff for:
 
 ### How to install
 
-> **Note:** Marketplace has plugin only for stable (currently 2021.2) Rider version. If you are looking for installing plugin on EAP version of Rider, use Manual installation. 
+#### Using marketplace:
+> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing
 
-#### Using JetBrains Plugin Marketplace:
-   1. Go to <kbd>Settings</kbd> / <kbd>Plugins</kbd> / <kbd>Marketplace</kbd>
-   2. Search for "Entity Framework Core UI"
-   3. Click <kbd>Install</kbd>
-   4. After installing restart Rider
+1. Go to `Settings` / `Plugins` / `Marketplace`
+1. Search for "Entity Framework Core UI"
+1. Click `Install`, then `Save`
+1. After saving restart Rider
 
-#### Using `.zip` file with plugin:
-   1. Download the latest plugin `.zip` file from Releases section at the right for your version of Rider
-   2. Open Rider's <kbd>File</kbd> / <kbd>Settings</kbd> and proceed to <kbd>Plugins</kbd> / <kbd>⚙</kbd> / <kbd>Install plugin from disk</kbd>, select downloaded `.zip` and restart Rider
+#### Using `.zip` file
+1. Go to [**Releases**](https://github.com/seclerp/rider-efcore/releases)
+2. Download the latest release of plugin for your edition of JetBrains Rider (Stable or EAP) 
+3. Proceed to `Settings` / `Plugins` / `⚙` / `Install plugin from disk`
+4. Click `Save`
+5. After saving restart Rider
 
 ### How to use
 
@@ -47,35 +50,62 @@ There are a couple of UI stuff for:
 
    ![Logo](img/how-to-use-4.png)
 
+More about features and available dialogs you could read in [**the blog post**](TODO).
+
 ### Requirements
 
-- JetBrains Rider **2021.2+**
+- JetBrains Rider **2021.2.***
+
+  or JetBrains Rider **2021.3 EAP10**
+
 - EF Core **5.0+** with projects under `net5.0` or `net6.0` target framework
+
 - EF Core global tools (`dotnet ef`) **5.0+** installed
 
-### Building
+### Development
 
-You should have JDK 11 and .NET SDK 5.0+ installed and configured. Then, execute:
+> **Note**: You should have JDK 11 and .NET SDK 5.0+ installed and configured.
+
+#### Preparing
 
 `./gradlew rdgen` - generates RD protocol data for plugin internal communication
 
-Then you could build a plugin with:
+#### Building plugin parts
 
-`./gradlew buildPlugin`
+- for stable version of Rider:
+
+  `./gradlew buildPlugin`
+
+
+- for EAP version of Rider:
+
+  `./gradlew buildPlugin -PRiderSdkVersion=2021.3.0-eap10 -PProductVersion=2021.3-EAP10-SNAPSHOT`
 
 It will build both frontend and backend parts.
 
-Or to run JetBrains Rider with plugin:
+#### Running
 
-`./gradlew runIde` - runs a Rider instance with plugin attached to it
+Next command will start instance of JetBrains Rider with plugin attached to it:
+
+`./gradlew runIde`
 
 ### Contributing
 
-Contributions are welcome!
+Contributions are welcome! 🎉
 
 It's better to create an issue with description of your bug/feature before creating pull requests.
+
+#### About branching
+
+This project uses modified version of **trunk-based git strategy**. 
+
+- `develop` branch play main development branch role. When creating any feature or bugfix, please make your branch from `develop`.
+
+- `master` branch stands for stable releases. `develop` branch will be merged into it before every release.
+- `eap` branch stands for EAP release. `develop` branch will be also merged into it before every release (if EAP build of Rider is available to use)
 
 ### See also
 
 - [**Changelog**](CHANGELOG.md)
 - [**Roadmap**](docs/ROADMAP.md)
+- [**Working with Entity Framework Core inside JetBrains Rider**](TODO)

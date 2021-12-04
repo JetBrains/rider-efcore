@@ -1,0 +1,20 @@
+name: Build (EAP)
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: ./.github/workflows/prepare-build-env
+
+      - name: 🏗 Build Plugin (EAP)
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: buildPlugin -PRiderSdkVersion=2021.3.0-eap10 -PProductVersion=2021.3-EAP10-SNAPSHOT

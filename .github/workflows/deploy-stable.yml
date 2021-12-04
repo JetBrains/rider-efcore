@@ -1,0 +1,39 @@
+name: Deploy (Stable)
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: ./.github/workflows/prepare-build-env
+
+      - name: 🔍 Extract Version
+        id: version
+        run: |
+          echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=PluginVersion: ).*')" >> $GITHUB_ENV
+
+#       - name: 🚀 Publish Plugin
+#         uses: gradle/gradle-build-action@v2
+#         with:
+#           arguments: buildPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
+
+      - name: 🏗 Build Plugin for 2021.2
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: buildPlugin -PRiderSdkVersion=2021.2.0 -PProductVersion=2021.2
+
+      - name: 🚀 Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          commit: ${{ github.sha }} # Commit SHA
+          tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
+          draft: true
+          artifacts: "output/*.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
