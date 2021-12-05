@@ -6,8 +6,8 @@
     <Title>Entity Framework Core</Title>
     <Description>JetBrains Rider plugin for Entity Framework Core</Description>
 
-    <Authors>seclerp</Authors>
-    <Copyright>Copyright $([System.DateTime]::Now.Year) seclerp</Copyright>
+    <Authors>Andrew Rublyov</Authors>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) Andrew Rublyov</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
     <PackageProjectUrl></PackageProjectUrl>

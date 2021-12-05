@@ -47,8 +47,8 @@ abstract class BaseEfCoreDialogWrapper(
 
     private val migrationsProjects: Array<MigrationsProjectItem>
     private val startupProjects: Array<StartupProjectItem>
-    private val dotnetProjectName: String
-    private val dotnetProjectId: UUID
+    private val dotnetProjectName: String?
+    private val dotnetProjectId: UUID?
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
@@ -83,10 +83,10 @@ abstract class BaseEfCoreDialogWrapper(
             .toTypedArray()
 
         val dotnetProject = migrationsProjects.find { it.displayName == actionDotnetProjectName }
-            ?: migrationsProjects.first()
+            ?: migrationsProjects.firstOrNull()
 
-        dotnetProjectName = dotnetProject.displayName
-        dotnetProjectId = dotnetProject.data.id
+        dotnetProjectName = dotnetProject?.displayName
+        dotnetProjectId = dotnetProject?.data?.id
 
         migrationsProjectChangedEvent += ::migrationsProjectChanged
         startupProjectChangedEvent += ::startupProjectChanged
@@ -217,6 +217,11 @@ abstract class BaseEfCoreDialogWrapper(
     }
 
     private fun loadPreferredProjects() {
+        if (dotnetProjectId == null || dotnetProjectName == null) {
+            setDefaultProjects()
+            return
+        }
+
         val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProjectId)
         if (preferredProjects != null) {
             val (migrationsProjectId, startupProjectId) = preferredProjects
@@ -228,9 +233,13 @@ abstract class BaseEfCoreDialogWrapper(
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
         } else {
-            migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.firstOrNull())
-            startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.firstOrNull())
+            setDefaultProjects()
         }
+    }
+
+    private fun setDefaultProjects() {
+        migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.firstOrNull())
+        startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.firstOrNull())
     }
 
     private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {

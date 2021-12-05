@@ -2,7 +2,7 @@
   <id>me.seclerp.rider.plugins.efcore</id>
   <name>Entity Framework Core UI</name>
   <version>1.0.0</version>
-  <vendor url="https://github.com/seclerp">seclerp</vendor>
+  <vendor url="https://github.com/seclerp">Andrew Rublyov</vendor>
   <idea-version since-build="2021.2" />
   <depends>com.intellij.modules.rider</depends>
 
