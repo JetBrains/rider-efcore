@@ -13,10 +13,4 @@
 
 ## Suggestions
 
-> Suggestions are not submitted completely and need to be discussed/revisited
-
-- Add "Remove All Migrations" action
-- Add "Squash Migrations", something similar to git squash for commits on merge
-- Support .NET Core 3.1 and .NET Standard 2.1 projects
-- Pop-up with quick access to actions related to last used project pair
-- Remove Migrations folder after Remove Last Migration if there are no migrations left
+Currently submitted suggestions are located [**here**](https://github.com/seclerp/rider-efcore/issues?q=is%3Aissue+is%3Aopen+label%3Asuggestion).
