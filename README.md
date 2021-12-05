@@ -51,7 +51,7 @@ There are a couple of UI stuff for:
 
    ![Logo](img/how-to-use-4.png)
 
-More about features and available dialogs you could read in [**the blog post**](TODO).
+More about features and available dialogs you could read in [**the blog post**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/).
 
 ### Requirements
 
@@ -107,6 +107,7 @@ This project uses modified version of **trunk-based git strategy**.
 
 ### See also
 
+- [**Marketplace page**](https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui)
 - [**Changelog**](CHANGELOG.md)
 - [**Roadmap**](docs/ROADMAP.md)
-- [**Working with Entity Framework Core inside JetBrains Rider**](TODO)
+- [**Working with Entity Framework Core inside JetBrains Rider**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/)
