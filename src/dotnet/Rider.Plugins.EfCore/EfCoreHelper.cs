@@ -8,7 +8,8 @@ namespace Rider.Plugins.EfCore
 {
     public static class EfCoreHelper
     {
-        private static readonly string EfCoreToolsNugetId = "Microsoft.EntityFrameworkCore.Design";
+        private static readonly string EfCoreDesignNugetId = "Microsoft.EntityFrameworkCore.Design";
+        private static readonly string EfCoreToolsNugetId = "Microsoft.EntityFrameworkCore.Tools";
 
         public static IEnumerable<IProject> GetSupportedMigrationProjects(ISolution solution) =>
             GetSupportedDotnetProjects(solution)
@@ -16,7 +17,8 @@ namespace Rider.Plugins.EfCore
 
         public static IEnumerable<IProject> GetSupportedStartupProjects(ISolution solution) =>
             GetSupportedDotnetProjects(solution)
-                .Where(project => project.GetInstalledPackage(EfCoreToolsNugetId) != default);
+                .Where(project => project.GetInstalledPackage(EfCoreToolsNugetId) != default
+                                  || project.GetInstalledPackage(EfCoreDesignNugetId) != default);
 
         private static IEnumerable<IProject> GetSupportedDotnetProjects(ISolution solution) =>
             solution
