@@ -9,7 +9,6 @@ import me.seclerp.rider.plugins.efcore.actions.getDotnetProjectName
 import me.seclerp.rider.plugins.efcore.actions.isLoadedProjectFile
 import me.seclerp.rider.plugins.efcore.dialogs.BaseEfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.commands.CommonOptions
-import me.seclerp.rider.plugins.efcore.commands.CommonOptionsMapper
 
 abstract class BaseEfCoreAction: AnAction() {
     override fun update(actionEvent: AnActionEvent) {
@@ -17,15 +16,13 @@ abstract class BaseEfCoreAction: AnAction() {
     }
 
     fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions {
-        val mapper = CommonOptionsMapper()
-        val mappedFramework = mapper.getMappedTargetFramework(dialog.targetFramework!!.displayName)
 
         return CommonOptions(
             dialog.migrationsProject!!.data.fullPath,
             dialog.startupProject!!.data.fullPath,
             dialog.dbContext!!.data,
             dialog.buildConfiguration!!.displayName,
-            mappedFramework,
+            dialog.targetFramework!!.displayName,
             dialog.noBuild
         )
     }
