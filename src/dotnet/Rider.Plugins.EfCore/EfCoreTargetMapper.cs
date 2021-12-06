@@ -8,9 +8,9 @@ namespace Rider.Plugins.EfCore
         {
             switch (targetFrameworkId.PresentableString)
             {
-                case EfCoreSupportedTarget.NetCore31Target:
+                case EfCoreSupportedTarget.NetCore31:
                     return "netcoreapp3.1";
-                case EfCoreSupportedTarget.NetStandard21Target:
+                case EfCoreSupportedTarget.NetStandard21:
                     return "netstandard2.1";
                 default:
                     return targetFrameworkId.PresentableString;

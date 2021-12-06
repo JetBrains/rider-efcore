@@ -36,15 +36,15 @@ namespace Rider.Plugins.EfCore
         }
 
         private static bool IsMigrationProjectSupported(TargetFrameworkId targetFrameworkId) =>
-            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5Target
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6Target
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31Target
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetStandard21Target;
+            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetStandard21;
 
         private static bool IsStartupProjectSupported(TargetFrameworkId targetFrameworkId) =>
-            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5Target
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6Target
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31Target;
+            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31;
 
         private static bool StartupProjectPackagesInstalled(IProject project) =>
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
