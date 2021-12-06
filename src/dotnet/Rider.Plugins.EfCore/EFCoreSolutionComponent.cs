@@ -58,7 +58,8 @@ namespace Rider.Plugins.EfCore
                         project.Guid,
                         project.Name,
                         project.ProjectFileLocation.FullPath,
-                        project.TargetFrameworkIds.Select(fr => fr.PresentableString).ToList()))
+                        project.TargetFrameworkIds
+                            .Select(fr => fr.MapTargetFrameworkId()).ToList()))
                     .ToList();
 
                 return RdTask<List<StartupProjectInfo>>.Successful(allProjectNames);
@@ -76,11 +77,11 @@ namespace Rider.Plugins.EfCore
                     return RdTask<bool>.Faulted(new ProjectNotFoundException(identity.ProjectName));
                 }
 
-                var projectHasMigrations = project
-                    ?.GetPsiModules()
+                var projectHasMigrations = project.GetPsiModules()
                     ?.SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
                     .Select(cl => cl.ToMigrationInfo())
-                    .Any(migrationInfo => migrationInfo != null && migrationInfo.DbContextClass == identity.DbContextClass);
+                    .Any(migrationInfo =>
+                        migrationInfo != null && migrationInfo.DbContextClass == identity.DbContextClass);
 
                 return RdTask<bool>.Successful(projectHasMigrations ?? false);
             }
@@ -121,7 +122,8 @@ namespace Rider.Plugins.EfCore
                 var foundDbContexts = project
                     .GetPsiModules()
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
-                    .Select(dbContextClass => new DbContextInfo(dbContextClass.ShortName, dbContextClass.GetFullClrName()))
+                    .Select(dbContextClass =>
+                        new DbContextInfo(dbContextClass.ShortName, dbContextClass.GetFullClrName()))
                     .ToList();
 
                 return RdTask<List<DbContextInfo>>.Successful(foundDbContexts);
