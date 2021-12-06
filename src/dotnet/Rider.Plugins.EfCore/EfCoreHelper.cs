@@ -21,7 +21,7 @@ namespace Rider.Plugins.EfCore
         {
             var supportedStartupProjects = solution
                 .GetSupportedDotnetProjects(IsStartupProjectSupported)
-                .Where(IsRequiredNugetPackageInstalled);
+                .Where(StartupProjectPackagesInstalled);
 
             return supportedStartupProjects;
         }
@@ -46,7 +46,7 @@ namespace Rider.Plugins.EfCore
             || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6Target
             || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31Target;
 
-        private static bool IsRequiredNugetPackageInstalled(IProject project) =>
+        private static bool StartupProjectPackagesInstalled(IProject project) =>
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
             || project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreDesignNugetId) != default;
     }
