@@ -36,7 +36,9 @@ namespace Rider.Plugins.EfCore
         }
 
         private static bool IsMigrationProjectSupported(TargetFrameworkId targetFrameworkId) =>
-            IsStartupProjectSupported(targetFrameworkId)
+            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5Target
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6Target
+            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31Target
             || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetStandard21Target;
 
         private static bool IsStartupProjectSupported(TargetFrameworkId targetFrameworkId) =>

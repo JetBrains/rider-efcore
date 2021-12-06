@@ -10,7 +10,6 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
-using JetBrains.Util.Dotnet.TargetFrameworkIds;
 using Rider.Plugins.EfCore.Exceptions;
 using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Rd;
@@ -59,7 +58,8 @@ namespace Rider.Plugins.EfCore
                         project.Guid,
                         project.Name,
                         project.ProjectFileLocation.FullPath,
-                        project.TargetFrameworkIds.Select(MapTargetFrameworkId).ToList()))
+                        project.TargetFrameworkIds
+                            .Select(fr => fr.MapTargetFrameworkId()).ToList()))
                     .ToList();
 
                 return RdTask<List<StartupProjectInfo>>.Successful(allProjectNames);
@@ -127,19 +127,6 @@ namespace Rider.Plugins.EfCore
                     .ToList();
 
                 return RdTask<List<DbContextInfo>>.Successful(foundDbContexts);
-            }
-        }
-
-        private static string MapTargetFrameworkId(TargetFrameworkId targetFrameworkId)
-        {
-            switch (targetFrameworkId.PresentableString)
-            {
-                case EfCoreSupportedTarget.NetCore31Target:
-                    return "netcoreapp3.1";
-                case EfCoreSupportedTarget.NetStandard21Target:
-                    return "netstandard2.1";
-                default:
-                    return targetFrameworkId.PresentableString;
             }
         }
     }
