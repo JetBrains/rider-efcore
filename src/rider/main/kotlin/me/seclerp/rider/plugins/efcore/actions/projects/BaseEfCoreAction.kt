@@ -10,14 +10,13 @@ import me.seclerp.rider.plugins.efcore.actions.isLoadedProjectFile
 import me.seclerp.rider.plugins.efcore.dialogs.BaseEfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.commands.CommonOptions
 
-abstract class BaseEfCoreAction: AnAction() {
+abstract class BaseEfCoreAction : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
         actionEvent.presentation.isVisible = actionEvent.isLoadedProjectFile()
     }
 
-    fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions {
-
-        return CommonOptions(
+    fun getCommonOptions(dialog: BaseEfCoreDialogWrapper): CommonOptions =
+        CommonOptions(
             dialog.migrationsProject!!.data.fullPath,
             dialog.startupProject!!.data.fullPath,
             dialog.dbContext!!.data,
@@ -25,7 +24,7 @@ abstract class BaseEfCoreAction: AnAction() {
             dialog.targetFramework!!.displayName,
             dialog.noBuild
         )
-    }
+
 
     protected fun getEfCoreRiderModel(actionEvent: AnActionEvent): RiderEfCoreModel {
         // TODO: Validate
@@ -45,5 +44,6 @@ abstract class BaseEfCoreAction: AnAction() {
     @Suppress("ArrayInDataClass")
     data class DialogBuildParameters(
         val model: RiderEfCoreModel,
-        val currentDotnetProjectName: String)
+        val currentDotnetProjectName: String
+    )
 }
