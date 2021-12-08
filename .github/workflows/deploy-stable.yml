@@ -26,10 +26,10 @@ jobs:
 #         with:
 #           arguments: buildPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
 
-      - name: 🏗 Build Plugin for 2021.2
+      - name: 🏗 Build Plugin for 2021.3
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: buildPlugin -PRiderSdkVersion=2021.2.0 -PProductVersion=2021.2
+          arguments: buildPlugin
 
       - name: 🚀 Create Release
         uses: ncipollo/release-action@v1

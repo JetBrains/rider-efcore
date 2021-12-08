@@ -35,7 +35,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           commit: ${{ github.sha }} # Commit SHA
-          tag: v${{ env.PLUGIN_VERSION }}-eap # 'v' + version from gradle.properties
+          tag: v${{ env.PLUGIN_VERSION }}-eap # 'v' + version from gradle.properties + 'eap'
           draft: true
           artifacts: "output/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
