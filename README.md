@@ -2,7 +2,7 @@
 ![Logo](img/rider-plus-efcore-128.png)
 
 [![Build (Stable)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml)
-[![Build (EAP)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml)
+<!-- [![Build (EAP)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml) -->
 
 ---
 
@@ -20,7 +20,7 @@ There are a couple of UI stuff for:
 ### How to install
 
 #### Using marketplace:
-> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing
+<!-- > **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing -->
 
 1. Go to `Settings` / `Plugins` / `Marketplace`
 1. Search for "Entity Framework Core UI"
@@ -55,13 +55,17 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2021.2.***
-
-  or JetBrains Rider **2021.3 EAP10**
-
-- EF Core **5.0+** with projects under `net5.0` or `net6.0` target framework
+- JetBrains Rider **2021.3.***
+<!-- or JetBrains Rider **2021.3 EAP10** -->
+- EF Core **5.0+** with projects under such target frameworks:
+  - `net6.0`
+  - `net5.0`
+  - `netcoreapp3.1`
+  - `netstandard2.1` (only for Migrations projects)
 
 - EF Core global tools (`dotnet ef`) **5.0+** installed
+
+> **Note**: Projects with older versions of EF Core might work, but with issues
 
 ### Development
 
