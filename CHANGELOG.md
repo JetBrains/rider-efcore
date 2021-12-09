@@ -1,3 +1,17 @@
+<h2>1.1.1</h2>
+<p>
+  <ul>
+    <li>Fix: Projects with whitespaces in project file path are recognized incorrectly</li>
+    <li>Fix: Default Update database target migration is selected incorrectly</li>
+  </ul>
+</p>
+<h2>1.1.0</h2>
+<p>
+  <ul>
+    <li>General: Support .NET Core 3.1 and .NET Standard 2.1 projects (#30 by @kolosovpetro)</li>
+    <li>Upgrade to Rider 2021.3 in stable channel</li>
+  </ul>
+</p>
 <h2>1.0.0</h2>
 <p>
   <ul>
