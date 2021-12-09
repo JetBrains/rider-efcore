@@ -15,7 +15,7 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
     }
 
     fun add(value: String): CliCommandBuilder {
-        commandStringBuilder.append(" ", value)
+        commandStringBuilder.append(" ", formatValue(value))
 
         return this
     }
@@ -28,14 +28,14 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
     }
 
     fun addNamed(name: String, value: String): CliCommandBuilder {
-        commandStringBuilder.append(" ", name, " ", value)
+        commandStringBuilder.append(" ", name, " ", formatValue(value))
 
         return this
     }
 
     fun addNamedNullable(name: String, value: String?): CliCommandBuilder {
         if (value != null)
-            commandStringBuilder.append(" ", name, " ", value)
+            commandStringBuilder.append(" ", name, " ", formatValue(value))
 
         return this
     }
@@ -44,5 +44,15 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
         val fullCommand = commandStringBuilder.toString()
 
         return CliCommand(fullCommand)
+    }
+
+    private fun formatValue(value: String): String =
+        if (!value.matches(HAS_WHITESPACES_REGEX))
+            value
+        else
+            "\"$value\""
+
+    companion object {
+        private val HAS_WHITESPACES_REGEX = Regex(".*\\s.*")
     }
 }

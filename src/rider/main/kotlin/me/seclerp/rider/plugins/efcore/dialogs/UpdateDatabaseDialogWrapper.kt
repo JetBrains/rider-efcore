@@ -118,7 +118,7 @@ class UpdateDatabaseDialogWrapper(
         if (availableDbContextMigrations.isEmpty())
             targetMigration = ""
         else {
-            val lastMigration = availableDbContextMigrations.last()
+            val lastMigration = availableDbContextMigrations.first()
             targetMigration = lastMigration
             currentDbContextMigrationsList.addAll(0, availableDbContextMigrations)
         }

@@ -16,7 +16,7 @@ class UpdateDatabaseAction : BaseEfCoreAction() {
         if (dialog.showAndGet()) {
             val databaseClient = intellijProject.getService<DatabaseClient>()
             val commonOptions = getCommonOptions(dialog)
-            val targetMigration = dialog.targetMigration
+            val targetMigration = dialog.targetMigration.trim()
             val connection = if (dialog.useDefaultConnection) null else dialog.connection
 
             executeCommandUnderProgress(intellijProject, "Updating database...", "Database has been updated") {
