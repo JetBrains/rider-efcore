@@ -101,7 +101,8 @@ namespace Rider.Plugins.EfCore
                 var foundMigrations = project
                     .GetPsiModules()
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
-                    .Select(cl => cl.ToMigrationInfo())
+                    .Distinct(migrationClass => migrationClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
+                    .Select(migrationClass => migrationClass.ToMigrationInfo())
                     .ToList();
 
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
@@ -122,6 +123,7 @@ namespace Rider.Plugins.EfCore
                 var foundDbContexts = project
                     .GetPsiModules()
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
+                    .Distinct(dbContextClass => dbContextClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
                     .Select(dbContextClass =>
                         new DbContextInfo(dbContextClass.ShortName, dbContextClass.GetFullClrName()))
                     .ToList();

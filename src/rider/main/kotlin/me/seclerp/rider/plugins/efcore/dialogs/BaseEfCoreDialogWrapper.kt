@@ -192,6 +192,7 @@ abstract class BaseEfCoreDialogWrapper(
         val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value!!
 
         val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection.valueOrNull!!
+            .distinctBy { it.configuration } // To get around of different platforms for the same configurations
             .map { BuildConfigurationItem(it.configuration) }
             .toTypedArray()
 
