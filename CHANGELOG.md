@@ -1,3 +1,11 @@
+<h2>1.1.2</h2>
+<p>
+  <ul>
+    <li>Fix: Duplicated items in dropdowns when projects has multiple target framework</li>
+    <li>Fix: Duplicated items in the build configuration dropdown when solution has multiple target platforms</li>
+    <li>Fix: Exceptions when trying to open any action with no build configuration in solution</li>
+  </ul>
+</p>
 <h2>1.1.1</h2>
 <p>
   <ul>
