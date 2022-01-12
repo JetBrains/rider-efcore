@@ -41,7 +41,6 @@ abstract class BaseEfCoreAction : AnAction() {
         return dialogFactory(params)
     }
 
-    @Suppress("ArrayInDataClass")
     data class DialogBuildParameters(
         val model: RiderEfCoreModel,
         val currentDotnetProjectName: String

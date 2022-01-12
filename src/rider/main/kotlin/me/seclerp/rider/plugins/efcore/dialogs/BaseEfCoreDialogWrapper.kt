@@ -7,6 +7,7 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.layout.*
+import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.Event
@@ -189,16 +190,17 @@ abstract class BaseEfCoreDialogWrapper(
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun buildConfigurationRow(parent: Row): Row {
-        val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value!!
+        val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value
 
-        val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection.valueOrNull!!
+        val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection
+            .valueOrEmpty()
             .distinctBy { it.configuration } // To get around of different platforms for the same configurations
             .map { BuildConfigurationItem(it.configuration) }
             .toTypedArray()
 
         buildConfigurationModel = DefaultComboBoxModel(availableConfigurations)
-        buildConfiguration = availableConfigurations.find { it.displayName == currentConfiguration.configuration }
-            ?: availableConfigurations.first()
+        buildConfiguration = availableConfigurations.find { it.displayName == currentConfiguration?.configuration }
+            ?: availableConfigurations.firstOrNull()
 
         return parent.row("Build configuration:") {
             iconComboBox(buildConfigurationModel, { buildConfiguration }, ::buildConfigurationSetter)
