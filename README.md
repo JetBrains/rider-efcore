@@ -1,12 +1,14 @@
-# Entity Framework Core UI plugin for JetBrains Rider
-![Logo](img/rider-plus-efcore-128.png)
-
-[![Build (Stable)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml)
-<!-- [![Build (EAP)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg)](https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml) -->
+<div align="center">
+  <h1>Entity Framework Core UI plugin for JetBrains Rider</h1>
+  <img src="img/rider-efcore-cover.png" alt="Logo">
+  <br /><br />
+  This plugin introduces Entity Framework Core commands' UI inside JetBrains Rider.
+  <br /><br />
+  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg" alt="Build (Stable)"></a>
+  <!-- <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg" alt="Build (EAP)"></a> -->
+</div>
 
 ---
-
-This plugin introduces Entity Framework Core commands' UI inside JetBrains Rider.
 
 ### Features
 
