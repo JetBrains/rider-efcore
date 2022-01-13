@@ -1,25 +1,23 @@
 package me.seclerp.rider.plugins.efcore.commands
 
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.util.ExecUtil
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
-class CliCommand(private val fullCommand: String) {
+class CliCommand(private val command: GeneralCommandLine) {
     fun execute(): CliCommandResult {
         return try {
-            val runtime = Runtime.getRuntime()
-            val proc = runtime.exec(fullCommand)
+            val result = ExecUtil.execAndGetOutput(command)
 
-            proc.waitFor(60, TimeUnit.MINUTES)
+            val output = result.stdout
+            val error = result.stderr
+            val exitCode = result.exitCode
 
-            val output = proc.inputStream.bufferedReader().readText()
-            val error = proc.errorStream.bufferedReader().readText()
-            val exitCode = proc.exitValue()
-
-            CliCommandResult(fullCommand, exitCode, output, exitCode == 0, error)
+            CliCommandResult(command.commandLineString, exitCode, output, exitCode == 0, error)
         } catch(e: IOException) {
             e.printStackTrace()
 
-            CliCommandResult(fullCommand, -1, e.toString(), false)
+            CliCommandResult(command.commandLineString, -1, e.toString(), false)
         }
     }
 }

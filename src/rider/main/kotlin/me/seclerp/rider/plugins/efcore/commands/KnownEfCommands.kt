@@ -1,7 +1,8 @@
 package me.seclerp.rider.plugins.efcore.commands
 
 object KnownEfCommands {
-    val dotnetEf     = "dotnet ef"
+    val dotnet       = "dotnet"
+    val ef           = "ef"
 
     object Migrations {
         val add      = "migrations add"

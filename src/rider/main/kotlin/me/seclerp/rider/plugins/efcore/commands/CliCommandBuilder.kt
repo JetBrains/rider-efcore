@@ -1,11 +1,16 @@
 package me.seclerp.rider.plugins.efcore.commands
 
+import com.intellij.execution.configurations.GeneralCommandLine
+import java.nio.charset.Charset
+
 class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
-    private val commandStringBuilder: StringBuilder = StringBuilder(KnownEfCommands.dotnetEf)
+    private var generalCommandLine: GeneralCommandLine =
+        GeneralCommandLine(KnownEfCommands.dotnet)
+            .withParameters(KnownEfCommands.ef)
+            .withParameters(baseCommand.split(" "))
+            .withCharset(Charset.forName("UTF-8"))
 
     init {
-        commandStringBuilder.append(" ", baseCommand)
-
         addNamed("--project", commonOptions.migrationsProject)
         addNamed("--startup-project", commonOptions.startupProject)
         addNamed("--context", commonOptions.dbContext)
@@ -15,44 +20,32 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
     }
 
     fun add(value: String): CliCommandBuilder {
-        commandStringBuilder.append(" ", formatValue(value))
+        generalCommandLine = generalCommandLine.withParameters(value)
 
         return this
     }
 
     fun addIf(key: String, condition: Boolean): CliCommandBuilder {
         if (condition)
-            commandStringBuilder.append(" ", key)
+            generalCommandLine = generalCommandLine.withParameters(key)
 
         return this
     }
 
     fun addNamed(name: String, value: String): CliCommandBuilder {
-        commandStringBuilder.append(" ", name, " ", formatValue(value))
+        generalCommandLine = generalCommandLine.withParameters(name, value)
 
         return this
     }
 
     fun addNamedNullable(name: String, value: String?): CliCommandBuilder {
         if (value != null)
-            commandStringBuilder.append(" ", name, " ", formatValue(value))
+            generalCommandLine = generalCommandLine.withParameters(name, value)
 
         return this
     }
 
     fun build(): CliCommand {
-        val fullCommand = commandStringBuilder.toString()
-
-        return CliCommand(fullCommand)
-    }
-
-    private fun formatValue(value: String): String =
-        if (!value.matches(HAS_WHITESPACES_REGEX))
-            value
-        else
-            "\"$value\""
-
-    companion object {
-        private val HAS_WHITESPACES_REGEX = Regex(".*\\s.*")
+        return CliCommand(generalCommandLine)
     }
 }

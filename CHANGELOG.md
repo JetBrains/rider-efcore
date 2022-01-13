@@ -1,3 +1,9 @@
+<h2>1.1.3</h2>
+<p>
+  <ul>
+    <li>Fix: Unable to run any action under Mac OS X</li>
+  </ul>
+</p>
 <h2>1.1.2</h2>
 <p>
   <ul>
