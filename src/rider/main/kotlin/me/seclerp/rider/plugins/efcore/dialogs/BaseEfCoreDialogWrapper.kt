@@ -355,7 +355,7 @@ abstract class BaseEfCoreDialogWrapper(
         val configurationIconItems = project.data.targetFrameworks
             .map { TargetFrameworkItem(it) }
 
-        var defaultFramework = TargetFrameworkItem("<Default>")
+        val defaultFramework = TargetFrameworkItem("<Default>", icon = null)
         val targetFrameworkItems = LinkedList(configurationIconItems)
         targetFrameworkItems.push(defaultFramework)
 

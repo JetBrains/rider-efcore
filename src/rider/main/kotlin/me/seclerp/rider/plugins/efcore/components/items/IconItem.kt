@@ -4,6 +4,6 @@ import javax.swing.Icon
 
 open class IconItem<T>(
     val displayName: String,
-    val icon: Icon,
+    val icon: Icon?,
     val data: T
 )
