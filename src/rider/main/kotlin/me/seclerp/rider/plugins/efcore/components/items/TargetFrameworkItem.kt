@@ -4,12 +4,11 @@ import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.DotnetIconType
 import javax.swing.Icon
 
-class TargetFrameworkItem : IconItem<Unit> {
-    constructor(displayName: String, icon: Icon?) : super(displayName, icon, Unit)
+abstract class BaseTargetFrameworkItem(displayName: String, icon: Icon?, data: String?) :
+    IconItem<String?>(displayName, icon, data)
 
-    constructor(displayName: String) : super(
-        displayName,
-        DotnetIconResolver.resolveForType(DotnetIconType.TARGET_FRAMEWORK),
-        Unit
-    )
-}
+
+class TargetFrameworkItem(displayName: String, data: String) :
+    BaseTargetFrameworkItem(displayName, DotnetIconResolver.resolveForType(DotnetIconType.TARGET_FRAMEWORK), data)
+
+class DefaultTargetFrameworkItem : BaseTargetFrameworkItem("<Default>", null, null)

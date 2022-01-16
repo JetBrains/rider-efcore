@@ -27,7 +27,7 @@ abstract class BaseEfCoreDialogWrapper(
     private val intellijProject: Project,
     private val actionDotnetProjectName: String,
     private val shouldHaveMigrationsInProject: Boolean = false
-): DialogWrapper(true) {
+) : DialogWrapper(true) {
     var migrationsProject: MigrationsProjectItem? = null
         private set
 
@@ -40,7 +40,7 @@ abstract class BaseEfCoreDialogWrapper(
     var buildConfiguration: BuildConfigurationItem? = null
         private set
 
-    var targetFramework: TargetFrameworkItem? = null
+    var targetFramework: BaseTargetFrameworkItem? = null
         private set
 
     var noBuild = false
@@ -60,7 +60,7 @@ abstract class BaseEfCoreDialogWrapper(
     @Suppress("MemberVisibilityCanBePrivate")
     protected val dbContextChangedEvent: Event<DbContextItem?> = Event()
 
-    private var targetFrameworkModel: DefaultComboBoxModel<TargetFrameworkItem>
+    private var targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem>
     private var dbContextModel: DefaultComboBoxModel<DbContextItem>
 
     private lateinit var noBuildCheckbox: JBCheckBox
@@ -92,7 +92,7 @@ abstract class BaseEfCoreDialogWrapper(
         migrationsProjectChangedEvent += ::migrationsProjectChanged
         startupProjectChangedEvent += ::startupProjectChanged
 
-        targetFrameworkModel = DefaultComboBoxModel<TargetFrameworkItem>()
+        targetFrameworkModel = DefaultComboBoxModel<BaseTargetFrameworkItem>()
         dbContextModel = DefaultComboBoxModel<DbContextItem>()
     }
 
@@ -107,7 +107,10 @@ abstract class BaseEfCoreDialogWrapper(
         val commonOptionsService = CommonOptionsStateService.getInstance(intellijProject)
 
         if (prevPreferredMigrationsProjectId != null && prevPreferredStartupProjectId != null)
-            commonOptionsService.clearPreferredProjectsPair(prevPreferredMigrationsProjectId!!, prevPreferredStartupProjectId!!)
+            commonOptionsService.clearPreferredProjectsPair(
+                prevPreferredMigrationsProjectId!!,
+                prevPreferredStartupProjectId!!
+            )
 
         commonOptionsService.setPreferredProjectsPair(migrationsProject!!.data.id, startupProject!!.data.id)
     }
@@ -185,7 +188,8 @@ abstract class BaseEfCoreDialogWrapper(
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun noBuildRow(parent: Row) =
         parent.row {
-            noBuildCheckbox = checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it }).component
+            noBuildCheckbox =
+                checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it }).component
         }
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -225,13 +229,16 @@ abstract class BaseEfCoreDialogWrapper(
             return
         }
 
-        val preferredProjects = CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProjectId)
+        val preferredProjects =
+            CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProjectId)
         if (preferredProjects != null) {
             val (migrationsProjectId, startupProjectId) = preferredProjects
             prevPreferredMigrationsProjectId = migrationsProjectId
             prevPreferredStartupProjectId = startupProjectId
-            val migrationsProject = migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
-            val startupProject = startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.firstOrNull()
+            val migrationsProject =
+                migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
+            val startupProject =
+                startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.firstOrNull()
 
             migrationsProjectSetter(migrationsProject)
             startupProjectSetter(startupProject)
@@ -241,30 +248,34 @@ abstract class BaseEfCoreDialogWrapper(
     }
 
     private fun setDefaultProjects() {
-        migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName } ?: migrationsProjects.firstOrNull())
-        startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName } ?: startupProjects.firstOrNull())
+        migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName }
+            ?: migrationsProjects.firstOrNull())
+        startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName }
+            ?: startupProjects.firstOrNull())
     }
 
-    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {
-        if (migrationsProject == null)
-            error("You should selected valid migrations project")
-        else if (shouldHaveMigrationsInProject) {
-            if (dbContext == null)
-                null
-            else {
-                val migrationsIdentity = MigrationsIdentity(migrationsProject!!.displayName, dbContext!!.data)
-                val hasMigrations = model.hasAvailableMigrations.runUnderProgress(migrationsIdentity, intellijProject, "Checking migrations...",
-                    isCancelable = true,
-                    throwFault = true
-                )
-
-                if (hasMigrations == null || !hasMigrations)
-                    error("Selected migrations project doesn't have migrations")
-                else
+    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? =
+        {
+            if (migrationsProject == null)
+                error("You should selected valid migrations project")
+            else if (shouldHaveMigrationsInProject) {
+                if (dbContext == null)
                     null
-            }
-        } else null
-    }
+                else {
+                    val migrationsIdentity = MigrationsIdentity(migrationsProject!!.displayName, dbContext!!.data)
+                    val hasMigrations = model.hasAvailableMigrations.runUnderProgress(
+                        migrationsIdentity, intellijProject, "Checking migrations...",
+                        isCancelable = true,
+                        throwFault = true
+                    )
+
+                    if (hasMigrations == null || !hasMigrations)
+                        error("Selected migrations project doesn't have migrations")
+                    else
+                        null
+                }
+            } else null
+        }
 
     private fun startupProjectValidation(): ValidationInfoBuilder.(ComboBox<StartupProjectItem>) -> ValidationInfo? = {
         if (startupProject == null)
@@ -280,19 +291,21 @@ abstract class BaseEfCoreDialogWrapper(
             null
     }
 
-    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
-        if (buildConfiguration == null || buildConfigurationModel.size == 0)
-            error("Solution doesn't have any build configurations")
-        else
-            null
-    }
+    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? =
+        {
+            if (buildConfiguration == null || buildConfigurationModel.size == 0)
+                error("Solution doesn't have any build configurations")
+            else
+                null
+        }
 
-    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<TargetFrameworkItem>) -> ValidationInfo? = {
-        if (targetFramework == null || targetFrameworkModel.size == 0)
-            error("Startup project should have at least 1 supported target framework")
-        else
-            null
-    }
+    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? =
+        {
+            if (targetFramework == null || targetFrameworkModel.size == 0)
+                error("Startup project should have at least 1 supported target framework")
+            else
+                null
+        }
 
     private fun migrationsProjectSetter(project: MigrationsProjectItem?) {
         if (project == migrationsProject) return
@@ -321,7 +334,7 @@ abstract class BaseEfCoreDialogWrapper(
         buildConfiguration = configuration
     }
 
-    private fun targetFrameworkSetter(framework: TargetFrameworkItem?) {
+    private fun targetFrameworkSetter(framework: BaseTargetFrameworkItem?) {
         if (framework == targetFramework) return
 
         targetFramework = framework
@@ -332,7 +345,8 @@ abstract class BaseEfCoreDialogWrapper(
 
         if (project == null) return
 
-        val dbContexts = model.getAvailableDbContexts.runUnderProgress(migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
+        val dbContexts = model.getAvailableDbContexts.runUnderProgress(
+            migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
             isCancelable = true,
             throwFault = true
         )
@@ -352,15 +366,14 @@ abstract class BaseEfCoreDialogWrapper(
 
         if (project == null) return
 
-        val configurationIconItems = project.data.targetFrameworks
-            .map { TargetFrameworkItem(it) }
+        val baseTargetFrameworkItems = project.data.targetFrameworks
+            .map { TargetFrameworkItem(it, it) } as List<BaseTargetFrameworkItem>
 
-        val defaultFramework = TargetFrameworkItem("<Default>", icon = null)
-        val targetFrameworkItems = LinkedList(configurationIconItems)
-        targetFrameworkItems.push(defaultFramework)
+        val defaultFramework = DefaultTargetFrameworkItem()
 
-        targetFrameworkModel.addAll(targetFrameworkItems)
-        targetFramework = targetFrameworkItems.first()
+        targetFrameworkModel.addElement(defaultFramework)
+        targetFrameworkModel.addAll(baseTargetFrameworkItems)
+        targetFramework = defaultFramework
         targetFrameworkModel.selectedItem = targetFramework
     }
 }
