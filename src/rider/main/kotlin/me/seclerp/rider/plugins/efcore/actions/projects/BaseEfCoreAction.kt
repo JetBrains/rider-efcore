@@ -21,7 +21,7 @@ abstract class BaseEfCoreAction : AnAction() {
             dialog.startupProject!!.data.fullPath,
             dialog.dbContext!!.data,
             dialog.buildConfiguration!!.displayName,
-            dialog.targetFramework!!.displayName,
+            dialog.targetFramework!!.data,
             dialog.noBuild
         )
 
