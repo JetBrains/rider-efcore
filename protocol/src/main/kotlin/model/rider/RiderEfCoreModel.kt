@@ -13,12 +13,14 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("name", string)
         field("fullPath", string)
         field("targetFrameworks", immutableList(string))
+        field("namespace", string)
     }
 
     private val MigrationsProjectInfo = structdef {
         field("id", guid)
         field("name", string)
         field("fullPath", string)
+        field("namespace", string)
     }
 
     private val MigrationsIdentity = structdef {

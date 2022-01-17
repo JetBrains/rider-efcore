@@ -7,6 +7,7 @@ using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
@@ -42,7 +43,8 @@ namespace Rider.Plugins.EfCore
                     .Select(project => new MigrationsProjectInfo(
                         project.Guid,
                         project.Name,
-                        project.ProjectFileLocation.FullPath))
+                        project.ProjectFileLocation.FullPath,
+                        project.GetDefaultNamespace() ?? string.Empty))
                     .ToList();
 
                 return RdTask<List<MigrationsProjectInfo>>.Successful(allProjectNames);
@@ -59,7 +61,8 @@ namespace Rider.Plugins.EfCore
                         project.Name,
                         project.ProjectFileLocation.FullPath,
                         project.TargetFrameworkIds
-                            .Select(fr => fr.MapTargetFrameworkId()).ToList()))
+                            .Select(fr => fr.MapTargetFrameworkId()).ToList(),
+                        project.GetDefaultNamespace() ?? string.Empty))
                     .ToList();
 
                 return RdTask<List<StartupProjectInfo>>.Successful(allProjectNames);
