@@ -19,7 +19,7 @@ class DbContextClient : BaseEfCoreClient() {
             addIf("--data-annotations", useAttributes)
             addNamed("--context", dbContextName)
             addNamed("--context-dir", dbContextFolder)
-            //addNamed("--force", force)
+            //addIf("--force", force)
             addNamed("--output-dir", outputFolder)
 
             if (!scaffoldAllSchemas) {
