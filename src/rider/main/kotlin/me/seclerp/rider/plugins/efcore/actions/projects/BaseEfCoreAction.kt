@@ -31,7 +31,7 @@ abstract class BaseEfCoreAction : AnAction() {
         CommonOptions(
             dialog.migrationsProject!!.data.fullPath,
             dialog.startupProject!!.data.fullPath,
-            dialog.dbContext!!.data,
+            dialog.dbContext?.data,
             dialog.buildConfiguration!!.displayName,
             dialog.targetFramework!!.data,
             dialog.noBuild

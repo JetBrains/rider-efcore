@@ -13,7 +13,7 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
     init {
         addNamed("--project", commonOptions.migrationsProject)
         addNamed("--startup-project", commonOptions.startupProject)
-        addNamed("--context", commonOptions.dbContext)
+        addNamedNullable("--context", commonOptions.dbContext)
         addNamed("--configuration", commonOptions.buildConfiguration)
         addNamedNullable("--framework", commonOptions.targetFramework)
         addIf("--no-build", commonOptions.noBuild)

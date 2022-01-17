@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package me.seclerp.rider.plugins.efcore.dialogs
 
 import com.intellij.openapi.project.Project
