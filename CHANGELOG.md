@@ -1,3 +1,10 @@
+<h2>1.2.0</h2>
+<p>
+  <ul>
+    <li>Implement DbContext Scaffolding</li>
+    <li>Make Target framework optional (#38 by @kolosovpetro)</li>
+  </ul>
+</p>
 <h2>1.1.3</h2>
 <p>
   <ul>

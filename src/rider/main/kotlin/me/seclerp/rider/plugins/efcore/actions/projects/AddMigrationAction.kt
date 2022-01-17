@@ -5,9 +5,10 @@ import com.jetbrains.rider.util.idea.getService
 import me.seclerp.rider.plugins.efcore.clients.MigrationsClient
 import me.seclerp.rider.plugins.efcore.dialogs.AddMigrationDialogWrapper
 import me.seclerp.rider.plugins.efcore.commands.executeCommandUnderProgress
+import me.seclerp.rider.plugins.efcore.models.EfCoreVersion
 
 class AddMigrationAction : BaseEfCoreAction() {
-    override fun actionPerformed(actionEvent: AnActionEvent) {
+    override fun ready(actionEvent: AnActionEvent, efCoreVersion: EfCoreVersion) {
         val intellijProject = actionEvent.project!!
         val dialog = buildDialogInstance(actionEvent) {
             AddMigrationDialogWrapper(model, intellijProject, currentDotnetProjectName)

@@ -1,7 +1,7 @@
 <idea-plugin require-restart="true">
   <id>me.seclerp.rider.plugins.efcore</id>
   <name>Entity Framework Core UI</name>
-  <version>1.1.3</version>
+  <version>1.2.0</version>
   <vendor url="https://github.com/seclerp">Andrew Rublyov</vendor>
   <idea-version since-build="2021.3" />
   <depends>com.intellij.modules.rider</depends>
@@ -44,8 +44,11 @@
               text="Remove Last Migration" description="Removes last created migration">
       </action>
       <separator />
+      <action id="me.seclerp.rider.plugins.efcore.ScaffoldDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.ScaffoldDatabaseAction"
+              text="Scaffold Database" description="Generates code for a DbContext and entity types for a database">
+      </action>
       <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.UpdateDatabaseAction"
-              text="Update Database" description="Update database using one of migration as a target">
+              text="Update Database" description="Update database using a selected migration as a target">
       </action>
       <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.DropDatabaseAction"
               text="Drop Database" description="Drop database used by a DbContext">

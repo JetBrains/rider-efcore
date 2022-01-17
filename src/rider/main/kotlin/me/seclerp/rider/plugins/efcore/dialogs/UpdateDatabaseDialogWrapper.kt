@@ -14,10 +14,12 @@ import me.seclerp.rider.plugins.efcore.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.DotnetIconType
 import me.seclerp.rider.plugins.efcore.components.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.components.items.MigrationsProjectItem
+import me.seclerp.rider.plugins.efcore.models.EfCoreVersion
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import javax.swing.JCheckBox
 
 class UpdateDatabaseDialogWrapper(
+    private val efCoreVersion: EfCoreVersion,
     private val model: RiderEfCoreModel,
     private val intellijProject: Project,
     currentDotnetProjectName: String,
@@ -50,12 +52,14 @@ class UpdateDatabaseDialogWrapper(
                 targetMigrationRow(this)
             }
             additionalOptions(this) {
-                row {
-                    useDefaultConnectionCheckbox = checkBox("Use default connection of startup project", ::useDefaultConnection).component
-                    row("Connection:") {
-                        textField(::connection)
+                if (efCoreVersion.major >= 5) {
+                    row {
+                        useDefaultConnectionCheckbox = checkBox("Use default connection of startup project", ::useDefaultConnection).component
+                        row("Connection:") {
+                            textField(::connection)
 //                            .withValidationOnApply(connectionValidation())
-                    }.enableIf(useDefaultConnectionCheckbox.selected.not())
+                        }.enableIf(useDefaultConnectionCheckbox.selected.not())
+                    }
                 }
             }
         }

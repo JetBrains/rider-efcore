@@ -4,11 +4,12 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.Service
 import me.seclerp.rider.plugins.efcore.commands.CliCommand
 import me.seclerp.rider.plugins.efcore.commands.CliCommandResult
+import me.seclerp.rider.plugins.efcore.models.EfCoreVersion
 import java.nio.charset.Charset
 
 @Service
 class ManagementClient : BaseEfCoreClient() {
-    fun getEfCoreVersion(): String? {
+    fun getEfCoreVersion(): EfCoreVersion? {
         val generalCommandLine =
             GeneralCommandLine("dotnet", "ef", "--version")
                 .withCharset(Charset.forName("UTF-8"))
@@ -17,7 +18,7 @@ class ManagementClient : BaseEfCoreClient() {
         val result = command.execute()
 
         return if (result.succeeded)
-            result.output
+            EfCoreVersion.fromString(result.output.split("\n")[1])
         else
             null
     }
