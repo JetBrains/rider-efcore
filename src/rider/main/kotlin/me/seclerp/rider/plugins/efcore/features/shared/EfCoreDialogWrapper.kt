@@ -50,7 +50,6 @@ abstract class EfCoreDialogWrapper(
 
     private val migrationsProjects: Array<MigrationsProjectItem>
     private val startupProjects: Array<StartupProjectItem>
-    private val dotnetProjectName: String?
     private val dotnetProjectId: UUID?
 
     @Suppress("MemberVisibilityCanBePrivate")
@@ -88,7 +87,6 @@ abstract class EfCoreDialogWrapper(
         val dotnetProject = migrationsProjects.find { it.displayName == actionDotnetProjectName }
             ?: migrationsProjects.firstOrNull()
 
-        dotnetProjectName = dotnetProject?.displayName
         dotnetProjectId = dotnetProject?.data?.id
 
         migrationsProjectChangedEvent += ::migrationsProjectChanged
@@ -227,13 +225,13 @@ abstract class EfCoreDialogWrapper(
     }
 
     private fun loadPreferredProjects() {
-        if (dotnetProjectId == null || dotnetProjectName == null) {
+        if (dotnetProjectId == null) {
             setDefaultProjects()
             return
         }
 
         val preferredProjects =
-            CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectPair(dotnetProjectId)
+            CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectIdsPair(dotnetProjectId)
         if (preferredProjects != null) {
             val (migrationsProjectId, startupProjectId) = preferredProjects
             prevPreferredMigrationsProjectId = migrationsProjectId
@@ -251,9 +249,9 @@ abstract class EfCoreDialogWrapper(
     }
 
     private fun setDefaultProjects() {
-        migrationsProjectSetter(migrationsProjects.find { it.displayName == dotnetProjectName }
+        migrationsProjectSetter(migrationsProjects.find { it.data.id == dotnetProjectId }
             ?: migrationsProjects.firstOrNull())
-        startupProjectSetter(startupProjects.find { it.displayName == dotnetProjectName }
+        startupProjectSetter(startupProjects.find { it.data.id == dotnetProjectId }
             ?: startupProjects.firstOrNull())
     }
 
@@ -294,21 +292,19 @@ abstract class EfCoreDialogWrapper(
             null
     }
 
-    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? =
-        {
-            if (buildConfiguration == null || buildConfigurationModel.size == 0)
-                error("Solution doesn't have any build configurations")
-            else
-                null
-        }
+    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
+        if (buildConfiguration == null || buildConfigurationModel.size == 0)
+            error("Solution doesn't have any build configurations")
+        else
+            null
+    }
 
-    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? =
-        {
-            if (targetFramework == null || targetFrameworkModel.size == 0)
-                error("Startup project should have at least 1 supported target framework")
-            else
-                null
-        }
+    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? = {
+        if (targetFramework == null || targetFrameworkModel.size == 0)
+            error("Startup project should have at least 1 supported target framework")
+        else
+            null
+    }
 
     private fun migrationsProjectSetter(project: MigrationsProjectItem?) {
         if (project == migrationsProject) return

@@ -28,7 +28,7 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         myState.startupToMigrationsProjects[startupProjectString] = migrationsProjectString
     }
 
-    fun getPreferredProjectPair(projectId: UUID): Pair<UUID, UUID>? {
+    fun getPreferredProjectIdsPair(projectId: UUID): Pair<UUID, UUID>? {
         val projectIdString = projectId.toString()
 
         return if (myState.migrationsToStartupProjects.containsKey(projectIdString)) {

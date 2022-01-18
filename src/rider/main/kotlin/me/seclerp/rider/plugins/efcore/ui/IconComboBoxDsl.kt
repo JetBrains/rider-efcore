@@ -18,8 +18,7 @@ fun <T : IconItem<*>> Cell.iconComboBox(
             getter,
             setter,
             IconComboBoxRendererAdapter()
-        )
-            .constraints(CCFlags.pushX, CCFlags.growX)
+        ).constraints(CCFlags.pushX, CCFlags.growX)
 
     // Setter provided above called only on submit, so we need additional change detection
     comboBoxBuilder.component.addItemListener {
