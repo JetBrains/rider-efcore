@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
-import me.seclerp.rider.plugins.efcore.actions.notifications.InstallEfCoreAction
-import me.seclerp.rider.plugins.efcore.clients.ManagementClient
+import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
+import me.seclerp.rider.plugins.efcore.cli.api.ManagementClient
 import me.seclerp.rider.plugins.efcore.rd.StartupProjectInfo
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 
@@ -31,7 +31,7 @@ class EfCoreStartupActivity : StartupActivity, DumbAware {
         if (version == null) {
             NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
                 .createNotification("EF Core tools are not installed", "These tools are required to execute EF Core commands", NotificationType.WARNING)
-                .addAction(InstallEfCoreAction())
+                .addAction(InstallDotnetEfAction())
                 .notify(intellijProject)
         }
     }

@@ -37,20 +37,20 @@
   <actions>
     <group id="me.seclerp.rider.plugins.efcore.EfCoreTools" text="Entity Framework Core" popup="true">
       <add-to-group group-id="ProjectViewPopupMenu"/>
-      <action id="me.seclerp.rider.plugins.efcore.actions.projects.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.projects.AddMigrationAction"
+      <action id="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction" class="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction"
               text="Add Migration" description="Add new code-first migration">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.actions.projects.RemoveLastMigrationAction"
+      <action id="me.seclerp.rider.plugins.efcore.RemoveLastMigrationAction" class="me.seclerp.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction"
               text="Remove Last Migration" description="Removes last created migration">
       </action>
       <separator />
-      <action id="me.seclerp.rider.plugins.efcore.ScaffoldDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.ScaffoldDatabaseAction"
+      <action id="me.seclerp.rider.plugins.efcore.ScaffoldDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDatabaseAction"
               text="Scaffold Database" description="Generates code for a DbContext and entity types for a database">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.UpdateDatabaseAction"
+      <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"
               text="Update Database" description="Update database using a selected migration as a target">
       </action>
-      <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.actions.projects.DropDatabaseAction"
+      <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"
               text="Drop Database" description="Drop database used by a DbContext">
       </action>
     </group>
