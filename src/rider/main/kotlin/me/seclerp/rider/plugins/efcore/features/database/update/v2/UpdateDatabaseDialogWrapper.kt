@@ -50,13 +50,11 @@ class UpdateDatabaseDialogWrapper(
         init()
     }
 
-    override fun createPrimaryOptions(): Panel.() -> Panel = {
-        panel {
-            createTargetMigrationRow()(this)
-        }
+    override fun createPrimaryOptions(): Panel.() -> Unit = {
+        createTargetMigrationRow()(this)
     }
 
-    override fun createAdditionalOptions(): Panel.() -> Panel = {
+    override fun createAdditionalGroup(): Panel.() -> Unit = {
         group("Additional Options") {
             if (efCoreVersion.major >= 5) {
                 indent {

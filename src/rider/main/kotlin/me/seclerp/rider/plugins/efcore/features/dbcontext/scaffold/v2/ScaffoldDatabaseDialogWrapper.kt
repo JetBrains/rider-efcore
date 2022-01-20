@@ -96,23 +96,21 @@ class ScaffoldDatabaseDialogWrapper(
         createMainUI()
             .apply(::configureValidation)
 
-    override fun createPrimaryOptions(): Panel.() -> Panel = {
-        panel {
-            row("Connection:") {
-                textField().bindText(model::connection)
-                    .validationOnInput(validator.connectionValidation())
-                    .validationOnApply(validator.connectionValidation())
-            }
+    override fun createPrimaryOptions(): Panel.() -> Unit = {
+        row("Connection:") {
+            textField().bindText(model::connection)
+                .validationOnInput(validator.connectionValidation())
+                .validationOnApply(validator.connectionValidation())
+        }
 
-            row("Provider:") {
-                textField().bindText(model::provider)
-                    .validationOnInput(validator.providerValidation())
-                    .validationOnApply(validator.providerValidation())
-            }
+        row("Provider:") {
+            textField().bindText(model::provider)
+                .validationOnInput(validator.providerValidation())
+                .validationOnApply(validator.providerValidation())
         }
     }
 
-    override fun createAdditionalOptions(): Panel.() -> Panel = {
+    override fun createAdditionalGroup(): Panel.() -> Unit = {
         panel {
             row("Output folder") {
                 textField().bindText(model::outputFolder)

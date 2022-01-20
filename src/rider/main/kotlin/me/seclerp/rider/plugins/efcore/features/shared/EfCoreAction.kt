@@ -36,6 +36,18 @@ abstract class EfCoreAction : AnAction() {
             dialog.noBuild
         )
 
+    fun getCommonOptionsV2(dialog: me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper): CommonOptions {
+        val common = dialog.commonOptions
+        return CommonOptions(
+            common.migrationsProject!!.data.fullPath,
+            common.startupProject!!.data.fullPath,
+            common.dbContext?.data,
+            common.buildConfiguration!!.displayName,
+            common.targetFramework!!.data,
+            common.noBuild
+        )
+    }
+
     override fun actionPerformed(actionEvent: AnActionEvent) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, "Getting dotnet ef version...", false) {
             override fun run(progress: ProgressIndicator) {

@@ -138,14 +138,14 @@ abstract class EfCoreDialogWrapper(
 
     protected fun createMainUI(): DialogPanel {
         return panel {
-            createPrimaryOptions()(this)
             panel {
+                createPrimaryOptions()(this)
                 createMigrationsProjectRow()(this)
                 createStartupProjectRow()(this)
                 createDbContextProjectRow()(this)
             }
             panel {
-                createAdditionalOptions()(this)
+                createAdditionalGroup()(this)
                 createBuildOptions()(this)
             }
         }
@@ -175,12 +175,10 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    protected open fun createPrimaryOptions(): Panel.() -> Panel = {
-        panel { }
+    protected open fun createPrimaryOptions(): Panel.() -> Unit = {
     }
 
-    protected open fun createAdditionalOptions(): Panel.() -> Panel = {
-        group("Additional Options") { }
+    protected open fun createAdditionalGroup(): Panel.() -> Unit = {
     }
 
     protected fun createBuildOptions(): Panel.() -> Panel = {

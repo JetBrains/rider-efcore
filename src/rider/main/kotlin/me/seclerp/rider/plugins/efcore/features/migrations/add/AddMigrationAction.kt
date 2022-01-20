@@ -16,10 +16,10 @@ class AddMigrationAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
-            val commonOptions = getCommonOptions(dialog)
+            val commonOptions = getCommonOptionsV2(dialog)
 
             executeCommandUnderProgress(intellijProject, "Creating migration...", "New migration has been created") {
-                migrationsClient.add(commonOptions, dialog.migrationName.trim())
+                migrationsClient.add(commonOptions, dialog.model.migrationName.trim())
             }
         }
     }

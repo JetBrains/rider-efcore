@@ -1,38 +1,72 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.layout.CCFlags
-import com.intellij.ui.layout.LayoutBuilder
-import com.intellij.ui.layout.ValidationInfoBuilder
-import com.intellij.ui.layout.panel
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindText
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
+import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
-import javax.swing.JTextField
+import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
+import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
+@Suppress("UnstableApiUsage")
 class AddMigrationDialogWrapper(
-    private val model: RiderEfCoreModel,
+    private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Add Migration", model, intellijProject, currentDotnetProjectName, false) {
+    selectedDotnetProjectName: String,
+) : EfCoreDialogWrapper("Add Migration", beModel, intellijProject, selectedDotnetProjectName, false) {
 
-    var migrationName = ""
-        private set
+    //
+    // Data binding
+    val model = AddMigrationModel("")
 
+    //
+    // Internal data
     private var availableMigrationsList = listOf<MigrationInfo>()
     private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
-
     private lateinit var migrationNameTextField: JBTextField
 
+    //
+    // Validation
+    private val validator = AddMigrationValidator()
+
+    //
+    // Constructor
+    init {
+        addMigrationsProjectChangedListener(::onMigrationsProjectChanged)
+        addDbContextChangedListener(::onDbContextChanged)
+
+        init()
+    }
+
+    override fun createPrimaryOptions(): Panel.() -> Unit = {
+        createMigrationNameRow()(this)
+    }
+
+    private fun createMigrationNameRow(): Panel.() -> Row = {
+        row("Migration name:") {
+            textField()
+                .bindText(model::migrationName)
+                .horizontalAlign(HorizontalAlign.FILL)
+                .validationOnInput { validator.migrationNameValidation(currentDbContextMigrationsList)(it) }
+                .validationOnApply { validator.migrationNameValidation(currentDbContextMigrationsList)(it) }
+                .focused()
+                .applyToComponent {
+                    document.addDocumentListener(migrationNameChangedListener)
+                    migrationNameTextField = this
+                }
+        }
+    }
+
+    //
+    // Event listeners
     private val migrationNameChangedListener = object : DocumentListener {
         override fun changedUpdate(e: DocumentEvent?) {
             userInputReceived = true
@@ -47,57 +81,22 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    init {
-        migrationsProjectChangedEvent += ::onMigrationsProjectChanged
-        dbContextChangedEvent += ::onDbContextChanged
-        init()
-    }
-
-    override fun createCenterPanel(): DialogPanel {
-        return panel {
-            primaryOptions(this) {
-                migrationNameRow(this)
-            }
-
-            additionalOptions(this)
-        }
-    }
-
-    private fun migrationNameRow(it: LayoutBuilder) =
-        it.row("Migration name:") {
-            migrationNameTextField = textField(::migrationName)
-                .constraints(CCFlags.pushX, CCFlags.growX)
-                .focused()
-                .withValidationOnInput(migrationNameValidation())
-                .withValidationOnApply(migrationNameValidation())
-                .component
-
-            migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
-        }
-
-    private fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
-        if (it.text.trim().isEmpty())
-            error("Migration name could not be empty")
-        else if (currentDbContextMigrationsList.contains(it.text.trim()))
-            error("Migration with such name already exist")
-        else
-            null
-    }
-
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
         refreshAvailableMigrations(migrationsProjectItem.displayName)
-        refreshCurrentDbContextMigrations(dbContext)
-    }
-
-    private fun refreshAvailableMigrations(migrationsProjectName: String) {
-        availableMigrationsList = model.getAvailableMigrations.runUnderProgress(migrationsProjectName, intellijProject, "Loading migrations...",
-            isCancelable = true,
-            throwFault = true
-        )!!
+        refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
 
     private fun onDbContextChanged(dbContext: DbContextItem?) {
         refreshCurrentDbContextMigrations(dbContext)
+    }
+
+    //
+    // Methods
+    private fun refreshAvailableMigrations(migrationsProjectName: String) {
+        availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(migrationsProjectName, intellijProject, "Loading migrations...",
+            isCancelable = true,
+            throwFault = true
+        )!!
     }
 
     private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
@@ -117,9 +116,14 @@ class AddMigrationDialogWrapper(
         if (userInputReceived) return
 
         val migrationsExist = currentDbContextMigrationsList.isNotEmpty()
+        val migrationName = if (migrationsExist) "" else "Initial"
 
-        migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
-        migrationNameTextField.text = if (migrationsExist) "" else "Initial"
-        migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
+        if (::migrationNameTextField.isInitialized) {
+            migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
+            migrationNameTextField.text = migrationName
+            migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
+        } else {
+            model.migrationName = migrationName
+        }
     }
 }

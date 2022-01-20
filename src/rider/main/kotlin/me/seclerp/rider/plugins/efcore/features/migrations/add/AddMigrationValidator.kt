@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.migrations.add.v2
+package me.seclerp.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
