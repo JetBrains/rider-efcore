@@ -1,6 +1,7 @@
 package me.seclerp.rider.plugins.efcore.features.shared.v2
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
@@ -133,9 +134,9 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    override fun createCenterPanel(): JComponent? = createMainUI()
+    override fun createCenterPanel(): JComponent = createMainUI()
 
-    protected fun createMainUI(): JComponent {
+    protected fun createMainUI(): DialogPanel {
         return panel {
             createPrimaryOptions()(this)
             panel {
