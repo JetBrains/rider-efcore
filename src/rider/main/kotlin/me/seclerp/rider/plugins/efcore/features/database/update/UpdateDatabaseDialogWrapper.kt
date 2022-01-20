@@ -44,6 +44,7 @@ class UpdateDatabaseDialogWrapper(
     init {
         migrationsProjectChangedEvent += ::onMigrationsProjectChanged
         dbContextChangedEvent += ::refreshCurrentDbContextMigrations
+
         init()
     }
 
@@ -67,7 +68,7 @@ class UpdateDatabaseDialogWrapper(
     }
 
     private fun targetMigrationRow(parent: LayoutBuilder): Row {
-        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CLASS)
+        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
         val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(currentDbContextMigrationsList, completionItemsIcon)
         targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
         targetMigrationTextField.document.addDocumentListener(object : DocumentListener {
@@ -93,12 +94,6 @@ class UpdateDatabaseDialogWrapper(
     }
 
     // TODO: Investigate why validation not worked properly for disabled fields
-
-    //    private fun connectionValidation(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-    //        if (it.text.isEmpty())
-    //            error("Connection could not be empty")
-    //        else null
-    //    }
 
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
         availableMigrationsList = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",

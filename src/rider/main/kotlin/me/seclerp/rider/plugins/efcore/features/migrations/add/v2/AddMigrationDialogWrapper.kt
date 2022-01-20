@@ -47,12 +47,11 @@ class AddMigrationDialogWrapper(
         init()
     }
 
-    override fun createCenterPanel(): JComponent =
+    override fun createPrimaryOptions(): Panel.() -> Panel = {
         panel {
             createMigrationNameRow()(this)
-            createPrimaryGroup()(this)
-            createSecondaryGroup()(this)
         }
+    }
 
     private fun createMigrationNameRow(): Panel.() -> Row = {
         row {

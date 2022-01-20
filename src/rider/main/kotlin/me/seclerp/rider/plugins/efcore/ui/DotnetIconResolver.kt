@@ -18,7 +18,7 @@ object DotnetIconResolver {
         val iconPath = when (type) {
             DotnetIconType.BUILD_CONFIGURATION -> "resharper/ProjectModel/ProjectProperties.svg"
             DotnetIconType.TARGET_FRAMEWORK -> "rider/runConfigurations/application.svg"
-            DotnetIconType.CLASS -> "resharper/PsiCSharp/Csharp.svg"
+            DotnetIconType.CSHARP_CLASS -> "resharper/PsiCSharp/Csharp.svg"
         }
 
         return IconLoader.getIcon(iconPath, javaClass)
@@ -28,5 +28,5 @@ object DotnetIconResolver {
 enum class DotnetIconType {
     BUILD_CONFIGURATION,
     TARGET_FRAMEWORK,
-    CLASS,
+    CSHARP_CLASS,
 }

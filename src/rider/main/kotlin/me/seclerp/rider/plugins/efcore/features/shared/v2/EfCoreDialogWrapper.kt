@@ -25,7 +25,7 @@ abstract class EfCoreDialogWrapper(
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
     private val selectedDotnetProjectName: String,
-    shouldHaveMigrationsInProject: Boolean = false
+    requireMigrationsInProject: Boolean = false
 ) : DialogWrapper(true) {
     //
     // Data binding
@@ -64,7 +64,7 @@ abstract class EfCoreDialogWrapper(
     //
     // Validation
     private val validator = EfCoreDialogValidator(
-        commonOptions, beModel, intellijProject, shouldHaveMigrationsInProject, dbContextModel,
+        commonOptions, beModel, intellijProject, requireMigrationsInProject, dbContextModel,
         availableBuildConfigurations, targetFrameworkModel)
 
     //
@@ -133,17 +133,20 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    override fun createCenterPanel(): JComponent? =
-        panel {
-            createPrimaryGroup()(this)
-            createSecondaryGroup()(this)
-        }
+    override fun createCenterPanel(): JComponent? = createMainUI()
 
-    protected open fun createPrimaryGroup(): Panel.() -> Panel = {
-        panel {
-            createMigrationsProjectRow()(this)
-            createStartupProjectRow()(this)
-            createDbContextProjectRow()(this)
+    protected fun createMainUI(): JComponent {
+        return panel {
+            createPrimaryOptions()(this)
+            panel {
+                createMigrationsProjectRow()(this)
+                createStartupProjectRow()(this)
+                createDbContextProjectRow()(this)
+            }
+            panel {
+                createAdditionalOptions()(this)
+                createBuildOptions()(this)
+            }
         }
     }
 
@@ -171,9 +174,8 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    protected open fun createSecondaryGroup(): Panel.() -> Panel = {
-        createAdditionalOptions()(this)
-        createBuildOptions()(this)
+    protected open fun createPrimaryOptions(): Panel.() -> Panel = {
+        panel { }
     }
 
     protected open fun createAdditionalOptions(): Panel.() -> Panel = {
