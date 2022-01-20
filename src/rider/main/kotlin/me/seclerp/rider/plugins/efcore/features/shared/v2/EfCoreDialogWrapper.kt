@@ -78,7 +78,12 @@ abstract class EfCoreDialogWrapper(
         addStartupProjectChangedListener(::startupProjectChanged)
 
         initSelectedBuildConfiguration()
+    }
+
+    override fun init() {
         initPreferredProjects()
+
+        super.init()
     }
 
     private fun initSelectedBuildConfiguration() {

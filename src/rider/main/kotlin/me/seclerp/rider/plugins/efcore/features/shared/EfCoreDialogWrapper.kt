@@ -94,8 +94,6 @@ abstract class EfCoreDialogWrapper(
 
         targetFrameworkModel = DefaultComboBoxModel<BaseTargetFrameworkItem>()
         dbContextModel = DefaultComboBoxModel<DbContextItem>()
-
-        loadPreferredProjects()
     }
 
     override fun createCenterPanel(): DialogPanel = panel {
@@ -120,6 +118,7 @@ abstract class EfCoreDialogWrapper(
     @Suppress("MemberVisibilityCanBePrivate")
     fun primaryOptions(parent: LayoutBuilder, customOptions: LayoutBuilder.() -> Unit) {
         customOptions(parent)
+        loadPreferredProjects()
         migrationsProjectRow(parent)
         startupProjectRow(parent)
         dbContextRow(parent)
