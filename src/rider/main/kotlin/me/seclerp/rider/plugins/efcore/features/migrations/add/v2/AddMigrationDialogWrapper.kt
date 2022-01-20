@@ -21,7 +21,7 @@ class AddMigrationDialogWrapper(
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
     private val selectedDotnetProjectName: String,
-) : EfCoreDialogWrapper(beModel, intellijProject, selectedDotnetProjectName, false) {
+) : EfCoreDialogWrapper("Add Migration", beModel, intellijProject, selectedDotnetProjectName, false) {
 
     //
     // Data binding

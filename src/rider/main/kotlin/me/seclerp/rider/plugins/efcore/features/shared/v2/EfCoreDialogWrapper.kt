@@ -14,7 +14,6 @@ import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectD
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
 import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
 import javax.swing.DefaultComboBoxModel
@@ -22,6 +21,7 @@ import javax.swing.JComponent
 
 @Suppress("UnstableApiUsage", "MemberVisibilityCanBePrivate")
 abstract class EfCoreDialogWrapper(
+    titleText: String,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
     private val selectedDotnetProjectName: String,
@@ -74,6 +74,8 @@ abstract class EfCoreDialogWrapper(
     //
     // Constructor
     init {
+        title = titleText
+
         addMigrationsProjectChangedListener(::migrationsProjectChanged)
         addStartupProjectChangedListener(::startupProjectChanged)
 
