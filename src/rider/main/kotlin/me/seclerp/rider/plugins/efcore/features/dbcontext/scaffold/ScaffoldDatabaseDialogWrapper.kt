@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Disposer
@@ -56,6 +57,7 @@ class ScaffoldDatabaseDialogWrapper(
 
     private val tablesModel = SimpleListTableModel(model.tablesList)
     private val schemasModel = SimpleListTableModel(model.schemasList)
+    private val propertyGraph = PropertyGraph()
 
     //
     // Validation
@@ -67,6 +69,7 @@ class ScaffoldDatabaseDialogWrapper(
         init()
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     override fun createCenterPanel(): JComponent {
         val tabbedPane = JBTabbedPane()
 
@@ -80,7 +83,20 @@ class ScaffoldDatabaseDialogWrapper(
         tabbedPane.addTab("Tables", tablesTab)
         tabbedPane.addTab("Schemas", schemaTab)
 
-        return tabbedPane
+        return panel {
+            row {
+                cell(tabbedPane)
+                    .horizontalAlign(HorizontalAlign.FILL)
+                    .verticalAlign(VerticalAlign.FILL)
+            }.resizableRow()
+        }.apply {
+            validateCallbacks = buildList {
+                addAll(mainTab.validateCallbacks)
+                addAll(dbContextTab.validateCallbacks)
+                addAll(tablesTab.validateCallbacks)
+                addAll(schemaTab.validateCallbacks)
+            }
+        }
     }
 
     override fun doOKAction() {
@@ -115,7 +131,7 @@ class ScaffoldDatabaseDialogWrapper(
     }
 
     override fun createAdditionalGroup(): Panel.() -> Unit = {
-        group("Additional Options") {
+        groupRowsRange("Additional Options") {
             row("Output folder") {
                 textField().bindText(model::outputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
@@ -150,12 +166,14 @@ class ScaffoldDatabaseDialogWrapper(
     private fun createDbContextTab(): DialogPanel = panel {
         row("Generated DbContext name") {
             textField().bindText(model::dbContextName)
+                .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
                 .validationOnInput(validator.dbContextNameValidation())
         }
 
         row("Generated DbContext folder") {
             textField().bindText(model::dbContextFolder)
+                .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
         }
@@ -209,28 +227,4 @@ class ScaffoldDatabaseDialogWrapper(
         panel.registerValidators(disposable)
         Disposer.register(myDisposable, disposable)
     }
-//
-//    // TODO: Remove after workaround for nested panels binding will be available
-//    private fun customTextField(getter: () -> String, setter: (String) -> Unit): JBTextField {
-//        val textField = JBTextField(getter())
-//        textField.document.addDocumentListener(object : DocumentListener {
-//            override fun insertUpdate(event: DocumentEvent?) {
-//                handleChanged(textField.document.getText(0, textField.document.length))
-//            }
-//
-//            override fun removeUpdate(event: DocumentEvent?) {
-//                handleChanged(textField.document.getText(0, textField.document.length))
-//            }
-//
-//            override fun changedUpdate(event: DocumentEvent?) {
-//                handleChanged(textField.document.getText(0, textField.document.length))
-//            }
-//
-//            private fun handleChanged(newValue: String) {
-//                setter(newValue)
-//            }
-//        })
-//
-//        return textField
-//    }
 }

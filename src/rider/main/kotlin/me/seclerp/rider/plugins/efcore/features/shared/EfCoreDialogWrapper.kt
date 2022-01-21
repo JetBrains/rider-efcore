@@ -139,10 +139,10 @@ abstract class EfCoreDialogWrapper(
                 createMigrationsProjectRow()(this)
                 createStartupProjectRow()(this)
                 createDbContextProjectRow()(this)
-            }
-            panel {
-                createAdditionalGroup()(this)
-                createBuildOptions()(this)
+                panel {
+                    createAdditionalGroup()(this)
+                    createBuildOptions()(this)
+                }
             }
         }
     }
@@ -177,8 +177,8 @@ abstract class EfCoreDialogWrapper(
     protected open fun createAdditionalGroup(): Panel.() -> Unit = {
     }
 
-    protected fun createBuildOptions(): Panel.() -> Panel = {
-        group("Build Options") {
+    protected fun createBuildOptions(): Panel.() -> Unit = {
+        groupRowsRange("Build Options") {
             var noBuildCheck: JBCheckBox? = null
             row {
                 noBuildCheck = checkBox("Skip project build process (--no-build)")

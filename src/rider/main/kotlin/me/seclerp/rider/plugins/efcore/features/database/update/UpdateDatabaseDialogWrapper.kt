@@ -54,23 +54,21 @@ class UpdateDatabaseDialogWrapper(
     }
 
     override fun createAdditionalGroup(): Panel.() -> Unit = {
-        group("Additional Options") {
+        groupRowsRange("Additional Options") {
             if (efCoreVersion.major >= 5) {
-                indent {
-                    var useDefaultConnectionCheckbox: JBCheckBox? = null
-                    row {
-                        useDefaultConnectionCheckbox =
-                            checkBox("Use default connection of startup project")
-                                .bindSelected(model::useDefaultConnection)
-                                .component
-                    }
-                    row("Connection:") {
-                        textField()
-                            .bindText(model::connection)
-                            .validationOnInput(validator.connectionValidation())
-                            .validationOnApply(validator.connectionValidation())
-                    }.enabledIf(useDefaultConnectionCheckbox!!.selected.not())
+                var useDefaultConnectionCheckbox: JBCheckBox? = null
+                row {
+                    useDefaultConnectionCheckbox =
+                        checkBox("Use default connection of startup project")
+                            .bindSelected(model::useDefaultConnection)
+                            .component
                 }
+                row("Connection:") {
+                    textField()
+                        .bindText(model::connection)
+                        .validationOnInput(validator.connectionValidation())
+                        .validationOnApply(validator.connectionValidation())
+                }.enabledIf(useDefaultConnectionCheckbox!!.selected.not())
             }
         }
     }
