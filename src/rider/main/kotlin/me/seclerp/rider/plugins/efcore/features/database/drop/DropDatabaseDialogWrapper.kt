@@ -3,7 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.database.drop
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
 
 class DropDatabaseDialogWrapper(
     model: RiderEfCoreModel,
@@ -18,7 +18,7 @@ class DropDatabaseDialogWrapper(
     override fun doOKAction() {
         if (showYesNoDialog(
                 "Confirmation",
-             "Are you sure that you want to drop database, used by ${dbContext!!.displayName}? This action can't be undone.",
+             "Are you sure that you want to drop database, used by ${commonOptions.dbContext!!.displayName}? This action can't be undone.",
                      intellijProject)) {
             super.doOKAction()
         }
