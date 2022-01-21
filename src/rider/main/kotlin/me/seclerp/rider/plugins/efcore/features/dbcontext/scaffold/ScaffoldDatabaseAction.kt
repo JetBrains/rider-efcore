@@ -15,25 +15,26 @@ class ScaffoldDatabaseAction : EfCoreAction() {
         }
 
         if (dialog.showAndGet()) {
-            val dbContextClient = intellijProject.getService<me.seclerp.rider.plugins.efcore.cli.api.DbContextClient>()
+            val dbContextClient = intellijProject.getService<DbContextClient>()
             val commonOptions = getCommonOptions(dialog)
 
             executeCommandUnderProgress(intellijProject, "Updating database...", "Database has been updated") {
+                val model = dialog.model
                 dbContextClient.scaffold(
                     efCoreVersion, commonOptions,
-                    dialog.connection,
-                    dialog.provider,
-                    dialog.outputFolder,
-                    dialog.useAttributes,
-                    dialog.useDatabaseNames,
-                    dialog.generateOnConfiguring,
-                    dialog.usePluralizer,
-                    dialog.dbContextName,
-                    dialog.dbContextFolder,
-                    dialog.scaffoldAllTables,
-                    dialog.tablesList.map { it.data },
-                    dialog.scaffoldAllSchemas,
-                    dialog.schemasList.map { it.data })
+                    model.connection,
+                    model.provider,
+                    model.outputFolder,
+                    model.useAttributes,
+                    model.useDatabaseNames,
+                    model.generateOnConfiguring,
+                    model.usePluralizer,
+                    model.dbContextName,
+                    model.dbContextFolder,
+                    model.scaffoldAllTables,
+                    model.tablesList.map { it.data },
+                    model.scaffoldAllSchemas,
+                    model.schemasList.map { it.data })
             }
         }
     }

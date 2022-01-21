@@ -16,7 +16,7 @@ class RemoveLastMigrationAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
-            val commonOptions = getCommonOptionsV2(dialog)
+            val commonOptions = getCommonOptions(dialog)
 
             executeCommandUnderProgress(intellijProject, "Removing migration...", "Last migration has been removed") {
                 migrationsClient.removeLast(commonOptions)

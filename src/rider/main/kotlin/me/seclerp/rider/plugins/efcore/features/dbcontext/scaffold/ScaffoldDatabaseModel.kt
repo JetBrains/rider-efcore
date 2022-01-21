@@ -1,7 +1,6 @@
-package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.v2
+package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
-import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 
 data class ScaffoldDatabaseModel(
     var connection: String,

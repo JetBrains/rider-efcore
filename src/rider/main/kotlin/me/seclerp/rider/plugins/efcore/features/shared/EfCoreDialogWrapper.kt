@@ -1,350 +1,249 @@
-@file:Suppress("UnstableApiUsage")
-
 package me.seclerp.rider.plugins.efcore.features.shared
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBCheckBox
-import com.intellij.ui.layout.*
+import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.layout.not
+import com.intellij.ui.layout.selected
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.Event
-import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
+import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
+import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
-import java.util.*
 import javax.swing.DefaultComboBoxModel
+import javax.swing.JComponent
 
+@Suppress("UnstableApiUsage", "MemberVisibilityCanBePrivate")
 abstract class EfCoreDialogWrapper(
-    title: String,
-    private val model: RiderEfCoreModel,
+    titleText: String,
+    private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val actionDotnetProjectName: String,
-    private val shouldHaveMigrationsInProject: Boolean = false
+    private val selectedDotnetProjectName: String,
+    requireMigrationsInProject: Boolean = false
 ) : DialogWrapper(true) {
-    var migrationsProject: MigrationsProjectItem? = null
-        private set
+    //
+    // Data binding
+    val commonOptions = CommonOptionsModel()
 
-    var startupProject: StartupProjectItem? = null
-        private set
-
-    var dbContext: DbContextItem? = null
-        private set
-
-    var buildConfiguration: BuildConfigurationItem? = null
-        private set
-
-    var targetFramework: BaseTargetFrameworkItem? = null
-        private set
-
-    var noBuild = false
-        private set
-
-    private val migrationsProjects: Array<MigrationsProjectItem>
-    private val startupProjects: Array<StartupProjectItem>
-    private val dotnetProjectId: UUID?
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val startupProjectChangedEvent: Event<StartupProjectItem> = Event()
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val dbContextChangedEvent: Event<DbContextItem?> = Event()
-
-    private var targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem>
-    private var dbContextModel: DefaultComboBoxModel<DbContextItem>
-
-    private lateinit var noBuildCheckbox: JBCheckBox
-    private lateinit var dbContextBox: ComboBox<DbContextItem>
-    private lateinit var buildConfigurationModel: DefaultComboBoxModel<BuildConfigurationItem>
-
-    private var prevPreferredMigrationsProjectId: UUID? = null
-    private var prevPreferredStartupProjectId: UUID? = null
-
-    init {
-        this.title = title
-
-        migrationsProjects = model.getAvailableMigrationsProjects
+    //
+    // Internal data
+    private val availableMigrationsProjects =
+        beModel.getAvailableMigrationsProjects
             .sync(Unit)
             .map { MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath)) }
             .toTypedArray()
 
-        startupProjects = model.getAvailableStartupProjects
+    private val availableStartupProjects =
+        beModel.getAvailableStartupProjects
             .sync(Unit)
             .map { StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks)) }
             .toTypedArray()
 
-        val dotnetProject = migrationsProjects.find { it.displayName == actionDotnetProjectName }
-            ?: migrationsProjects.firstOrNull()
-
-        dotnetProjectId = dotnetProject?.data?.id
-
-        migrationsProjectChangedEvent += ::migrationsProjectChanged
-        startupProjectChangedEvent += ::startupProjectChanged
-
-        targetFrameworkModel = DefaultComboBoxModel<BaseTargetFrameworkItem>()
-        dbContextModel = DefaultComboBoxModel<DbContextItem>()
-    }
-
-    override fun createCenterPanel(): DialogPanel = panel {
-        primaryOptions(this)
-        additionalOptions(this)
-    }
-
-    override fun doOKAction() {
-        super.doOKAction()
-
-        val commonOptionsService = CommonOptionsStateService.getInstance(intellijProject)
-
-        if (prevPreferredMigrationsProjectId != null && prevPreferredStartupProjectId != null)
-            commonOptionsService.clearPreferredProjectsPair(
-                prevPreferredMigrationsProjectId!!,
-                prevPreferredStartupProjectId!!
-            )
-
-        commonOptionsService.setPreferredProjectsPair(migrationsProject!!.data.id, startupProject!!.data.id)
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun primaryOptions(parent: LayoutBuilder, customOptions: LayoutBuilder.() -> Unit) {
-        customOptions(parent)
-        loadPreferredProjects()
-        migrationsProjectRow(parent)
-        startupProjectRow(parent)
-        dbContextRow(parent)
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun primaryOptions(parent: LayoutBuilder) = primaryOptions(parent) { }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun additionalOptions(parent: LayoutBuilder, customOptions: Row.() -> Unit) {
-        parent.titledRow("Additional Options") {
-            customOptions(this)
-        }
-
-        buildOptionsRow(parent)
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun additionalOptions(parent: LayoutBuilder) {
-        buildOptionsRow(parent)
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun migrationsProjectRow(parent: LayoutBuilder): Row {
-        val migrationsBoxModel = DefaultComboBoxModel(migrationsProjects)
-
-        return parent.row("Migrations project:") {
-            iconComboBox(migrationsBoxModel, { migrationsProject }, ::migrationsProjectSetter)
-                .withValidationOnInput(migrationsProjectValidation())
-                .withValidationOnApply(migrationsProjectValidation())
-        }
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun startupProjectRow(parent: LayoutBuilder): Row {
-        val startupBoxModel = DefaultComboBoxModel(startupProjects)
-
-        return parent.row("Startup project:") {
-            iconComboBox(startupBoxModel, { startupProject }, ::startupProjectSetter)
-                .withValidationOnInput(startupProjectValidation())
-                .withValidationOnApply(startupProjectValidation())
-        }
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun dbContextRow(parent: LayoutBuilder): Row {
-        return parent.row("DbContext class:") {
-            dbContextBox = iconComboBox(dbContextModel, { dbContext }, ::dbContextSetter)
-                .withValidationOnInput(dbContextValidation())
-                .withValidationOnApply(dbContextValidation())
-                .component
-        }
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun buildOptionsRow(parent: LayoutBuilder) =
-        parent.titledRow("Build Options") {
-            noBuildRow(this)
-
-            buildConfigurationRow(this)
-                .enableIf(noBuildCheckbox.selected.not())
-
-            targetFrameworkRow(this)
-                .enableIf(noBuildCheckbox.selected.not())
-        }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun noBuildRow(parent: Row) =
-        parent.row {
-            noBuildCheckbox =
-                checkBox("Skip project build process (--no-build)", { noBuild }, { noBuild = it }).component
-        }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun buildConfigurationRow(parent: Row): Row {
-        val currentConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value
-
-        val availableConfigurations = intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection
+    private val availableBuildConfigurations =
+        intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection
             .valueOrEmpty()
             .distinctBy { it.configuration } // To get around of different platforms for the same configurations
             .map { BuildConfigurationItem(it.configuration) }
             .toTypedArray()
 
-        buildConfigurationModel = DefaultComboBoxModel(availableConfigurations)
-        buildConfiguration = availableConfigurations.find { it.displayName == currentConfiguration?.configuration }
-            ?: availableConfigurations.firstOrNull()
+    private var targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem> = DefaultComboBoxModel()
+    private var dbContextModel: DefaultComboBoxModel<DbContextItem> = DefaultComboBoxModel()
 
-        return parent.row("Build configuration:") {
-            iconComboBox(buildConfigurationModel, { buildConfiguration }, ::buildConfigurationSetter)
-                .withValidationOnInput(buildConfigurationValidation())
-                .withValidationOnApply(buildConfigurationValidation())
+    //
+    // Events
+    private val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
+    private val startupProjectChangedEvent: Event<StartupProjectItem> = Event()
+    private val dbContextChangedEvent: Event<DbContextItem?> = Event()
+
+    //
+    // Validation
+    private val validator = EfCoreDialogValidator(
+        commonOptions, beModel, intellijProject, requireMigrationsInProject, dbContextModel,
+        availableBuildConfigurations, targetFrameworkModel)
+
+    //
+    // Preferences
+    private val preferredProjectsManager = PreferredProjectsManager(intellijProject)
+
+    //
+    // Constructor
+    init {
+        title = titleText
+
+        addMigrationsProjectChangedListener(::migrationsProjectChanged)
+        addStartupProjectChangedListener(::startupProjectChanged)
+
+        initSelectedBuildConfiguration()
+    }
+
+    private fun initSelectedBuildConfiguration() {
+        val currentBuilderConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value
+
+        commonOptions.buildConfiguration =
+            availableBuildConfigurations.find {
+                it.displayName == currentBuilderConfiguration?.configuration
+            } ?: availableBuildConfigurations.firstOrNull()
+    }
+
+    private fun initPreferredProjects() {
+        val selectedDotnetProject =
+            availableMigrationsProjects.find { it.displayName == selectedDotnetProjectName }
+
+        val (preferredMigrationsProject, preferredStartupProject) =
+            preferredProjectsManager.getProjectPair(selectedDotnetProject?.data?.id, availableMigrationsProjects, availableStartupProjects)
+
+        migrationsProjectSetter(preferredMigrationsProject)
+        startupProjectSetter(preferredStartupProject)
+    }
+
+    //
+    // Methods
+    protected fun addMigrationsProjectChangedListener(listener: (MigrationsProjectItem) -> Unit) {
+        migrationsProjectChangedEvent += listener
+    }
+
+    protected fun addStartupProjectChangedListener(listener: (StartupProjectItem) -> Unit) {
+        startupProjectChangedEvent += listener
+    }
+
+    protected fun addDbContextChangedListener(listener: (DbContextItem?) -> Unit) {
+        dbContextChangedEvent += listener
+    }
+
+    override fun doOKAction() {
+        super.doOKAction()
+
+        val migrationsProject = commonOptions.migrationsProject
+        val startupProject = commonOptions.startupProject
+
+        if (migrationsProject != null && startupProject != null) {
+            preferredProjectsManager.setProjectPair(migrationsProject, startupProject)
         }
     }
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun targetFrameworkRow(parent: Row): Row {
+    override fun createCenterPanel(): JComponent = createMainUI()
 
-        return parent.row("Target framework:") {
-            iconComboBox(targetFrameworkModel, { targetFramework }, ::targetFrameworkSetter)
-                .withValidationOnInput(targetFrameworkValidation())
-                .withValidationOnApply(targetFrameworkValidation())
+    protected fun createMainUI(): DialogPanel {
+        return panel {
+            panel {
+                createPrimaryOptions()(this)
+                // TODO: Find better place to load preferences keeping component lifetime in mind
+                initPreferredProjects()
+                createMigrationsProjectRow()(this)
+                createStartupProjectRow()(this)
+                createDbContextProjectRow()(this)
+            }
+            panel {
+                createAdditionalGroup()(this)
+                createBuildOptions()(this)
+            }
         }
     }
 
-    private fun loadPreferredProjects() {
-        if (dotnetProjectId == null) {
-            setDefaultProjects()
-            return
-        }
-
-        val preferredProjects =
-            CommonOptionsStateService.getInstance(intellijProject).getPreferredProjectIdsPair(dotnetProjectId)
-        if (preferredProjects != null) {
-            val (migrationsProjectId, startupProjectId) = preferredProjects
-            prevPreferredMigrationsProjectId = migrationsProjectId
-            prevPreferredStartupProjectId = startupProjectId
-            val migrationsProject =
-                migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
-            val startupProject =
-                startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.firstOrNull()
-
-            migrationsProjectSetter(migrationsProject)
-            startupProjectSetter(startupProject)
-        } else {
-            setDefaultProjects()
+    protected fun createMigrationsProjectRow(): Panel.() -> Row = {
+        row("Migrations project:") {
+            iconComboBox(availableMigrationsProjects, { commonOptions.migrationsProject }, ::migrationsProjectSetter)
+                .validationOnInput(validator.migrationsProjectValidation())
+                .validationOnApply(validator.migrationsProjectValidation())
         }
     }
 
-    private fun setDefaultProjects() {
-        migrationsProjectSetter(migrationsProjects.find { it.data.id == dotnetProjectId }
-            ?: migrationsProjects.firstOrNull())
-        startupProjectSetter(startupProjects.find { it.data.id == dotnetProjectId }
-            ?: startupProjects.firstOrNull())
-    }
-
-    private fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? =
-        {
-            if (migrationsProject == null)
-                error("You should selected valid migrations project")
-            else if (shouldHaveMigrationsInProject) {
-                if (dbContext == null)
-                    null
-                else {
-                    val migrationsIdentity = MigrationsIdentity(migrationsProject!!.displayName, dbContext!!.data)
-                    val hasMigrations = model.hasAvailableMigrations.runUnderProgress(
-                        migrationsIdentity, intellijProject, "Checking migrations...",
-                        isCancelable = true,
-                        throwFault = true
-                    )
-
-                    if (hasMigrations == null || !hasMigrations)
-                        error("Selected migrations project doesn't have migrations")
-                    else
-                        null
-                }
-            } else null
+    protected fun createStartupProjectRow(): Panel.() -> Row = {
+        row("Startup project:") {
+            iconComboBox(availableStartupProjects, { commonOptions.startupProject }, ::startupProjectSetter)
+                .validationOnInput(validator.startupProjectValidation())
+                .validationOnApply(validator.startupProjectValidation())
         }
-
-    private fun startupProjectValidation(): ValidationInfoBuilder.(ComboBox<StartupProjectItem>) -> ValidationInfo? = {
-        if (startupProject == null)
-            error("You should selected valid startup project")
-        else
-            null
     }
 
-    private fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
-        if (dbContext == null || dbContextModel.size == 0)
-            error("Migrations project should have at least 1 DbContext")
-        else
-            null
+    protected fun createDbContextProjectRow(): Panel.() -> Row = {
+        row("DbContext class:") {
+            iconComboBox(dbContextModel, { commonOptions.dbContext }, ::dbContextSetter)
+                .validationOnInput(validator.dbContextValidation())
+                .validationOnApply(validator.dbContextValidation())
+        }
     }
 
-    private fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
-        if (buildConfiguration == null || buildConfigurationModel.size == 0)
-            error("Solution doesn't have any build configurations")
-        else
-            null
+    protected open fun createPrimaryOptions(): Panel.() -> Unit = {
     }
 
-    private fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? = {
-        if (targetFramework == null || targetFrameworkModel.size == 0)
-            error("Startup project should have at least 1 supported target framework")
-        else
-            null
+    protected open fun createAdditionalGroup(): Panel.() -> Unit = {
     }
 
+    protected fun createBuildOptions(): Panel.() -> Panel = {
+        group("Build Options") {
+            var noBuildCheck: JBCheckBox? = null
+            row {
+                noBuildCheck = checkBox("Skip project build process (--no-build)")
+                    .bindSelected(commonOptions::noBuild)
+                    .component
+            }
+
+            row("Build configuration:") {
+                iconComboBox(availableBuildConfigurations, { commonOptions.buildConfiguration }, ::buildConfigurationSetter)
+                    .validationOnInput(validator.buildConfigurationValidation())
+                    .validationOnApply(validator.buildConfigurationValidation())
+            }.enabledIf(noBuildCheck!!.selected.not())
+
+            row("Target framework:") {
+                iconComboBox(targetFrameworkModel, { commonOptions.targetFramework }, ::targetFrameworkSetter)
+                    .validationOnInput(validator.targetFrameworkValidation())
+                    .validationOnInput(validator.targetFrameworkValidation())
+            }.enabledIf(noBuildCheck!!.selected.not())
+        }
+    }
+
+    //
+    // Setters
     private fun migrationsProjectSetter(project: MigrationsProjectItem?) {
-        if (project == migrationsProject) return
+        if (project == commonOptions.migrationsProject) return
 
-        migrationsProject = project
-        migrationsProjectChangedEvent.invoke(migrationsProject!!)
+        commonOptions.migrationsProject = project
+        migrationsProjectChangedEvent.invoke(commonOptions.migrationsProject!!)
     }
 
     private fun startupProjectSetter(project: StartupProjectItem?) {
-        if (project == startupProject) return
+        if (project == commonOptions.startupProject) return
 
-        startupProject = project
-        startupProjectChangedEvent.invoke(startupProject!!)
+        commonOptions.startupProject = project
+        startupProjectChangedEvent.invoke(commonOptions.startupProject!!)
     }
 
     private fun dbContextSetter(context: DbContextItem?) {
-        if (context == dbContext) return
+        if (context == commonOptions.dbContext) return
 
-        dbContext = context
-        dbContextChangedEvent.invoke(dbContext)
+        commonOptions.dbContext = context
+        dbContextChangedEvent.invoke(commonOptions.dbContext)
     }
 
     private fun buildConfigurationSetter(configuration: BuildConfigurationItem?) {
-        if (configuration == buildConfiguration) return
+        if (configuration == commonOptions.buildConfiguration) return
 
-        buildConfiguration = configuration
+        commonOptions.buildConfiguration = configuration
     }
 
     private fun targetFrameworkSetter(framework: BaseTargetFrameworkItem?) {
-        if (framework == targetFramework) return
+        if (framework == commonOptions.targetFramework) return
 
-        targetFramework = framework
+        commonOptions.targetFramework = framework
     }
 
+    //
+    // Event listeners
     private fun migrationsProjectChanged(project: MigrationsProjectItem?) {
         dbContextModel.removeAllElements()
 
         if (project == null) return
 
-        val dbContexts = model.getAvailableDbContexts.runUnderProgress(
-            migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
+        val dbContexts = beModel.getAvailableDbContexts.runUnderProgress(
+            commonOptions.migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
             isCancelable = true,
             throwFault = true
         )
@@ -354,9 +253,6 @@ abstract class EfCoreDialogWrapper(
         dbContextModel.addAll(dbContextIconItems)
         val firstDbContext = dbContextIconItems.firstOrNull()
         dbContextSetter(firstDbContext)
-
-        if (::dbContextBox.isInitialized)
-            dbContextBox.item = dbContext
     }
 
     private fun startupProjectChanged(project: IconItem<StartupProjectData>?) {
@@ -371,7 +267,8 @@ abstract class EfCoreDialogWrapper(
 
         targetFrameworkModel.addElement(defaultFramework)
         targetFrameworkModel.addAll(baseTargetFrameworkItems)
-        targetFramework = defaultFramework
-        targetFrameworkModel.selectedItem = targetFramework
+        commonOptions.targetFramework = defaultFramework
+        targetFrameworkModel.selectedItem = commonOptions.targetFramework
     }
 }
+

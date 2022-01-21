@@ -15,7 +15,7 @@ class UpdateDatabaseAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val databaseClient = intellijProject.getService<me.seclerp.rider.plugins.efcore.cli.api.DatabaseClient>()
-            val commonOptions = getCommonOptionsV2(dialog)
+            val commonOptions = getCommonOptions(dialog)
             val targetMigration = dialog.model.targetMigration.trim()
             val connection = if (dialog.model.useDefaultConnection) null else dialog.model.connection
 

@@ -9,7 +9,7 @@ import com.intellij.ui.layout.selected
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver

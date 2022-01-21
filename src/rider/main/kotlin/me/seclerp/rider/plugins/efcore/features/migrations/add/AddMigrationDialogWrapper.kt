@@ -7,7 +7,7 @@ import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem

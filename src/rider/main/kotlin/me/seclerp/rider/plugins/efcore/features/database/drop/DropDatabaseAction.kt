@@ -15,7 +15,7 @@ class DropDatabaseAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val databaseClient = intellijProject.getService<me.seclerp.rider.plugins.efcore.cli.api.DatabaseClient>()
-            val commonOptions = getCommonOptionsV2(dialog)
+            val commonOptions = getCommonOptions(dialog)
 
             executeCommandUnderProgress(intellijProject, "Deleting database...", "Database has been deleted") {
                 databaseClient.drop(commonOptions)

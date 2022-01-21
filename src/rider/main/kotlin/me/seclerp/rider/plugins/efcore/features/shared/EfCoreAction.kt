@@ -26,17 +26,7 @@ abstract class EfCoreAction : AnAction() {
         actionEvent.presentation.isVisible = actionEvent.isLoadedProjectFile()
     }
 
-    fun getCommonOptions(dialog: EfCoreDialogWrapper): CommonOptions =
-        CommonOptions(
-            dialog.migrationsProject!!.data.fullPath,
-            dialog.startupProject!!.data.fullPath,
-            dialog.dbContext?.data,
-            dialog.buildConfiguration!!.displayName,
-            dialog.targetFramework!!.data,
-            dialog.noBuild
-        )
-
-    fun getCommonOptionsV2(dialog: me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper): CommonOptions {
+    fun getCommonOptions(dialog: EfCoreDialogWrapper): CommonOptions {
         val common = dialog.commonOptions
         return CommonOptions(
             common.migrationsProject!!.data.fullPath,

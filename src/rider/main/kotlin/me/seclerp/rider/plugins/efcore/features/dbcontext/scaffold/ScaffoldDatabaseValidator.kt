@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.v2
+package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder

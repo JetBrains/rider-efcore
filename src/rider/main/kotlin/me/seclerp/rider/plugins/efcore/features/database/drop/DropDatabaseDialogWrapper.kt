@@ -3,7 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.database.drop
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 
 class DropDatabaseDialogWrapper(
     model: RiderEfCoreModel,

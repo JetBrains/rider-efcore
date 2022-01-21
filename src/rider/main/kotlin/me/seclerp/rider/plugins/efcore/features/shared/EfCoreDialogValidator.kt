@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.shared.v2
+package me.seclerp.rider.plugins.efcore.features.shared
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
