@@ -1,106 +1,109 @@
 package me.seclerp.rider.plugins.efcore.features.database.update
 
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.ui.TextFieldWithAutoCompletion
-import com.intellij.ui.layout.*
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.layout.not
+import com.intellij.ui.layout.selected
 import com.intellij.util.textCompletion.TextFieldWithCompletion
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.features.shared.v2.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
-import javax.swing.JCheckBox
+import me.seclerp.rider.plugins.efcore.ui.textFieldWithCompletion
 
+@Suppress("UnstableApiUsage")
 class UpdateDatabaseDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
-    private val model: RiderEfCoreModel,
+    private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Update Database", model, intellijProject, currentDotnetProjectName, true) {
+    selectedDotnetProjectName: String
+) : EfCoreDialogWrapper("Update Database", beModel, intellijProject, selectedDotnetProjectName, true) {
 
-    var targetMigration: String = ""
-        private set
+    //
+    // Data binding
+    val model = UpdateDatabaseModel("", true, "")
 
-    var useDefaultConnection: Boolean = true
-        private set
-
-    var connection: String = ""
-        private set
-
+    //
+    // Internal data
     private var availableMigrationsList = listOf<MigrationInfo>()
     private val currentDbContextMigrationsList = mutableListOf<String>()
-
-    private lateinit var useDefaultConnectionCheckbox: JCheckBox
     private lateinit var targetMigrationTextField: TextFieldWithCompletion
 
+    //
+    // Validation
+    private val validator = UpdateDatabaseValidator(currentDbContextMigrationsList)
+
+    //
+    // Constructor
     init {
-        migrationsProjectChangedEvent += ::onMigrationsProjectChanged
-        dbContextChangedEvent += ::refreshCurrentDbContextMigrations
+        addMigrationsProjectChangedListener(::onMigrationsProjectChanged)
+        addDbContextChangedListener(::onDbContextChanged)
 
         init()
     }
 
-    override fun createCenterPanel(): DialogPanel {
-        return panel {
-            primaryOptions(this) {
-                targetMigrationRow(this)
-            }
-            additionalOptions(this) {
-                if (efCoreVersion.major >= 5) {
+    override fun createPrimaryOptions(): Panel.() -> Unit = {
+        createTargetMigrationRow()(this)
+    }
+
+    override fun createAdditionalGroup(): Panel.() -> Unit = {
+        group("Additional Options") {
+            if (efCoreVersion.major >= 5) {
+                indent {
+                    var useDefaultConnectionCheckbox: JBCheckBox? = null
                     row {
-                        useDefaultConnectionCheckbox = checkBox("Use default connection of startup project", ::useDefaultConnection).component
-                        row("Connection:") {
-                            textField(::connection)
-//                            .withValidationOnApply(connectionValidation())
-                        }.enableIf(useDefaultConnectionCheckbox.selected.not())
+                        useDefaultConnectionCheckbox =
+                            checkBox("Use default connection of startup project")
+                                .bindSelected(model::useDefaultConnection)
+                                .component
                     }
+                    row("Connection:") {
+                        textField()
+                            .bindText(model::connection)
+                            .validationOnInput(validator.connectionValidation())
+                            .validationOnApply(validator.connectionValidation())
+                    }.enabledIf(useDefaultConnectionCheckbox!!.selected.not())
                 }
             }
         }
     }
 
-    private fun targetMigrationRow(parent: LayoutBuilder): Row {
-        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
-        val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(currentDbContextMigrationsList, completionItemsIcon)
-        targetMigrationTextField = TextFieldWithCompletion(intellijProject, provider, "Initial", true, true, false, false)
-        targetMigrationTextField.document.addDocumentListener(object : DocumentListener {
-            override fun documentChanged(event: DocumentEvent) {
-                targetMigration = event.document.text
-            }
-        })
-
-        return parent.row("Target migration:") {
-            targetMigrationTextField(CCFlags.pushX, CCFlags.growX)
+    private fun createTargetMigrationRow(): Panel.() -> Row = {
+        row("Target migration:") {
+            createTargetMigrationField()(this)
+                .horizontalAlign(HorizontalAlign.FILL)
                 .comment("Use '0' as a target migration to undo all applied migrations")
                 .focused()
-                .withValidationOnApply(targetMigrationValidation())
+                .validationOnInput(validator.targetMigrationValidation())
+                .validationOnApply(validator.targetMigrationValidation())
         }
     }
 
-    private fun targetMigrationValidation(): ValidationInfoBuilder.(TextFieldWithCompletion) -> ValidationInfo? = {
-        if (it.text.isEmpty())
-            error("Target migration could not be empty")
-        else if (!currentDbContextMigrationsList.contains(it.text))
-            error("Migration with such name doesn't exist")
-        else null
+    private fun createTargetMigrationField(): Row.() -> Cell<TextFieldWithCompletion> = {
+        textFieldWithCompletion(model::targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
+            .applyToComponent { targetMigrationTextField = this }
     }
 
-    // TODO: Investigate why validation not worked properly for disabled fields
-
+    //
+    // Event listeners
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        availableMigrationsList = model.getAvailableMigrations.runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
-            isCancelable = true,
-            throwFault = true
-        )?.sortedByDescending { it.longName } ?: listOf()
+        availableMigrationsList = beModel.getAvailableMigrations
+            .runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
+                isCancelable = true,
+                throwFault = true
+            )?.sortedByDescending { it.longName } ?: listOf()
 
+        refreshCurrentDbContextMigrations(commonOptions.dbContext)
+    }
+
+    private fun onDbContextChanged(dbContext: DbContextItem?) {
         refreshCurrentDbContextMigrations(dbContext)
     }
 
@@ -112,19 +115,23 @@ class UpdateDatabaseDialogWrapper(
         }
 
         val availableDbContextMigrations = availableMigrationsList
-            .filter { it.dbContextClass == dbContext!!.data }
+            .filter { it.dbContextClass == dbContext.data }
             .map { it.longName }
 
-        if (availableDbContextMigrations.isEmpty())
-            targetMigration = ""
-        else {
+        if (availableDbContextMigrations.isEmpty()) {
+            model.targetMigration = ""
+        } else {
             val lastMigration = availableDbContextMigrations.first()
-            targetMigration = lastMigration
+            model.targetMigration = lastMigration
             currentDbContextMigrationsList.addAll(0, availableDbContextMigrations)
         }
 
         currentDbContextMigrationsList.add("0")
 
-        targetMigrationTextField.text = targetMigration
+        targetMigrationTextField.text = model.targetMigration
+    }
+
+    companion object {
+        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
     }
 }

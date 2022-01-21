@@ -83,12 +83,6 @@ abstract class EfCoreDialogWrapper(
         initSelectedBuildConfiguration()
     }
 
-    override fun init() {
-        initPreferredProjects()
-
-        super.init()
-    }
-
     private fun initSelectedBuildConfiguration() {
         val currentBuilderConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value
 
@@ -140,6 +134,8 @@ abstract class EfCoreDialogWrapper(
         return panel {
             panel {
                 createPrimaryOptions()(this)
+                // TODO: Find better place to load preferences keeping component lifetime in mind
+                initPreferredProjects()
                 createMigrationsProjectRow()(this)
                 createStartupProjectRow()(this)
                 createDbContextProjectRow()(this)

@@ -4,9 +4,9 @@ package me.seclerp.rider.plugins.efcore.ui
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.TextFieldWithAutoCompletion
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
@@ -84,32 +84,35 @@ fun <T : IconItem<*>> Row.iconComboBox(
 fun Row.textFieldWithCompletion(
     binding: PropertyBinding<String>,
     completions: MutableList<String>,
+    project: Project? = null,
     icon: Icon? = null
-): Cell<JBTextField> {
+): Cell<TextFieldWithCompletion> {
     val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(completions, icon)
-    val textField = TextFieldWithCompletion(null, provider, binding.get(), true, true, false, false)
+    val textField = TextFieldWithCompletion(project, provider, binding.get(), true, true, false, false)
     textField.addDocumentListener(object : DocumentListener {
         override fun documentChanged(event: DocumentEvent) {
             binding.set(event.document.text)
         }
     })
 
-    return textField()
+    return cell(textField)
 }
 
 fun Row.textFieldWithCompletion(
     getter: () -> String,
     setter: (String) -> Unit,
     completions: MutableList<String>,
+    project: Project? = null,
     icon: Icon? = null
-): Cell<JBTextField> {
-    return textFieldWithCompletion(PropertyBinding(getter, setter), completions, icon)
+): Cell<TextFieldWithCompletion> {
+    return textFieldWithCompletion(PropertyBinding(getter, setter), completions, project, icon)
 }
 
 fun Row.textFieldWithCompletion(
     property: KMutableProperty0<String>,
     completions: MutableList<String>,
+    project: Project? = null,
     icon: Icon? = null
-): Cell<JBTextField> {
-    return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, icon)
+): Cell<TextFieldWithCompletion> {
+    return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, project, icon)
 }

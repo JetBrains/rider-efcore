@@ -2,7 +2,6 @@ package me.seclerp.rider.plugins.efcore.features.database.update
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.jetbrains.rider.util.idea.getService
-import me.seclerp.rider.plugins.efcore.cli.api.DatabaseClient
 import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreAction
@@ -16,9 +15,9 @@ class UpdateDatabaseAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val databaseClient = intellijProject.getService<me.seclerp.rider.plugins.efcore.cli.api.DatabaseClient>()
-            val commonOptions = getCommonOptions(dialog)
-            val targetMigration = dialog.targetMigration.trim()
-            val connection = if (dialog.useDefaultConnection) null else dialog.connection
+            val commonOptions = getCommonOptionsV2(dialog)
+            val targetMigration = dialog.model.targetMigration.trim()
+            val connection = if (dialog.model.useDefaultConnection) null else dialog.model.connection
 
             executeCommandUnderProgress(intellijProject, "Updating database...", "Database has been updated") {
                 databaseClient.update(efCoreVersion, commonOptions, targetMigration, connection)

@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.database.update.v2
+package me.seclerp.rider.plugins.efcore.features.database.update
 
 data class UpdateDatabaseModel(
     var targetMigration: String,

@@ -118,12 +118,8 @@ class AddMigrationDialogWrapper(
         val migrationsExist = currentDbContextMigrationsList.isNotEmpty()
         val migrationName = if (migrationsExist) "" else "Initial"
 
-        if (::migrationNameTextField.isInitialized) {
-            migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
-            migrationNameTextField.text = migrationName
-            migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
-        } else {
-            model.migrationName = migrationName
-        }
+        migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
+        migrationNameTextField.text = migrationName
+        migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
     }
 }
