@@ -1,9 +1,10 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.add
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
@@ -24,7 +25,7 @@ class AddMigrationDialogWrapper(
 
     //
     // Data binding
-    val model = AddMigrationModel("")
+    val model = AddMigrationModel("", "<Default>")
 
     //
     // Internal data
@@ -32,6 +33,7 @@ class AddMigrationDialogWrapper(
     private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
     private lateinit var migrationNameTextField: JBTextField
+    private lateinit var migrationFolderTextFieldWithBrowseButton: TextFieldWithBrowseButton
 
     //
     // Validation
@@ -50,6 +52,7 @@ class AddMigrationDialogWrapper(
     // UI
     override fun Panel.createPrimaryOptions() {
         createMigrationNameRow()
+        createMigrationFolderRow()
     }
 
     private fun Panel.createMigrationNameRow() {
@@ -63,6 +66,26 @@ class AddMigrationDialogWrapper(
                 .applyToComponent {
                     document.addDocumentListener(migrationNameChangedListener)
                     migrationNameTextField = this
+                }
+        }
+    }
+
+    private fun Panel.createMigrationFolderRow() {
+        val fileChooserDescriptor =  FileChooserDescriptor(
+            /* chooseFiles = */ false,
+            /* chooseFolders = */ true,
+            /* chooseJars = */ false,
+            /* chooseJarsAsFiles = */ false,
+            /* chooseJarContents = */ false,
+            /* chooseMultiple = */ false
+        )
+
+        row("Migration folder:") {
+            textFieldWithBrowseButton(fileChooserDescriptor = fileChooserDescriptor)
+                .bindText(model::migrationFolder)
+                .horizontalAlign(HorizontalAlign.FILL)
+                .applyToComponent {
+                    migrationFolderTextFieldWithBrowseButton = this
                 }
         }
     }
