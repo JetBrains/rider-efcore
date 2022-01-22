@@ -82,7 +82,7 @@ class AddMigrationDialogWrapper(
                     /* chooseMultiple = */ false
                 )
 
-                textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
+                textFieldWithBrowseButton("Select Migrations Folder", intellijProject, fileChooserDescriptor) {
                     val migrationsFolder : VirtualFile = it
                     formatMigrationFolderPath(migrationsFolder)
                 }.bindText(model::migrationOutputFolder)
