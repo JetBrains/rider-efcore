@@ -2,17 +2,19 @@ package me.seclerp.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.jetbrains.rdclient.util.idea.toIOFile
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
+import java.io.File
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -25,7 +27,7 @@ class AddMigrationDialogWrapper(
 
     //
     // Data binding
-    val model = AddMigrationModel("", "<Default>")
+    val model = AddMigrationModel("")
 
     //
     // Internal data
@@ -33,7 +35,7 @@ class AddMigrationDialogWrapper(
     private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
     private lateinit var migrationNameTextField: JBTextField
-    private lateinit var migrationFolderTextFieldWithBrowseButton: TextFieldWithBrowseButton
+    private lateinit var migrationProjectFullPath: String
 
     //
     // Validation
@@ -71,39 +73,21 @@ class AddMigrationDialogWrapper(
     }
 
     private fun Panel.createMigrationFolderRow() {
-        val fileChooserDescriptor =  FileChooserDescriptor(
-            /* chooseFiles = */ false,
-            /* chooseFolders = */ true,
-            /* chooseJars = */ false,
-            /* chooseJarsAsFiles = */ false,
-            /* chooseJarContents = */ false,
-            /* chooseMultiple = */ false
-        )
-
         row("Migration folder:") {
-            textFieldWithBrowseButton(fileChooserDescriptor = fileChooserDescriptor)
-                .bindText(model::migrationFolder)
-                .horizontalAlign(HorizontalAlign.FILL)
-                .applyToComponent {
-                    textField.document.addDocumentListener(migrationFolderChangeListener)
-                    migrationFolderTextFieldWithBrowseButton = this
-                }
-        }
-    }
+            val fileChooserDescriptor =  FileChooserDescriptor(
+                /* chooseFiles = */ false,
+                /* chooseFolders = */ true,
+                /* chooseJars = */ false,
+                /* chooseJarsAsFiles = */ false,
+                /* chooseJarContents = */ false,
+                /* chooseMultiple = */ false
+            )
 
-    private val migrationFolderChangeListener = object : DocumentListener {
-        override fun insertUpdate(e: DocumentEvent?) {
-            TODO("Not yet implemented")
+            textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
+                val migrationsFolder : VirtualFile = it
+                formatMigrationFolderPath(migrationsFolder)
+            }
         }
-
-        override fun removeUpdate(e: DocumentEvent?) {
-            TODO("Not yet implemented")
-        }
-
-        override fun changedUpdate(e: DocumentEvent?) {
-            TODO("Not yet implemented")
-        }
-
     }
 
     //
@@ -123,7 +107,10 @@ class AddMigrationDialogWrapper(
     }
 
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
+        setMigrationProjectFullPath(migrationsProjectItem)
+
         refreshAvailableMigrations(migrationsProjectItem.displayName)
+
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
 
@@ -162,5 +149,16 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
         migrationNameTextField.text = migrationName
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
+    }
+
+    private fun formatMigrationFolderPath(virtualFile: VirtualFile) : String {
+        val migrationProjectFolder = File(migrationProjectFullPath).parentFile.path
+        val relativePath = virtualFile.toIOFile().relativeTo(File(migrationProjectFolder)).path
+
+        return relativePath
+    }
+
+    private fun setMigrationProjectFullPath(migrationsProjectItem: MigrationsProjectItem) {
+        migrationProjectFullPath = migrationsProjectItem.data.fullPath
     }
 }
