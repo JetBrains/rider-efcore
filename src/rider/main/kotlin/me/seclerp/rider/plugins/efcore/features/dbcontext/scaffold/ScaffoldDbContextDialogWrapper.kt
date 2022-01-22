@@ -23,25 +23,27 @@ import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
 
 @Suppress("UnstableApiUsage")
-class ScaffoldDatabaseDialogWrapper(
+class ScaffoldDbContextDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
     beModel: RiderEfCoreModel,
     intellijProject: Project,
     currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Scaffold Database", beModel, intellijProject, currentDotnetProjectName, false) {
+) : EfCoreDialogWrapper("Scaffold DbContext", beModel, intellijProject, currentDotnetProjectName,
+    requireMigrationsInProject = false, requireDbContext = false
+) {
 
     //
     // Data binding
-    val model = ScaffoldDatabaseModel(
+    val model = ScaffoldDbContextModel(
         connection = "",
         provider = "",
-        outputFolder = "Models",
+        outputFolder = "Entities",
         useAttributes = false,
         useDatabaseNames = false,
         generateOnConfiguring = true,
         usePluralizer = true,
         dbContextName = "MyDbContext",
-        dbContextFolder = "DbContext",
+        dbContextFolder = "Context",
         tablesList = mutableListOf(),
         schemasList = mutableListOf(),
         scaffoldAllTables = true,
@@ -61,7 +63,7 @@ class ScaffoldDatabaseDialogWrapper(
 
     //
     // Validation
-    private val validator = ScaffoldDatabaseValidator()
+    private val validator = ScaffoldDbContextValidator()
 
     //
     // Constructor
@@ -187,16 +189,16 @@ class ScaffoldDatabaseDialogWrapper(
         return createToggleableTablePanel(schemasModel, "Scaffold all schemas", model::scaffoldAllSchemas)
     }
 
-    private fun createToggleableTablePanel(model: SimpleListTableModel, checkboxText: String,
+    private fun createToggleableTablePanel(tableModel: SimpleListTableModel, checkboxText: String,
                                            checkboxProperty: KMutableProperty0<Boolean>): DialogPanel {
-        val table = JBTable(model)
+        val table = JBTable(tableModel)
             .apply {
                 tableHeader.isVisible = false
             }
 
         val tableDecorator = ToolbarDecorator.createDecorator(table)
             .setAddAction {
-                model.addRow(SimpleItem(""))
+                tableModel.addRow(SimpleItem(""))
             }
             .setRemoveAction {
                 TableUtil.removeSelectedItems(table)
@@ -212,6 +214,12 @@ class ScaffoldDatabaseDialogWrapper(
                     .bindSelected(checkboxProperty)
                     .component
             }
+
+            enabledCheckbox!!.selected.addListener {
+                tablePanel.isVisible = !it
+            }
+
+            tablePanel.isVisible = !enabledCheckbox!!.isSelected
 
             row {
                 cell(tablePanel)

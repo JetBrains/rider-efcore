@@ -2,7 +2,7 @@ package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 
-data class ScaffoldDatabaseModel(
+data class ScaffoldDbContextModel(
     var connection: String,
     var provider: String,
     var outputFolder: String,

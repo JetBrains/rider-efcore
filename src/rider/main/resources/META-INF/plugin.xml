@@ -44,14 +44,15 @@
               text="Remove Last Migration" description="Removes last created migration">
       </action>
       <separator />
-      <action id="me.seclerp.rider.plugins.efcore.ScaffoldDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDatabaseAction"
-              text="Scaffold Database" description="Generates code for a DbContext and entity types for a database">
-      </action>
       <action id="me.seclerp.rider.plugins.efcore.UpdateDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"
               text="Update Database" description="Update database using a selected migration as a target">
       </action>
       <action id="me.seclerp.rider.plugins.efcore.DropDatabaseAction" class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"
               text="Drop Database" description="Drop database used by a DbContext">
+      </action>
+      <separator />
+      <action id="me.seclerp.rider.plugins.efcore.ScaffoldDbContextAction" class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"
+              text="Scaffold DbContext" description="Generates code for a DbContext and entity types for a database">
       </action>
     </group>
   </actions>

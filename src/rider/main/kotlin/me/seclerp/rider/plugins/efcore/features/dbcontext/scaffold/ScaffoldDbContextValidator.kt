@@ -4,7 +4,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
 import javax.swing.JTextField
 
-class ScaffoldDatabaseValidator {
+class ScaffoldDbContextValidator {
     fun connectionValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
             error("Connection could not be empty")

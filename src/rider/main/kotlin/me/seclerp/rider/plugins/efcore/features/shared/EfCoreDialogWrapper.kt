@@ -26,7 +26,8 @@ abstract class EfCoreDialogWrapper(
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
     private val selectedDotnetProjectName: String,
-    requireMigrationsInProject: Boolean = false
+    requireMigrationsInProject: Boolean = false,
+    private val requireDbContext: Boolean = true
 ) : DialogWrapper(true) {
     //
     // Data binding
@@ -77,7 +78,10 @@ abstract class EfCoreDialogWrapper(
     init {
         title = titleText
 
-        addMigrationsProjectChangedListener(::migrationsProjectChanged)
+        if (requireDbContext) {
+            addMigrationsProjectChangedListener(::migrationsProjectChanged)
+        }
+
         addStartupProjectChangedListener(::startupProjectChanged)
 
         initSelectedBuildConfiguration()
@@ -136,14 +140,20 @@ abstract class EfCoreDialogWrapper(
                 createPrimaryOptions()(this)
                 // TODO: Find better place to load preferences keeping component lifetime in mind
                 initPreferredProjects()
-                createMigrationsProjectRow()(this)
-                createStartupProjectRow()(this)
-                createDbContextProjectRow()(this)
+                createDefaultMainRows()
                 panel {
                     createAdditionalGroup()(this)
                     createBuildOptions()(this)
                 }
             }
+        }
+    }
+
+    protected open fun Panel.createDefaultMainRows() {
+        createMigrationsProjectRow()(this)
+        createStartupProjectRow()(this)
+        if (requireDbContext) {
+            createDbContextProjectRow()(this)
         }
     }
 

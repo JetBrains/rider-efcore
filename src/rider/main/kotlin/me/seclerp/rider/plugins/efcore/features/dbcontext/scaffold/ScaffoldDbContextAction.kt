@@ -7,18 +7,18 @@ import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreAction
 
-class ScaffoldDatabaseAction : EfCoreAction() {
+class ScaffoldDbContextAction : EfCoreAction() {
     override fun ready(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
         val intellijProject = actionEvent.project!!
         val dialog = buildDialogInstance(actionEvent) {
-            ScaffoldDatabaseDialogWrapper(efCoreVersion, model, intellijProject, currentDotnetProjectName)
+            ScaffoldDbContextDialogWrapper(efCoreVersion, model, intellijProject, currentDotnetProjectName)
         }
 
         if (dialog.showAndGet()) {
             val dbContextClient = intellijProject.getService<DbContextClient>()
             val commonOptions = getCommonOptions(dialog)
 
-            executeCommandUnderProgress(intellijProject, "Updating database...", "Database has been updated") {
+            executeCommandUnderProgress(intellijProject, "Scaffolding DbContext...", "Database has been updated") {
                 val model = dialog.model
                 dbContextClient.scaffold(
                     efCoreVersion, commonOptions,
