@@ -85,9 +85,25 @@ class AddMigrationDialogWrapper(
                 .bindText(model::migrationFolder)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .applyToComponent {
+                    textField.document.addDocumentListener(migrationFolderChangeListener)
                     migrationFolderTextFieldWithBrowseButton = this
                 }
         }
+    }
+
+    private val migrationFolderChangeListener = object : DocumentListener {
+        override fun insertUpdate(e: DocumentEvent?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun removeUpdate(e: DocumentEvent?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun changedUpdate(e: DocumentEvent?) {
+            TODO("Not yet implemented")
+        }
+
     }
 
     //
