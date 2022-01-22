@@ -104,7 +104,8 @@ class AddMigrationDialogWrapper(
                 textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
                     val migrationsFolder : VirtualFile = it
                     formatMigrationFolderPath(migrationsFolder)
-                }
+                }.validationOnInput(validator.migrationsOutputFolderValidation())
+                    .validationOnApply(validator.migrationsOutputFolderValidation())
             }
         }
     }
