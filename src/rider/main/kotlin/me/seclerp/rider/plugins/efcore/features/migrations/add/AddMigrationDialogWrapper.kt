@@ -71,24 +71,6 @@ class AddMigrationDialogWrapper(
         }
     }
 
-//    private fun Panel.createMigrationFolderRow() {
-//        row("Migration folder:") {
-//            val fileChooserDescriptor =  FileChooserDescriptor(
-//                /* chooseFiles = */ false,
-//                /* chooseFolders = */ true,
-//                /* chooseJars = */ false,
-//                /* chooseJarsAsFiles = */ false,
-//                /* chooseJarContents = */ false,
-//                /* chooseMultiple = */ false
-//            )
-//
-//            textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
-//                val migrationsFolder : VirtualFile = it
-//                formatMigrationFolderPath(migrationsFolder)
-//            }
-//        }
-//    }
-
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
