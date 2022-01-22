@@ -11,6 +11,8 @@ class DropDatabaseDialogWrapper(
     currentDotnetProjectName: String,
 ) : EfCoreDialogWrapper("Drop Database", model, intellijProject, currentDotnetProjectName, false) {
 
+    //
+    // Constructor
     init {
         init()
     }

@@ -18,7 +18,7 @@ class ScaffoldDbContextAction : EfCoreAction() {
             val dbContextClient = intellijProject.getService<DbContextClient>()
             val commonOptions = getCommonOptions(dialog)
 
-            executeCommandUnderProgress(intellijProject, "Scaffolding DbContext...", "Database has been updated") {
+            executeCommandUnderProgress(intellijProject, "Scaffolding DbContext...", "DbContext has been scaffolded") {
                 val model = dialog.model
                 dbContextClient.scaffold(
                     efCoreVersion, commonOptions,

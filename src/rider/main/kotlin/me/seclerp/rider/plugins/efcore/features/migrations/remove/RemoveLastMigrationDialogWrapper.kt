@@ -10,6 +10,8 @@ class RemoveLastMigrationDialogWrapper(
     currentDotnetProjectName: String,
 ) : EfCoreDialogWrapper("Remove Last Migration", model, intellijProject, currentDotnetProjectName, true) {
 
+    //
+    // Constructor
     init {
         init()
     }

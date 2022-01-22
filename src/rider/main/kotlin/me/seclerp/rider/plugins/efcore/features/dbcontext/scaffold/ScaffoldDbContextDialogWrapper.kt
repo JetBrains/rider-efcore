@@ -71,6 +71,8 @@ class ScaffoldDbContextDialogWrapper(
         init()
     }
 
+    //
+    // UI
     @OptIn(ExperimentalStdlibApi::class)
     override fun createCenterPanel(): JComponent {
         val tabbedPane = JBTabbedPane()
@@ -116,7 +118,7 @@ class ScaffoldDbContextDialogWrapper(
         createMainUI()
             .apply(::configureValidation)
 
-    override fun createPrimaryOptions(): Panel.() -> Unit = {
+    override fun Panel.createPrimaryOptions() {
         row("Connection:") {
             textField().bindText(model::connection)
                 .horizontalAlign(HorizontalAlign.FILL)
@@ -132,7 +134,7 @@ class ScaffoldDbContextDialogWrapper(
         }
     }
 
-    override fun createAdditionalGroup(): Panel.() -> Unit = {
+    override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options") {
             row("Output folder") {
                 textField().bindText(model::outputFolder)
@@ -230,6 +232,8 @@ class ScaffoldDbContextDialogWrapper(
         }.apply(::configureValidation)
     }
 
+    //
+    // Methods
     private fun configureValidation(panel: DialogPanel) {
         val disposable = Disposer.newDisposable()
         panel.registerValidators(disposable)

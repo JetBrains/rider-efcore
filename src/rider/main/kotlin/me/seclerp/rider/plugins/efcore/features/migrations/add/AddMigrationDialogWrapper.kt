@@ -46,11 +46,13 @@ class AddMigrationDialogWrapper(
         init()
     }
 
-    override fun createPrimaryOptions(): Panel.() -> Unit = {
-        createMigrationNameRow()(this)
+    //
+    // UI
+    override fun Panel.createPrimaryOptions() {
+        createMigrationNameRow()
     }
 
-    private fun createMigrationNameRow(): Panel.() -> Row = {
+    private fun Panel.createMigrationNameRow() {
         row("Migration name:") {
             textField()
                 .bindText(model::migrationName)

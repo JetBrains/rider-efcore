@@ -132,32 +132,34 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
+    //
+    // UI
     override fun createCenterPanel(): JComponent = createMainUI()
 
     protected fun createMainUI(): DialogPanel {
         return panel {
             panel {
-                createPrimaryOptions()(this)
+                createPrimaryOptions()
                 // TODO: Find better place to load preferences keeping component lifetime in mind
                 initPreferredProjects()
                 createDefaultMainRows()
                 panel {
-                    createAdditionalGroup()(this)
-                    createBuildOptions()(this)
+                    createAdditionalGroup()
+                    createBuildOptions()
                 }
             }
         }
     }
 
     protected open fun Panel.createDefaultMainRows() {
-        createMigrationsProjectRow()(this)
-        createStartupProjectRow()(this)
+        createMigrationsProjectRow()
+        createStartupProjectRow()
         if (requireDbContext) {
-            createDbContextProjectRow()(this)
+            createDbContextProjectRow()
         }
     }
 
-    protected fun createMigrationsProjectRow(): Panel.() -> Row = {
+    protected fun Panel.createMigrationsProjectRow() {
         row("Migrations project:") {
             iconComboBox(availableMigrationsProjects, { commonOptions.migrationsProject }, ::migrationsProjectSetter)
                 .validationOnInput(validator.migrationsProjectValidation())
@@ -165,7 +167,7 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    protected fun createStartupProjectRow(): Panel.() -> Row = {
+    protected fun Panel.createStartupProjectRow() {
         row("Startup project:") {
             iconComboBox(availableStartupProjects, { commonOptions.startupProject }, ::startupProjectSetter)
                 .validationOnInput(validator.startupProjectValidation())
@@ -173,7 +175,7 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    protected fun createDbContextProjectRow(): Panel.() -> Row = {
+    protected fun Panel.createDbContextProjectRow() {
         row("DbContext class:") {
             iconComboBox(dbContextModel, { commonOptions.dbContext }, ::dbContextSetter)
                 .validationOnInput(validator.dbContextValidation())
@@ -181,13 +183,11 @@ abstract class EfCoreDialogWrapper(
         }
     }
 
-    protected open fun createPrimaryOptions(): Panel.() -> Unit = {
-    }
+    protected open fun Panel.createPrimaryOptions() {}
 
-    protected open fun createAdditionalGroup(): Panel.() -> Unit = {
-    }
+    protected open fun Panel.createAdditionalGroup() {}
 
-    protected fun createBuildOptions(): Panel.() -> Unit = {
+    protected fun Panel.createBuildOptions() {
         groupRowsRange("Build Options") {
             var noBuildCheck: JBCheckBox? = null
             row {

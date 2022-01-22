@@ -49,11 +49,13 @@ class UpdateDatabaseDialogWrapper(
         init()
     }
 
-    override fun createPrimaryOptions(): Panel.() -> Unit = {
-        createTargetMigrationRow()(this)
+    //
+    // UI
+    override fun Panel.createPrimaryOptions() {
+        createTargetMigrationRow()
     }
 
-    override fun createAdditionalGroup(): Panel.() -> Unit = {
+    override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options") {
             if (efCoreVersion.major >= 5) {
                 var useDefaultConnectionCheckbox: JBCheckBox? = null
@@ -73,9 +75,9 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    private fun createTargetMigrationRow(): Panel.() -> Row = {
+    private fun Panel.createTargetMigrationRow() {
         row("Target migration:") {
-            createTargetMigrationField()(this)
+            createTargetMigrationField()
                 .horizontalAlign(HorizontalAlign.FILL)
                 .comment("Use '0' as a target migration to undo all applied migrations")
                 .focused()
@@ -84,10 +86,9 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    private fun createTargetMigrationField(): Row.() -> Cell<TextFieldWithCompletion> = {
+    private fun Row.createTargetMigrationField(): Cell<TextFieldWithCompletion> =
         textFieldWithCompletion(model::targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
             .applyToComponent { targetMigrationTextField = this }
-    }
 
     //
     // Event listeners
