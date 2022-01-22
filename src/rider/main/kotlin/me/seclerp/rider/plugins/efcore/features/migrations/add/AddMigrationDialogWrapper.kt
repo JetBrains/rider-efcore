@@ -54,7 +54,6 @@ class AddMigrationDialogWrapper(
     // UI
     override fun Panel.createPrimaryOptions() {
         createMigrationNameRow()
-        createMigrationFolderRow()
     }
 
     private fun Panel.createMigrationNameRow() {
@@ -72,20 +71,40 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    private fun Panel.createMigrationFolderRow() {
-        row("Migration folder:") {
-            val fileChooserDescriptor =  FileChooserDescriptor(
-                /* chooseFiles = */ false,
-                /* chooseFolders = */ true,
-                /* chooseJars = */ false,
-                /* chooseJarsAsFiles = */ false,
-                /* chooseJarContents = */ false,
-                /* chooseMultiple = */ false
-            )
+//    private fun Panel.createMigrationFolderRow() {
+//        row("Migration folder:") {
+//            val fileChooserDescriptor =  FileChooserDescriptor(
+//                /* chooseFiles = */ false,
+//                /* chooseFolders = */ true,
+//                /* chooseJars = */ false,
+//                /* chooseJarsAsFiles = */ false,
+//                /* chooseJarContents = */ false,
+//                /* chooseMultiple = */ false
+//            )
+//
+//            textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
+//                val migrationsFolder : VirtualFile = it
+//                formatMigrationFolderPath(migrationsFolder)
+//            }
+//        }
+//    }
 
-            textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
-                val migrationsFolder : VirtualFile = it
-                formatMigrationFolderPath(migrationsFolder)
+    override fun Panel.createAdditionalGroup() {
+        groupRowsRange("Additional Options"){
+            row("Migrations folder:") {
+                val fileChooserDescriptor =  FileChooserDescriptor(
+                    /* chooseFiles = */ false,
+                    /* chooseFolders = */ true,
+                    /* chooseJars = */ false,
+                    /* chooseJarsAsFiles = */ false,
+                    /* chooseJarContents = */ false,
+                    /* chooseMultiple = */ false
+                )
+
+                textFieldWithBrowseButton(null, intellijProject, fileChooserDescriptor) {
+                    val migrationsFolder : VirtualFile = it
+                    formatMigrationFolderPath(migrationsFolder)
+                }
             }
         }
     }
