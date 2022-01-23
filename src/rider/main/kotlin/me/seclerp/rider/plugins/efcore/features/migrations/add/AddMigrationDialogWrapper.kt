@@ -12,6 +12,7 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.textFieldWithBrowseButtonForRelativeFolders
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
+import java.io.File
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -73,7 +74,7 @@ class AddMigrationDialogWrapper(
                 textFieldWithBrowseButtonForRelativeFolders(
                     project = intellijProject,
                     browseDialogTitle = "Select Migrations Folder",
-                    commonOptions = commonOptions)
+                    getter = { getCurrentMigrationProjectFolder() })
                     .bindText(model::migrationsOutputFolder)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
@@ -137,5 +138,12 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
         migrationNameTextField.text = migrationName
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
+    }
+
+    private fun getCurrentMigrationProjectFolder(): String? {
+        val currentMigrationsProject = commonOptions.migrationsProject?.data?.fullPath
+        val migrationsProjectFolderPath = File(currentMigrationsProject!!).parentFile.path
+
+        return migrationsProjectFolderPath
     }
 }
