@@ -13,7 +13,6 @@ import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
-import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
@@ -125,7 +124,6 @@ fun Row.textFieldWithCompletion(
 }
 
 fun Row.textFieldWithBrowseButtonForRelativeFolders(
-    binding: KMutableProperty0<String>,
     project: Project? = null,
     browseDialogTitle: String? = null,
     commonOptions: CommonOptionsModel?
@@ -134,20 +132,18 @@ fun Row.textFieldWithBrowseButtonForRelativeFolders(
     val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
 
     val provider = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
-        val migrationsFolder : VirtualFile = it
-        formatRelativePathToFolder(migrationsFolder, commonOptions)
-    }
-        .bindText(binding)
-        .horizontalAlign(HorizontalAlign.FILL)
+        val folderFromTextFieldWithBrowseButton : VirtualFile = it
+        formatRelativePathToFolder(folderFromTextFieldWithBrowseButton, commonOptions)
+    }.horizontalAlign(HorizontalAlign.FILL)
 
     return provider
 }
 
-private fun formatRelativePathToFolder(virtualFile: VirtualFile, commonOptions: CommonOptionsModel?) : String {
-    val migrationProjectFullPath = commonOptions?.migrationsProject?.data?.fullPath!!
+private fun formatRelativePathToFolder(folderFromTextFieldWithBrowseButton: VirtualFile, pathRelativeTo: CommonOptionsModel?) : String {
+    val migrationProjectFullPath = pathRelativeTo?.migrationsProject?.data?.fullPath!!
 
     val migrationProjectFolder = File(migrationProjectFullPath).parentFile.path
-    val relativePath = virtualFile.toIOFile().relativeTo(File(migrationProjectFolder)).path
+    val relativePath = folderFromTextFieldWithBrowseButton.toIOFile().relativeTo(File(migrationProjectFolder)).path
 
     return relativePath
 }

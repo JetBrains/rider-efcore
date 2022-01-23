@@ -71,10 +71,10 @@ class AddMigrationDialogWrapper(
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
                 textFieldWithBrowseButtonForRelativeFolders(
-                    binding = model::migrationsOutputFolder,
                     project = intellijProject,
                     browseDialogTitle = "Select Migrations Folder",
                     commonOptions = commonOptions)
+                    .bindText(model::migrationsOutputFolder)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
             }
