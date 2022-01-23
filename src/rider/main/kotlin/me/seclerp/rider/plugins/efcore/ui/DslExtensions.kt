@@ -123,23 +123,16 @@ fun Row.textFieldWithCompletion(
 }
 
 fun Row.textFieldForRelativeFolder(
-    getter: () -> String?,
+    basePathGetter: () -> String,
     project: Project? = null,
     browseDialogTitle: String? = null,
 ): Cell<TextFieldWithBrowseButton> {
 
     val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-
     val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
-        formatRelativePathToFolder(it, getter())
-    }.horizontalAlign(HorizontalAlign.FILL)
+        val pathRelativeToAsFile = File(basePathGetter()).path
+        it.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
+    }
 
     return textFieldWithBrowseButtonCell
-}
-
-private fun formatRelativePathToFolder(folderFromTextFieldWithBrowseButton: VirtualFile, pathRelativeTo: String?) : String {
-    val pathRelativeToAsFile = File(pathRelativeTo!!).path
-    val relativePath = folderFromTextFieldWithBrowseButton.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
-
-    return relativePath
 }

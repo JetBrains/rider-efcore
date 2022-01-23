@@ -33,6 +33,7 @@ class AddMigrationDialogWrapper(
     private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
     private lateinit var migrationNameTextField: JBTextField
+    private var migrationsProjectSpecified: Boolean = false
 
     //
     // Validation
@@ -71,10 +72,17 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
-                textFieldForRelativeFolder({ currentMigrationProjectFolderGetter() }, intellijProject, "Select Migrations Folder")
+                textFieldForRelativeFolder(
+                    { currentMigrationsProjectFolderGetter() },
+                    intellijProject,
+                    "Select Migrations Folder")
                     .bindText(model::migrationsOutputFolder)
+                    .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
+                    .applyToComponent {
+                        isEnabled = migrationsProjectSpecified
+                    }
             }
         }
     }
@@ -98,6 +106,7 @@ class AddMigrationDialogWrapper(
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
         refreshAvailableMigrations(migrationsProjectItem.displayName)
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
+        enableOutputFolderField()
     }
 
     private fun onDbContextChanged(dbContext: DbContextItem?) {
@@ -137,10 +146,13 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
     }
 
-    private fun currentMigrationProjectFolderGetter(): String? {
-        val currentMigrationsProject = commonOptions.migrationsProject?.data?.fullPath
-        val migrationsProjectFolderPath = File(currentMigrationsProject!!).parentFile.path
+    private fun currentMigrationsProjectFolderGetter(): String {
+        val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
 
-        return migrationsProjectFolderPath
+        return File(currentMigrationsProject).parentFile.path
+    }
+
+    private fun enableOutputFolderField() {
+        migrationsProjectSpecified = false
     }
 }
