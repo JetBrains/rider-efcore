@@ -3,15 +3,16 @@ package me.seclerp.rider.plugins.efcore.features.migrations.add
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
+import java.io.File
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -24,7 +25,7 @@ class AddMigrationDialogWrapper(
 
     //
     // Data binding
-    val model = AddMigrationModel("")
+    val model = AddMigrationModel("", "Migrations")
 
     //
     // Internal data
@@ -64,6 +65,17 @@ class AddMigrationDialogWrapper(
                     document.addDocumentListener(migrationNameChangedListener)
                     migrationNameTextField = this
                 }
+        }
+    }
+
+    override fun Panel.createAdditionalGroup() {
+        groupRowsRange("Additional Options"){
+            row("Migrations folder:") {
+                textFieldForRelativeFolder({ currentMigrationProjectFolderGetter() }, intellijProject, "Select Migrations Folder")
+                    .bindText(model::migrationsOutputFolder)
+                    .validationOnInput(validator.migrationsOutputFolderValidation())
+                    .validationOnApply(validator.migrationsOutputFolderValidation())
+            }
         }
     }
 
@@ -123,5 +135,12 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
         migrationNameTextField.text = migrationName
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
+    }
+
+    private fun currentMigrationProjectFolderGetter(): String? {
+        val currentMigrationsProject = commonOptions.migrationsProject?.data?.fullPath
+        val migrationsProjectFolderPath = File(currentMigrationsProject!!).parentFile.path
+
+        return migrationsProjectFolderPath
     }
 }
