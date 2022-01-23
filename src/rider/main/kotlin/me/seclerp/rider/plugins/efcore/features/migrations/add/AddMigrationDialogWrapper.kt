@@ -9,7 +9,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.ui.textFieldWithBrowseButtonForRelativeFolders
+import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import java.io.File
@@ -71,10 +71,7 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
-                textFieldWithBrowseButtonForRelativeFolders(
-                    project = intellijProject,
-                    browseDialogTitle = "Select Migrations Folder",
-                    getter = { getCurrentMigrationProjectFolder() })
+                textFieldForRelativeFolder({ currentMigrationProjectFolderGetter() }, intellijProject, "Select Migrations Folder")
                     .bindText(model::migrationsOutputFolder)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
@@ -140,7 +137,7 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
     }
 
-    private fun getCurrentMigrationProjectFolder(): String? {
+    private fun currentMigrationProjectFolderGetter(): String? {
         val currentMigrationsProject = commonOptions.migrationsProject?.data?.fullPath
         val migrationsProjectFolderPath = File(currentMigrationsProject!!).parentFile.path
 

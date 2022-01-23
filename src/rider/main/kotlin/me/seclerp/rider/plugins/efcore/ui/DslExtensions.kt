@@ -17,7 +17,6 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rdclient.util.idea.toIOFile
-import me.seclerp.rider.plugins.efcore.features.shared.CommonOptionsModel
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
 import java.io.File
@@ -123,7 +122,7 @@ fun Row.textFieldWithCompletion(
     return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, project, icon)
 }
 
-fun Row.textFieldWithBrowseButtonForRelativeFolders(
+fun Row.textFieldForRelativeFolder(
     getter: () -> String?,
     project: Project? = null,
     browseDialogTitle: String? = null,
@@ -132,17 +131,15 @@ fun Row.textFieldWithBrowseButtonForRelativeFolders(
     val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
 
     val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
-        val folderFromTextFieldWithBrowseButton : VirtualFile = it
-        val pathRelativeTo = getter()
-        formatRelativePathToFolder(folderFromTextFieldWithBrowseButton, pathRelativeTo)
+        formatRelativePathToFolder(it, getter())
     }.horizontalAlign(HorizontalAlign.FILL)
 
     return textFieldWithBrowseButtonCell
 }
 
 private fun formatRelativePathToFolder(folderFromTextFieldWithBrowseButton: VirtualFile, pathRelativeTo: String?) : String {
-    val migrationProjectFolder = File(pathRelativeTo!!).path
-    val relativePath = folderFromTextFieldWithBrowseButton.toIOFile().relativeTo(File(migrationProjectFolder)).path
+    val pathRelativeToAsFile = File(pathRelativeTo!!).path
+    val relativePath = folderFromTextFieldWithBrowseButton.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
 
     return relativePath
 }
