@@ -1,20 +1,17 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.add
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.jetbrains.rdclient.util.idea.toIOFile
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.ui.customTextWithBrowseButton
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import java.io.File
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -73,20 +70,11 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
-                val fileChooserDescriptor =  FileChooserDescriptor(
-                    /* chooseFiles = */ false,
-                    /* chooseFolders = */ true,
-                    /* chooseJars = */ false,
-                    /* chooseJarsAsFiles = */ false,
-                    /* chooseJarContents = */ false,
-                    /* chooseMultiple = */ false
-                )
-
-                textFieldWithBrowseButton("Select Migrations Folder", intellijProject, fileChooserDescriptor) {
-                    val migrationsFolder : VirtualFile = it
-                    formatMigrationFolderPath(migrationsFolder)
-                }.bindText(model::migrationOutputFolder)
-                    .horizontalAlign(HorizontalAlign.FILL)
+                customTextWithBrowseButton(
+                    binding = model::migrationOutputFolder,
+                    project = intellijProject,
+                    browseDialogTitle = "Select Migrations Folder",
+                    commonOptions = commonOptions)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
             }
@@ -149,14 +137,5 @@ class AddMigrationDialogWrapper(
         migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
         migrationNameTextField.text = migrationName
         migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
-    }
-
-    private fun formatMigrationFolderPath(virtualFile: VirtualFile) : String {
-        val migrationProjectFullPath = commonOptions.migrationsProject?.data?.fullPath!!
-
-        val migrationProjectFolder = File(migrationProjectFullPath).parentFile.path
-        val relativePath = virtualFile.toIOFile().relativeTo(File(migrationProjectFolder)).path
-
-        return relativePath
     }
 }

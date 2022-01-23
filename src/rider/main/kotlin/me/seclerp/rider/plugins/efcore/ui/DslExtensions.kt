@@ -4,17 +4,25 @@ package me.seclerp.rider.plugins.efcore.ui
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
+import com.jetbrains.rdclient.util.idea.toIOFile
+import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
+import me.seclerp.rider.plugins.efcore.features.shared.CommonOptionsModel
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
+import java.io.File
 import javax.swing.DefaultComboBoxModel
 import javax.swing.Icon
 import kotlin.reflect.KMutableProperty0
@@ -115,4 +123,32 @@ fun Row.textFieldWithCompletion(
     icon: Icon? = null
 ): Cell<TextFieldWithCompletion> {
     return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, project, icon)
+}
+
+fun Row.customTextWithBrowseButton(
+    binding: KMutableProperty0<String>,
+    project: Project? = null,
+    browseDialogTitle: String? = null,
+    commonOptions: CommonOptionsModel?
+): Cell<TextFieldWithBrowseButton> {
+
+    val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+
+    val provider = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
+        val migrationsFolder : VirtualFile = it
+        formatMigrationFolderPath(migrationsFolder, commonOptions)
+    }
+        .bindText(binding)
+        .horizontalAlign(HorizontalAlign.FILL)
+
+    return provider
+}
+
+private fun formatMigrationFolderPath(virtualFile: VirtualFile, commonOptions: CommonOptionsModel?) : String {
+    val migrationProjectFullPath = commonOptions?.migrationsProject?.data?.fullPath!!
+
+    val migrationProjectFolder = File(migrationProjectFullPath).parentFile.path
+    val relativePath = virtualFile.toIOFile().relativeTo(File(migrationProjectFolder)).path
+
+    return relativePath
 }

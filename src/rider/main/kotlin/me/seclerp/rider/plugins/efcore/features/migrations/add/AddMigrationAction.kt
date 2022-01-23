@@ -20,9 +20,9 @@ class AddMigrationAction : EfCoreAction() {
 
             executeCommandUnderProgress(intellijProject, "Creating migration...", "New migration has been created") {
                 val migrationName = dialog.model.migrationName.trim()
-                val migrationOutputFolder = dialog.model.migrationOutputFolder
+                val migrationsOutputFolder = dialog.model.migrationOutputFolder
 
-                migrationsClient.add(commonOptions, migrationName, migrationOutputFolder)
+                migrationsClient.add(commonOptions, migrationName, migrationsOutputFolder)
             }
         }
     }
