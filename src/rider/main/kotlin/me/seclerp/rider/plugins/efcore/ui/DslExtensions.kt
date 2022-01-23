@@ -18,7 +18,6 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rdclient.util.idea.toIOFile
-import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.features.shared.CommonOptionsModel
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
@@ -125,7 +124,7 @@ fun Row.textFieldWithCompletion(
     return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, project, icon)
 }
 
-fun Row.customTextWithBrowseButton(
+fun Row.textFieldWithBrowseButtonForRelativeFolders(
     binding: KMutableProperty0<String>,
     project: Project? = null,
     browseDialogTitle: String? = null,
@@ -136,7 +135,7 @@ fun Row.customTextWithBrowseButton(
 
     val provider = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
         val migrationsFolder : VirtualFile = it
-        formatMigrationFolderPath(migrationsFolder, commonOptions)
+        formatRelativePathToFolder(migrationsFolder, commonOptions)
     }
         .bindText(binding)
         .horizontalAlign(HorizontalAlign.FILL)
@@ -144,7 +143,7 @@ fun Row.customTextWithBrowseButton(
     return provider
 }
 
-private fun formatMigrationFolderPath(virtualFile: VirtualFile, commonOptions: CommonOptionsModel?) : String {
+private fun formatRelativePathToFolder(virtualFile: VirtualFile, commonOptions: CommonOptionsModel?) : String {
     val migrationProjectFullPath = commonOptions?.migrationsProject?.data?.fullPath!!
 
     val migrationProjectFolder = File(migrationProjectFullPath).parentFile.path

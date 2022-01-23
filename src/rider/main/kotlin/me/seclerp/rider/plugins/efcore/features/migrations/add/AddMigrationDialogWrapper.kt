@@ -9,7 +9,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.ui.customTextWithBrowseButton
+import me.seclerp.rider.plugins.efcore.ui.textFieldWithBrowseButtonForRelativeFolders
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import javax.swing.event.DocumentEvent
@@ -70,8 +70,8 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
-                customTextWithBrowseButton(
-                    binding = model::migrationOutputFolder,
+                textFieldWithBrowseButtonForRelativeFolders(
+                    binding = model::migrationsOutputFolder,
                     project = intellijProject,
                     browseDialogTitle = "Select Migrations Folder",
                     commonOptions = commonOptions)
