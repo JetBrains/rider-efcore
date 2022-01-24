@@ -61,8 +61,6 @@ class ScaffoldDbContextDialogWrapper(
     private val tablesModel = SimpleListTableModel(model.tablesList)
     private val schemasModel = SimpleListTableModel(model.schemasList)
 
-    private var migrationsProjectSpecified: Boolean = false
-
     //
     // Validation
     private val validator = ScaffoldDbContextValidator()
@@ -70,10 +68,6 @@ class ScaffoldDbContextDialogWrapper(
     //
     // Constructor
     init {
-        addMigrationsProjectChangedListener {
-            migrationsProjectSpecified = true
-        }
-
         init()
     }
 
@@ -151,7 +145,7 @@ class ScaffoldDbContextDialogWrapper(
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.outputFolderValidation())
                     .validationOnApply(validator.outputFolderValidation())
-                    .applyToComponent { isEnabled = migrationsProjectSpecified }
+                    .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
             }
 
             row {
@@ -195,6 +189,7 @@ class ScaffoldDbContextDialogWrapper(
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
+                .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
         }
     }.apply(::configureValidation)
 

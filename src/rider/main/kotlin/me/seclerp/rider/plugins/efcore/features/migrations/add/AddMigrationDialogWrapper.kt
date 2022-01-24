@@ -33,7 +33,6 @@ class AddMigrationDialogWrapper(
     private var currentDbContextMigrationsList = listOf<String>()
     private var userInputReceived: Boolean = false
     private lateinit var migrationNameTextField: JBTextField
-    private var migrationsProjectSpecified: Boolean = false
 
     //
     // Validation
@@ -80,7 +79,7 @@ class AddMigrationDialogWrapper(
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
-                    .applyToComponent { isEnabled = migrationsProjectSpecified }
+                    .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
             }
         }
     }
@@ -104,7 +103,6 @@ class AddMigrationDialogWrapper(
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
         refreshAvailableMigrations(migrationsProjectItem.displayName)
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
-        enableOutputFolderField()
     }
 
     private fun onDbContextChanged(dbContext: DbContextItem?) {
@@ -148,9 +146,5 @@ class AddMigrationDialogWrapper(
         val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
 
         return File(currentMigrationsProject).parentFile.path
-    }
-
-    private fun enableOutputFolderField() {
-        migrationsProjectSpecified = false
     }
 }
