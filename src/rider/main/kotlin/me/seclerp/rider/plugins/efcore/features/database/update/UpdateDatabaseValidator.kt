@@ -17,7 +17,7 @@ class UpdateDatabaseValidator(
     }
 
     fun connectionValidation(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-        if (it.text.isEmpty())
+        if (it.isEnabled && it.text.isEmpty())
             error("Connection could not be empty")
         else null
     }

@@ -59,14 +59,14 @@ class EfCoreDialogValidator(
     }
 
     fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
-        if (commonOptions.buildConfiguration == null || availableBuildConfigurations.isEmpty())
+        if (it.isEnabled && (commonOptions.buildConfiguration == null || availableBuildConfigurations.isEmpty()))
             error("Solution doesn't have any build configurations")
         else
             null
     }
 
     fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? = {
-        if (commonOptions.targetFramework == null || targetFrameworkModel.size == 0)
+        if (it.isEnabled && (commonOptions.targetFramework == null || targetFrameworkModel.size == 0))
             error("Startup project should have at least 1 supported target framework")
         else
             null

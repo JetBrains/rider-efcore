@@ -70,7 +70,8 @@ class UpdateDatabaseDialogWrapper(
                         .bindText(model::connection)
                         .validationOnInput(validator.connectionValidation())
                         .validationOnApply(validator.connectionValidation())
-                }.enabledIf(useDefaultConnectionCheckbox!!.selected.not())
+                        .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
+                }
             }
         }
     }

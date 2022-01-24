@@ -1,3 +1,10 @@
+<h2>1.2.1</h2>
+<p>
+  <ul>
+    <li>Fix: NoSuchMethodError using the new DSL v2</li>
+    <li>Fix: Disabled optional fields require validation</li>
+  </ul>
+</p>
 <h2>1.2.0</h2>
 <p>
   <ul>
