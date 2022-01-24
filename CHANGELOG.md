@@ -3,7 +3,7 @@
   <ul>
     <li>Implement DbContext Scaffolding</li>
     <li>Add output folder for Add Migration dialog (#44 by @kolosovpetro)</li>
-    <li>Make Target framework optional (#38 by @kolosovpetro)</li>
+    <li>Make Target framework optional (#41 by @kolosovpetro)</li>
   </ul>
 </p>
 <h2>1.1.3</h2>
