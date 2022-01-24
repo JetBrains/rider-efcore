@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
 import javax.swing.JTextField
@@ -19,7 +20,7 @@ class ScaffoldDbContextValidator {
             null
     }
 
-    fun outputFolderValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
+    fun outputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
             error("Output folder could not be empty")
         else
@@ -33,7 +34,7 @@ class ScaffoldDbContextValidator {
             null
     }
 
-    fun dbContextFolderValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
+    fun dbContextFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
             error("DbContext folder could not be empty")
         else

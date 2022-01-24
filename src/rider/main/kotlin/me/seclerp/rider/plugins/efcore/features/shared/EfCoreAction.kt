@@ -14,8 +14,6 @@ import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.getService
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
-import me.seclerp.rider.plugins.efcore.actions.getDotnetProjectName
-import me.seclerp.rider.plugins.efcore.actions.isLoadedProjectFile
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import me.seclerp.rider.plugins.efcore.cli.api.ManagementClient
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions

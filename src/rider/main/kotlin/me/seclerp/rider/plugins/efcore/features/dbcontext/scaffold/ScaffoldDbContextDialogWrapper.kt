@@ -1,6 +1,5 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
-import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Disposer
@@ -19,6 +18,8 @@ import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
+import java.io.File
 import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
 
@@ -26,7 +27,7 @@ import kotlin.reflect.KMutableProperty0
 class ScaffoldDbContextDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
     beModel: RiderEfCoreModel,
-    intellijProject: Project,
+    private val intellijProject: Project,
     currentDotnetProjectName: String,
 ) : EfCoreDialogWrapper("Scaffold DbContext", beModel, intellijProject, currentDotnetProjectName,
     requireMigrationsInProject = false, requireDbContext = false
@@ -59,7 +60,8 @@ class ScaffoldDbContextDialogWrapper(
 
     private val tablesModel = SimpleListTableModel(model.tablesList)
     private val schemasModel = SimpleListTableModel(model.schemasList)
-    private val propertyGraph = PropertyGraph()
+
+    private var migrationsProjectSpecified: Boolean = false
 
     //
     // Validation
@@ -68,6 +70,10 @@ class ScaffoldDbContextDialogWrapper(
     //
     // Constructor
     init {
+        addMigrationsProjectChangedListener {
+            migrationsProjectSpecified = true
+        }
+
         init()
     }
 
@@ -136,11 +142,16 @@ class ScaffoldDbContextDialogWrapper(
 
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options") {
-            row("Output folder") {
-                textField().bindText(model::outputFolder)
+            row("Output folder:") {
+                textFieldForRelativeFolder(
+                    ::currentMigrationsProjectFolderGetter,
+                    intellijProject,
+                    "Select Output Folder")
+                    .bindText(model::outputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.outputFolderValidation())
                     .validationOnApply(validator.outputFolderValidation())
+                    .applyToComponent { isEnabled = migrationsProjectSpecified }
             }
 
             row {
@@ -168,15 +179,19 @@ class ScaffoldDbContextDialogWrapper(
     }
 
     private fun createDbContextTab(): DialogPanel = panel {
-        row("Generated DbContext name") {
+        row("Generated DbContext name:") {
             textField().bindText(model::dbContextName)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
                 .validationOnInput(validator.dbContextNameValidation())
         }
 
-        row("Generated DbContext folder") {
-            textField().bindText(model::dbContextFolder)
+        row("Generated DbContext folder:") {
+            textFieldForRelativeFolder(
+                ::currentMigrationsProjectFolderGetter,
+                intellijProject,
+                "Select Generated DbContext Folder")
+                .bindText(model::dbContextFolder)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
@@ -238,5 +253,11 @@ class ScaffoldDbContextDialogWrapper(
         val disposable = Disposer.newDisposable()
         panel.registerValidators(disposable)
         Disposer.register(myDisposable, disposable)
+    }
+
+    private fun currentMigrationsProjectFolderGetter(): String {
+        val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
+
+        return File(currentMigrationsProject).parentFile.path
     }
 }

@@ -73,16 +73,14 @@ class AddMigrationDialogWrapper(
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
                 textFieldForRelativeFolder(
-                    { currentMigrationsProjectFolderGetter() },
+                    ::currentMigrationsProjectFolderGetter,
                     intellijProject,
                     "Select Migrations Folder")
                     .bindText(model::migrationsOutputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
-                    .applyToComponent {
-                        isEnabled = migrationsProjectSpecified
-                    }
+                    .applyToComponent { isEnabled = migrationsProjectSpecified }
             }
         }
     }
