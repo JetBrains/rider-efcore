@@ -14,6 +14,7 @@
 <ul>
 <li>Creating migrations</li>
 <li>Updating database with selected migration (including migration names autocompletion)</li>
+<li>DbContext scaffolding from existing database</li>
 <li>Removing last created migration</li>
 <li>Suggesting installing <code>dotnet ef</code> command line tools if not installed (when opening solution that contains EF Core related projects)</li>
 <li>Persisting selected migrations and startup projects between dialogs</li>

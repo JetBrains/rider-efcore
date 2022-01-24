@@ -15,6 +15,7 @@
 There are a couple of UI stuff for:
 - Creating migrations
 - Updating database with selected migration (including migration names autocompletion)
+- DbContext scaffolding from existing database
 - Removing last created migration
 - Suggesting installing `dotnet ef` command line tools if not installed (when opening solution that contains EF Core related projects)
 - Persisting selected migrations and startup projects between dialogs
