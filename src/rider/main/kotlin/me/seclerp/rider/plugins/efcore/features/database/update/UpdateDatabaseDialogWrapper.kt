@@ -11,6 +11,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
@@ -94,11 +95,18 @@ class UpdateDatabaseDialogWrapper(
     //
     // Event listeners
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
+        val dbContextData = if (commonOptions.dbContext == null) ""
+        else commonOptions.dbContext!!.data
+
+        val migrationsIdentity = MigrationsIdentity(
+            migrationsProjectItem.displayName,
+            dbContextData)
+
         availableMigrationsList = beModel.getAvailableMigrations
-            .runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
+            .runUnderProgress(migrationsIdentity, intellijProject, "Loading migrations...",
                 isCancelable = true,
                 throwFault = true
-            )?.sortedByDescending { it.longName } ?: listOf()
+            )?.sortedByDescending { it.migrationLongName } ?: listOf()
 
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
@@ -115,8 +123,8 @@ class UpdateDatabaseDialogWrapper(
         }
 
         val availableDbContextMigrations = availableMigrationsList
-            .filter { it.dbContextClass == dbContext.data }
-            .map { it.longName }
+            .filter { it.dbContextClassFullName == dbContext.data }
+            .map { it.migrationLongName }
 
         if (availableDbContextMigrations.isEmpty()) {
             model.targetMigration = ""
