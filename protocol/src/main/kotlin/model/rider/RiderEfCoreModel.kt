@@ -32,6 +32,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("dbContextClassFullName", string)
         field("migrationShortName", string)
         field("migrationLongName", string)
+        field("migrationFolderAbsPath", string)
     }
 
     private val DbContextInfo = structdef {
