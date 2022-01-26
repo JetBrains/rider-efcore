@@ -100,15 +100,11 @@ class UpdateDatabaseDialogWrapper(
             return
         }
 
-        val migrationsIdentity = MigrationsIdentity(
-            migrationsProjectItem.displayName,
-            commonOptions.dbContext!!.data)
+        val migrationProjectName = migrationsProjectItem.displayName
+        val dbContextFullName = commonOptions.dbContext!!.data
+        val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
 
-        availableMigrationsList = beModel.getAvailableMigrations
-            .runUnderProgress(migrationsIdentity, intellijProject, "Loading migrations...",
-                isCancelable = true,
-                throwFault = true
-            )?.sortedByDescending { it.migrationLongName } ?: listOf()
+        loadMigrationsByContextName(migrationsIdentity)
 
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
@@ -124,8 +120,11 @@ class UpdateDatabaseDialogWrapper(
             return
         }
 
-        val availableDbContextMigrations = availableMigrationsList
-            .filter { it.dbContextClassFullName == dbContext.data }
+        val migrationProjectName = commonOptions.migrationsProject!!.displayName
+        val dbContextFullName = commonOptions.dbContext!!.data
+        val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
+
+        val availableDbContextMigrations = loadMigrationsByContextName(migrationsIdentity)
             .map { it.migrationLongName }
 
         if (availableDbContextMigrations.isEmpty()) {
@@ -139,6 +138,23 @@ class UpdateDatabaseDialogWrapper(
         currentDbContextMigrationsList.add("0")
 
         targetMigrationTextField.text = model.targetMigration
+    }
+
+    private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
+
+        if (migrationsIdentity.dbContextClassFullName.isEmpty()) {
+            availableMigrationsList = listOf()
+            return availableMigrationsList
+        }
+
+        availableMigrationsList = beModel.getAvailableMigrations
+            .runUnderProgress(
+                migrationsIdentity, intellijProject, "Loading migrations...",
+                isCancelable = true,
+                throwFault = true
+            )?.sortedByDescending { it.migrationLongName } ?: listOf()
+
+        return availableMigrationsList
     }
 
     companion object {

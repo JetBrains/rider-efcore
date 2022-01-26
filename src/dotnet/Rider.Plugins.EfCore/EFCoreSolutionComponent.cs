@@ -106,15 +106,9 @@ namespace Rider.Plugins.EfCore
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
                     .Distinct(migrationClass => migrationClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
                     .Select(migrationClass => migrationClass.ToMigrationInfo())
+                    .Where(m => m.DbContextClassFullName == identity.DbContextClassFullName)
                     .ToList();
-
-                if (!string.IsNullOrEmpty(identity.DbContextClassFullName))
-                {
-                    foundMigrations = foundMigrations
-                        .Where(m => m.DbContextClassFullName == identity.DbContextClassFullName)
-                        .ToList();
-                }
-
+                
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
             }
         }
