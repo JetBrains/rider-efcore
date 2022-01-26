@@ -20,11 +20,10 @@ class RemoveLastMigrationAction : EfCoreAction() {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
             val commonOptions = getCommonOptions(dialog)
             val currentDbContextMigrationsList = dialog.availableMigrationsList
+            val migration = currentDbContextMigrationsList.firstOrNull()
 
             executeCommandUnderProgress(intellijProject, "Removing migration...", "Last migration has been removed") {
                 val res = migrationsClient.removeLast(commonOptions)
-
-                val migration = currentDbContextMigrationsList.firstOrNull()
 
                 deleteMigrationsFolderIfEmpty(migration)
 

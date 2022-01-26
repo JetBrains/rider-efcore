@@ -57,6 +57,6 @@ class RemoveLastMigrationDialogWrapper(
             "Loading migrations...",
             isCancelable = true,
             throwFault = true
-        )!!
+        )?.sortedByDescending { it.migrationLongName } ?: listOf()
     }
 }
