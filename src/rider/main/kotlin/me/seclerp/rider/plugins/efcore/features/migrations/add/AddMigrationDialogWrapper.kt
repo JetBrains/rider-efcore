@@ -113,12 +113,14 @@ class AddMigrationDialogWrapper(
     //
     // Methods
     private fun refreshAvailableMigrations(migrationsProjectName: String) {
-        val dbContextData = if (commonOptions.dbContext == null) ""
-        else commonOptions.dbContext!!.data
+        if (commonOptions.dbContext == null) {
+            availableMigrationsList = listOf()
+            return
+        }
 
         val migrationsIdentity = MigrationsIdentity(
             migrationsProjectName,
-            dbContextData)
+            commonOptions.dbContext!!.data)
 
         availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(
             migrationsIdentity,
