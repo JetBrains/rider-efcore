@@ -95,12 +95,14 @@ class UpdateDatabaseDialogWrapper(
     //
     // Event listeners
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        val dbContextData = if (commonOptions.dbContext == null) ""
-        else commonOptions.dbContext!!.data
+        if (commonOptions.dbContext == null) {
+            refreshCurrentDbContextMigrations(null)
+            return
+        }
 
         val migrationsIdentity = MigrationsIdentity(
             migrationsProjectItem.displayName,
-            dbContextData)
+            commonOptions.dbContext!!.data)
 
         availableMigrationsList = beModel.getAvailableMigrations
             .runUnderProgress(migrationsIdentity, intellijProject, "Loading migrations...",
