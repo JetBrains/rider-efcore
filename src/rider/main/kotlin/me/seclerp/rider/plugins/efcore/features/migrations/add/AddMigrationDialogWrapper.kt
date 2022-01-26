@@ -8,6 +8,7 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
@@ -112,7 +113,19 @@ class AddMigrationDialogWrapper(
     //
     // Methods
     private fun refreshAvailableMigrations(migrationsProjectName: String) {
-        availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(migrationsProjectName, intellijProject, "Loading migrations...",
+        if (commonOptions.dbContext == null) {
+            availableMigrationsList = listOf()
+            return
+        }
+
+        val migrationsIdentity = MigrationsIdentity(
+            migrationsProjectName,
+            commonOptions.dbContext!!.data)
+
+        availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(
+            migrationsIdentity,
+            intellijProject,
+            "Loading migrations...",
             isCancelable = true,
             throwFault = true
         )!!
@@ -124,8 +137,8 @@ class AddMigrationDialogWrapper(
                 listOf()
             else
                 availableMigrationsList
-                    .filter { it.dbContextClass == dbContext.data }
-                    .map { it.shortName }
+                    .filter { it.dbContextClassFullName == dbContext.data }
+                    .map { it.migrationShortName }
                     .toList()
 
         setInitialMigrationNameIfNeeded()

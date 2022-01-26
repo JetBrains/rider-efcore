@@ -11,6 +11,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
@@ -94,12 +95,6 @@ class UpdateDatabaseDialogWrapper(
     //
     // Event listeners
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        availableMigrationsList = beModel.getAvailableMigrations
-            .runUnderProgress(migrationsProjectItem.displayName, intellijProject, "Loading migrations...",
-                isCancelable = true,
-                throwFault = true
-            )?.sortedByDescending { it.longName } ?: listOf()
-
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
 
@@ -114,9 +109,12 @@ class UpdateDatabaseDialogWrapper(
             return
         }
 
-        val availableDbContextMigrations = availableMigrationsList
-            .filter { it.dbContextClass == dbContext.data }
-            .map { it.longName }
+        val migrationProjectName = commonOptions.migrationsProject!!.displayName
+        val dbContextFullName = commonOptions.dbContext!!.data
+        val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
+
+        val availableDbContextMigrations = loadMigrationsByContextName(migrationsIdentity)
+            .map { it.migrationLongName }
 
         if (availableDbContextMigrations.isEmpty()) {
             model.targetMigration = ""
@@ -129,6 +127,22 @@ class UpdateDatabaseDialogWrapper(
         currentDbContextMigrationsList.add("0")
 
         targetMigrationTextField.text = model.targetMigration
+    }
+
+    private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
+        if (migrationsIdentity.dbContextClassFullName.isEmpty()) {
+            availableMigrationsList = listOf()
+            return availableMigrationsList
+        }
+
+        availableMigrationsList = beModel.getAvailableMigrations
+            .runUnderProgress(
+                migrationsIdentity, intellijProject, "Loading migrations...",
+                isCancelable = true,
+                throwFault = true
+            )?.sortedByDescending { it.migrationLongName } ?: listOf()
+
+        return availableMigrationsList
     }
 
     companion object {

@@ -15,19 +15,21 @@ namespace Rider.Plugins.EfCore.Extensions
     {
         public static MigrationInfo ToMigrationInfo(this IClass @class)
         {
-            var migrationClassName = @class.ShortName;
+            var migrationShortName = @class.ShortName;
             var migrationAttribute = @class.GetAttributeInstance("MigrationAttribute");
             var dbContextAttribute = @class.GetAttributeInstance("DbContextAttribute");
 
-            var migrationFullName = migrationAttribute.PositionParameter(0).ConstantValue.Value as string;
+            var migrationLongName = migrationAttribute.PositionParameter(0).ConstantValue.Value as string;
 
-            var dbContextClassFullName = dbContextAttribute.PositionParameter(0).TypeValue?.GetScalarType()?.GetClrName();
-            if (migrationFullName is null || dbContextClassFullName is null)
+            var dbContextClass = dbContextAttribute.PositionParameter(0).TypeValue?.GetScalarType()?
+                .GetClrName();
+            
+            if (migrationLongName is null || dbContextClass is null)
             {
                 return null;
             }
 
-            return new MigrationInfo(dbContextClassFullName.FullName, migrationClassName, migrationFullName);
+            return new MigrationInfo(dbContextClass.FullName, migrationShortName, migrationLongName);
         }
 
         public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project, IClrTypeName clrTypeName)

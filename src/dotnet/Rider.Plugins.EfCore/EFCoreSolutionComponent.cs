@@ -84,21 +84,21 @@ namespace Rider.Plugins.EfCore
                     ?.SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
                     .Select(cl => cl.ToMigrationInfo())
                     .Any(migrationInfo =>
-                        migrationInfo != null && migrationInfo.DbContextClass == identity.DbContextClass);
+                        migrationInfo != null && migrationInfo.DbContextClassFullName == identity.DbContextClassFullName);
 
                 return RdTask<bool>.Successful(projectHasMigrations ?? false);
             }
         }
 
-        private RdTask<List<MigrationInfo>> GetAvailableMigrations(Lifetime lifetime, string projectName)
+        private RdTask<List<MigrationInfo>> GetAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
         {
             using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
             using (ReadLockCookie.Create())
             {
-                var project = _solution.GetProjectByName(projectName);
+                var project = _solution.GetProjectByName(identity.ProjectName);
                 if (project is null)
                 {
-                    return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(projectName));
+                    return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(identity.ProjectName));
                 }
 
                 var foundMigrations = project
@@ -106,6 +106,7 @@ namespace Rider.Plugins.EfCore
                     .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
                     .Distinct(migrationClass => migrationClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
                     .Select(migrationClass => migrationClass.ToMigrationInfo())
+                    .Where(m => m.DbContextClassFullName == identity.DbContextClassFullName)
                     .ToList();
 
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
