@@ -108,7 +108,7 @@ namespace Rider.Plugins.EfCore
                     .Select(migrationClass => migrationClass.ToMigrationInfo())
                     .Where(m => m.DbContextClassFullName == identity.DbContextClassFullName)
                     .ToList();
-                
+
                 return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
             }
         }

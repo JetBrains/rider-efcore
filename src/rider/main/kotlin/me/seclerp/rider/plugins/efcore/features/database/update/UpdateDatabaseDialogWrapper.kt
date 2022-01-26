@@ -95,17 +95,6 @@ class UpdateDatabaseDialogWrapper(
     //
     // Event listeners
     private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        if (commonOptions.dbContext == null) {
-            refreshCurrentDbContextMigrations(null)
-            return
-        }
-
-        val migrationProjectName = migrationsProjectItem.displayName
-        val dbContextFullName = commonOptions.dbContext!!.data
-        val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
-
-        loadMigrationsByContextName(migrationsIdentity)
-
         refreshCurrentDbContextMigrations(commonOptions.dbContext)
     }
 
@@ -141,7 +130,6 @@ class UpdateDatabaseDialogWrapper(
     }
 
     private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
-
         if (migrationsIdentity.dbContextClassFullName.isEmpty()) {
             availableMigrationsList = listOf()
             return availableMigrationsList
