@@ -18,6 +18,7 @@ class RemoveLastMigrationAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
+            val migrationsFolderService = RemoveLastMigrationFolderService()
             val commonOptions = getCommonOptions(dialog)
             val currentDbContextMigrationsList = dialog.availableMigrationsList
             val migration = currentDbContextMigrationsList.firstOrNull()
@@ -25,29 +26,10 @@ class RemoveLastMigrationAction : EfCoreAction() {
             executeCommandUnderProgress(intellijProject, "Removing migration...", "Last migration has been removed") {
                 val res = migrationsClient.removeLast(commonOptions)
 
-                deleteMigrationsFolderIfEmpty(migration)
+                migrationsFolderService.deleteMigrationsFolderIfEmpty(migration)
 
                 res
             }
         }
-    }
-
-    private fun deleteMigrationsFolderIfEmpty(migration: MigrationInfo?) {
-        val folder = migration?.migrationFolderAbsPath
-
-        if (migration == null || folder == null) return
-
-        val folderIsEmpty = folderIsEmpty(folder)
-
-        if (folderIsEmpty) {
-            File(folder).delete()
-        }
-    }
-
-    private fun folderIsEmpty(folderPath: String): Boolean {
-        val files = File(folderPath).listFiles()
-        val isEmpty = files?.isEmpty() ?: false
-
-        return isEmpty
     }
 }

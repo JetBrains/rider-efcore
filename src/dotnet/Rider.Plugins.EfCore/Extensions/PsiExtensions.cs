@@ -20,7 +20,6 @@ namespace Rider.Plugins.EfCore.Extensions
             var dbContextAttribute = @class.GetAttributeInstance("DbContextAttribute");
 
             var migrationLongName = migrationAttribute.PositionParameter(0).ConstantValue.Value as string;
-            var migrationLongNameWithExtension = $"{migrationLongName}.cs";
 
             var dbContextClass = dbContextAttribute.PositionParameter(0).TypeValue?.GetScalarType()?
                 .GetClrName();
@@ -29,14 +28,16 @@ namespace Rider.Plugins.EfCore.Extensions
             {
                 return null;
             }
-            
-            var migrationFolderAbsPath = @class.GetClassFolderAbsPath(migrationLongNameWithExtension);
+
+            var migrationFolderAbsolutePath = @class.GetSourceFiles()
+                .FirstOrDefault()
+                .GetLocation().Directory.FileAccessPath;
 
             return new MigrationInfo(
                 dbContextClass.FullName, 
                 migrationShortName, 
                 migrationLongName, 
-                migrationFolderAbsPath);
+                migrationFolderAbsolutePath);
         }
 
         public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project, IClrTypeName clrTypeName)
@@ -70,15 +71,5 @@ namespace Rider.Plugins.EfCore.Extensions
             @class
                 .GetAttributeInstances(AttributesSource.All)
                 .SingleOrDefault(attribute => attribute.GetAttributeShortName() == attributeShortName);
-
-        private static string GetClassFolderAbsPath(this IClass @class, string className)
-        {
-            var result = @class.GetSourceFiles()
-                .FirstOrDefault(x => x.Name == className);
-
-            var folder = result?.GetLocation().Directory.FileAccessPath;
-
-            return folder;
-        }
     }
 }
