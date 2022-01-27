@@ -6,8 +6,6 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsClient
 import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.EfCoreAction
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import java.io.File
 
 class RemoveLastMigrationAction : EfCoreAction() {
     override fun ready(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
@@ -18,7 +16,7 @@ class RemoveLastMigrationAction : EfCoreAction() {
 
         if (dialog.showAndGet()) {
             val migrationsClient = intellijProject.getService<MigrationsClient>()
-            val migrationsFolderService = RemoveLastMigrationFolderService()
+            val folderService = intellijProject.getService<RemoveLastMigrationFolderService>()
             val commonOptions = getCommonOptions(dialog)
             val currentDbContextMigrationsList = dialog.availableMigrationsList
             val migration = currentDbContextMigrationsList.firstOrNull()
@@ -26,7 +24,7 @@ class RemoveLastMigrationAction : EfCoreAction() {
             executeCommandUnderProgress(intellijProject, "Removing migration...", "Last migration has been removed") {
                 val res = migrationsClient.removeLast(commonOptions)
 
-                migrationsFolderService.deleteMigrationsFolderIfEmpty(migration)
+                folderService.deleteMigrationsFolderIfEmpty(migration)
 
                 res
             }
