@@ -29,7 +29,15 @@ namespace Rider.Plugins.EfCore.Extensions
                 return null;
             }
 
-            return new MigrationInfo(dbContextClass.FullName, migrationShortName, migrationLongName);
+            var migrationFolderAbsolutePath = @class.GetSourceFiles()
+                .FirstOrDefault()
+                .GetLocation().Directory.FileAccessPath;
+
+            return new MigrationInfo(
+                dbContextClass.FullName, 
+                migrationShortName, 
+                migrationLongName, 
+                migrationFolderAbsolutePath);
         }
 
         public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project, IClrTypeName clrTypeName)
