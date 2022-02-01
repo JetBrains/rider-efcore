@@ -40,7 +40,22 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         } else null
     }
 
+    fun getGlobalProjectIdsPair(): Pair<UUID, UUID>? {
+        val migrationsProject = myState.solutionLevelOptions[MIGRATIONS_PROJECT_KEY] ?: return null
+        val startupProject = myState.solutionLevelOptions[STARTUP_PROJECT_KEY] ?: return null
+
+        return UUID.fromString(migrationsProject) to UUID.fromString(startupProject)
+    }
+
+    fun setGlobalProjectIdsPair(migrationsProjectId: UUID, startupProjectId: UUID) {
+        myState.solutionLevelOptions[MIGRATIONS_PROJECT_KEY] = migrationsProjectId.toString()
+        myState.solutionLevelOptions[STARTUP_PROJECT_KEY] = startupProjectId.toString()
+    }
+
     companion object {
         fun getInstance(project: Project) = project.service<CommonOptionsStateService>()
+
+        private const val MIGRATIONS_PROJECT_KEY = "migrationsProject"
+        private const val STARTUP_PROJECT_KEY = "startupProject"
     }
 }

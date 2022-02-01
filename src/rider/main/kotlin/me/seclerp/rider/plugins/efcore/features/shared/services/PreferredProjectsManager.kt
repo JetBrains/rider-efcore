@@ -50,6 +50,26 @@ class PreferredProjectsManager(
         commonOptionsStateService.setPreferredProjectsPair(migrationsProjectItem.data.id, startupProjectItem.data.id)
     }
 
+    fun getGlobalProjectPair(migrationsProjects: Array<MigrationsProjectItem>,
+                             startupProjects: Array<StartupProjectItem>
+    ): Pair<MigrationsProjectItem?, StartupProjectItem?> {
+        val ids = commonOptionsStateService.getGlobalProjectIdsPair()
+
+        return if (ids == null) {
+            migrationsProjects.firstOrNull() to startupProjects.firstOrNull()
+        } else {
+            val migrationProject = migrationsProjects.find { it.data.id == ids.first }
+                ?: migrationsProjects.firstOrNull()
+            val startupProject = startupProjects.find { it.data.id == ids.second }
+                ?: startupProjects.firstOrNull()
+            migrationProject to startupProject
+        }
+    }
+
+    fun setGlobalProjectPair(migrationsProjectItem: MigrationsProjectItem, startupProjectItem: StartupProjectItem) {
+        commonOptionsStateService.setGlobalProjectIdsPair(migrationsProjectItem.data.id, startupProjectItem.data.id)
+    }
+
     private fun getDefaultProjects(preferredProjectId: UUID?, migrationsProjects: Array<MigrationsProjectItem>,
                                    startupProjects: Array<StartupProjectItem>): Pair<MigrationsProjectItem?, StartupProjectItem?> {
         val migrationsProject =

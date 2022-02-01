@@ -29,6 +29,7 @@ abstract class EfCoreDialogWrapper(
     requireMigrationsInProject: Boolean = false,
     private val requireDbContext: Boolean = true
 ) : DialogWrapper(true) {
+
     //
     // Data binding
     val commonOptions = CommonOptionsModel()
@@ -57,6 +58,8 @@ abstract class EfCoreDialogWrapper(
     private var targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem> = DefaultComboBoxModel()
     private var dbContextModel: DefaultComboBoxModel<DbContextItem> = DefaultComboBoxModel()
 
+    private val isSolutionLevelMode = selectedDotnetProjectName == null
+
     //
     // Events
     private val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
@@ -80,6 +83,7 @@ abstract class EfCoreDialogWrapper(
 
         if (requireDbContext) {
             addMigrationsProjectChangedListener(::migrationsProjectChanged)
+            addDbContextChangedListener(::dbContextChanged)
         }
 
         addStartupProjectChangedListener(::startupProjectChanged)
@@ -97,14 +101,33 @@ abstract class EfCoreDialogWrapper(
     }
 
     private fun initPreferredProjects() {
+        if (isSolutionLevelMode) {
+            initSolutionLevelPreferredProjects()
+        } else {
+            initProjectLevelPreferredProjects()
+        }
+    }
+
+    private fun initSolutionLevelPreferredProjects() {
+        val (preferredMigrationsProject, preferredStartupProject) =
+            preferredProjectsManager.getGlobalProjectPair(availableMigrationsProjects, availableStartupProjects)
+
+        refreshProjectsPair(preferredMigrationsProject, preferredStartupProject)
+    }
+
+    private fun initProjectLevelPreferredProjects() {
         val selectedDotnetProject =
             availableMigrationsProjects.find { it.displayName == selectedDotnetProjectName }
 
         val (preferredMigrationsProject, preferredStartupProject) =
             preferredProjectsManager.getProjectPair(selectedDotnetProject?.data?.id, availableMigrationsProjects, availableStartupProjects)
 
-        migrationsProjectSetter(preferredMigrationsProject)
-        startupProjectSetter(preferredStartupProject)
+        refreshProjectsPair(preferredMigrationsProject, preferredStartupProject)
+    }
+
+    private fun refreshProjectsPair(migrationsProject: MigrationsProjectItem?, startupProject: StartupProjectItem?) {
+        migrationsProjectSetter(migrationsProject)
+        startupProjectSetter(startupProject)
     }
 
     //
@@ -128,7 +151,11 @@ abstract class EfCoreDialogWrapper(
         val startupProject = commonOptions.startupProject
 
         if (migrationsProject != null && startupProject != null) {
-            preferredProjectsManager.setProjectPair(migrationsProject, startupProject)
+            if (isSolutionLevelMode) {
+                preferredProjectsManager.setGlobalProjectPair(migrationsProject, startupProject)
+            } else {
+                preferredProjectsManager.setProjectPair(migrationsProject, startupProject)
+            }
         }
     }
 
@@ -265,7 +292,7 @@ abstract class EfCoreDialogWrapper(
         dbContextSetter(firstDbContext)
     }
 
-    private fun startupProjectChanged(project: IconItem<StartupProjectData>?) {
+    private fun startupProjectChanged(project: StartupProjectItem?) {
         targetFrameworkModel.removeAllElements()
 
         if (project == null) return
@@ -279,6 +306,10 @@ abstract class EfCoreDialogWrapper(
         targetFrameworkModel.addAll(baseTargetFrameworkItems)
         commonOptions.targetFramework = defaultFramework
         targetFrameworkModel.selectedItem = commonOptions.targetFramework
+    }
+
+    private fun dbContextChanged(dbContext: DbContextItem?) {
+        dbContextModel.selectedItem = dbContext
     }
 }
 
