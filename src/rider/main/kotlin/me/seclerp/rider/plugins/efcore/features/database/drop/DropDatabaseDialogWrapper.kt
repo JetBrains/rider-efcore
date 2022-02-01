@@ -8,8 +8,8 @@ import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
 class DropDatabaseDialogWrapper(
     model: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Drop Database", model, intellijProject, currentDotnetProjectName, false) {
+    selectedDotnetProjectName: String?,
+) : EfCoreDialogWrapper("Drop Database", model, intellijProject, selectedDotnetProjectName, false) {
 
     //
     // Constructor

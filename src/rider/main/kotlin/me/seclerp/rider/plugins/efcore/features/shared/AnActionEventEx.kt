@@ -10,21 +10,23 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.projectView.workspace.isUnloadedProject
 
-fun AnActionEvent.isLoadedProjectFile(): Boolean {
+fun AnActionEvent.isEfCoreActionContext(): Boolean {
     if (project == null) return false
-    val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return false
-    val dotnetProject = getDotnetProject() ?: return false
+    val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return true
+    val dotnetProject = getDotnetProject() ?: return true
 
     return !dotnetProject.isUnloadedProject()
         && (actionFile.extension.equals("csproj") || actionFile.extension.equals("fsproj"))
 }
 
-fun AnActionEvent.getDotnetProjectName(): String {
-    return getDotnetProject()!!.descriptor.name
+fun AnActionEvent.getDotnetProjectName(): String? {
+    return getDotnetProject()?.descriptor?.name
 }
 
 private fun AnActionEvent.getDotnetProject(): ProjectModelEntity? {
-    return getDotnetProjects(project!!, getData(PlatformDataKeys.VIRTUAL_FILE)!!).firstOrNull {
+    val selectedFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return null
+
+    return getDotnetProjects(project!!, selectedFile).firstOrNull {
         it.descriptor is RdProjectDescriptor
     }
 }

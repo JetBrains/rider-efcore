@@ -21,7 +21,7 @@ import javax.swing.event.DocumentListener
 class AddMigrationDialogWrapper(
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    selectedDotnetProjectName: String,
+    selectedDotnetProjectName: String?,
 ) : EfCoreDialogWrapper("Add Migration", beModel, intellijProject, selectedDotnetProjectName, false) {
 
     //

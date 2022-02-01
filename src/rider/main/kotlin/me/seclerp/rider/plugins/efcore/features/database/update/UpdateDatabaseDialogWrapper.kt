@@ -24,7 +24,7 @@ class UpdateDatabaseDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    selectedDotnetProjectName: String
+    selectedDotnetProjectName: String?
 ) : EfCoreDialogWrapper("Update Database", beModel, intellijProject, selectedDotnetProjectName, true) {
 
     //

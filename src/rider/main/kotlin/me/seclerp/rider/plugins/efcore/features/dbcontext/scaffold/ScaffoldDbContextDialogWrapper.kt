@@ -28,8 +28,8 @@ class ScaffoldDbContextDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
     beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Scaffold DbContext", beModel, intellijProject, currentDotnetProjectName,
+    selectedDotnetProjectName: String?,
+) : EfCoreDialogWrapper("Scaffold DbContext", beModel, intellijProject, selectedDotnetProjectName,
     requireMigrationsInProject = false, requireDbContext = false
 ) {
 

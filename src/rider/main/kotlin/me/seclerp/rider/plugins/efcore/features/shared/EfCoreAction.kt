@@ -21,7 +21,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 
 abstract class EfCoreAction : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
-        actionEvent.presentation.isVisible = actionEvent.isLoadedProjectFile()
+        actionEvent.presentation.isVisible = actionEvent.isEfCoreActionContext()
     }
 
     fun getCommonOptions(dialog: EfCoreDialogWrapper): CommonOptions {
@@ -78,6 +78,6 @@ abstract class EfCoreAction : AnAction() {
 
     data class DialogBuildParameters(
         val model: RiderEfCoreModel,
-        val currentDotnetProjectName: String
+        val currentDotnetProjectName: String?
     )
 }

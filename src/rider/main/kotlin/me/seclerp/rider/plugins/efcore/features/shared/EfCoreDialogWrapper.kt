@@ -25,7 +25,7 @@ abstract class EfCoreDialogWrapper(
     titleText: String,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val selectedDotnetProjectName: String,
+    private val selectedDotnetProjectName: String?,
     requireMigrationsInProject: Boolean = false,
     private val requireDbContext: Boolean = true
 ) : DialogWrapper(true) {

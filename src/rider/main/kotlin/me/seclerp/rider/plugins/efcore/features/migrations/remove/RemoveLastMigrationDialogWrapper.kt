@@ -12,8 +12,8 @@ import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 class RemoveLastMigrationDialogWrapper(
     private val model: RiderEfCoreModel,
     private val intellijProject: Project,
-    currentDotnetProjectName: String,
-) : EfCoreDialogWrapper("Remove Last Migration", model, intellijProject, currentDotnetProjectName, true) {
+    selectedDotnetProjectName: String?,
+) : EfCoreDialogWrapper("Remove Last Migration", model, intellijProject, selectedDotnetProjectName, true) {
 
     var availableMigrationsList = listOf<MigrationInfo>()
 
