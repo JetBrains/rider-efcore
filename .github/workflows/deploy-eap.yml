@@ -26,10 +26,10 @@ jobs:
 #         with:
 #           arguments: buildPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
 
-      - name: 🏗 Build Plugin for 2021.3 EAP 10
+      - name: 🏗 Build Plugin for 2022.1 EAP 1
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: buildPlugin -PRiderSdkVersion=2021.3.0-eap10 -PProductVersion=2021.3-EAP10-SNAPSHOT
+          arguments: buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT
 
       - name: 🚀 Create Release
         uses: ncipollo/release-action@v1
