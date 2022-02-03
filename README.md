@@ -118,4 +118,4 @@ This project uses modified version of **trunk-based git strategy**.
 - [**Marketplace page**](https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui)
 - [**Changelog**](CHANGELOG.md)
 - [**Roadmap**](docs/ROADMAP.md)
-- [**Working with Entity Framework Core inside JetBrains Rider**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/)
+- [**Entity Framework Core inside Rider: UI Way**](https://blog.jetbrains.com/dotnet/2022/01/31/entity-framework-core-inside-rider-ui-way/) _(recommended tutorial)_
