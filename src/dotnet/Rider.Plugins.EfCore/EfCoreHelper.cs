@@ -19,11 +19,19 @@ namespace Rider.Plugins.EfCore
 
         public static IEnumerable<IProject> GetSupportedStartupProjects(ISolution solution)
         {
-            var supportedStartupProjects = solution
+            var projectsWithInstalledNugetPacks = solution
                 .GetSupportedDotnetProjects(IsStartupProjectSupported)
-                .Where(StartupProjectPackagesInstalled);
+                .Where(StartupProjectPackagesInstalled)
+                .ToList();
 
-            return supportedStartupProjects;
+            var startupProjects = new LinkedList<IProject>(projectsWithInstalledNugetPacks);
+
+            foreach (var project in projectsWithInstalledNugetPacks)
+            {
+                FillStartupProjectsList(startupProjects, project);
+            }
+
+            return startupProjects;
         }
 
         private static IEnumerable<IProject> GetSupportedDotnetProjects(this IProjectCollection solution,
@@ -49,5 +57,25 @@ namespace Rider.Plugins.EfCore
         private static bool StartupProjectPackagesInstalled(IProject project) =>
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
             || project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreDesignNugetId) != default;
+
+        private static void FillStartupProjectsList(LinkedList<IProject> startupProjects, IProject project)
+        {
+            var targetFramework = project.TargetFrameworkIds;
+
+            foreach (var frameworkId in targetFramework)
+            {
+                var referencingProjectsEx = project
+                    .GetReferencingProjectsEx(frameworkId)
+                    .ToList();
+
+                referencingProjectsEx.ForEach(x =>
+                {
+                    if (!startupProjects.Contains(x.Value))
+                    {
+                        startupProjects.AddLast(x.Value);
+                    }
+                });
+            }
+        }
     }
 }
