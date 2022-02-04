@@ -19,31 +19,17 @@ namespace Rider.Plugins.EfCore
 
         public static IEnumerable<IProject> GetSupportedStartupProjects(ISolution solution)
         {
-            var projectsWithInstalledNugetPacks = solution
+            var projectsWithNugetPacks = solution
                 .GetSupportedDotnetProjects(IsStartupProjectSupported)
                 .Where(StartupProjectPackagesInstalled)
                 .ToList();
 
-            var projectsLinkedList = new LinkedList<IProject>(projectsWithInstalledNugetPacks);
+            var referencingProjects = projectsWithNugetPacks
+                .SelectMany(p => p.GetReferencingProjects(projectsWithNugetPacks));
 
-            var referencingProjects = projectsWithInstalledNugetPacks.SelectMany(GetReferencingProjects);
+            var result = referencingProjects.Distinct();
 
-            foreach (var project in referencingProjects)
-            {
-                if (project.IsNetStandard21())
-                {
-                    continue;
-                }
-
-                if (projectsLinkedList.Contains(project))
-                {
-                    continue;
-                }
-
-                projectsLinkedList.AddLast(project);
-            }
-
-            return projectsLinkedList;
+            return result;
         }
 
         private static IEnumerable<IProject> GetSupportedDotnetProjects(this IProjectCollection solution,
@@ -70,9 +56,10 @@ namespace Rider.Plugins.EfCore
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
             || project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreDesignNugetId) != default;
 
-        private static IEnumerable<IProject> GetReferencingProjects(IProject project)
+        private static IEnumerable<IProject> GetReferencingProjects(this IProject project,
+            IEnumerable<IProject> list)
         {
-            var linkedList = new LinkedList<IProject>();
+            var linkedList = new LinkedList<IProject>(list);
 
             var targetFramework = project.TargetFrameworkIds;
 
@@ -80,7 +67,8 @@ namespace Rider.Plugins.EfCore
             {
                 var referencingProjects = project
                     .GetReferencingProjectsEx(frameworkId)
-                    .Select(x => x.Value)
+                    .Select(pair => pair.Value)
+                    .Where(proj => !proj.IsNetStandard())
                     .ToList();
 
                 referencingProjects.ForEach(x => linkedList.AddLast(x));
@@ -91,10 +79,10 @@ namespace Rider.Plugins.EfCore
             return result;
         }
 
-        private static bool IsNetStandard21(this IProject project)
+        private static bool IsNetStandard(this IProject project)
         {
             var containsNetStandardTarget = project.TargetFrameworkIds
-                .Any(x => x.UniqueString == EfCoreSupportedTarget.NetStandard21);
+                .Any(x => x.IsNetStandard);
 
             return containsNetStandardTarget;
         }
