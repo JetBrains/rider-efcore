@@ -24,10 +24,11 @@ namespace Rider.Plugins.EfCore
                 .Where(StartupProjectPackagesInstalled)
                 .ToList();
 
-            var referencingProjects = projectsWithNugetPacks
-                .SelectMany(p => p.GetReferencingProjects(projectsWithNugetPacks));
+            var referencingProjects = projectsWithNugetPacks.SelectMany(GetReferencingProjects);
 
-            var result = referencingProjects.Distinct();
+            var result = projectsWithNugetPacks.Concat(referencingProjects)
+                .Where(proj => !proj.IsNetStandard())
+                .Distinct();
 
             return result;
         }
@@ -56,35 +57,13 @@ namespace Rider.Plugins.EfCore
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
             || project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreDesignNugetId) != default;
 
-        private static IEnumerable<IProject> GetReferencingProjects(this IProject project,
-            IEnumerable<IProject> list)
-        {
-            var linkedList = new LinkedList<IProject>(list);
+        private static IEnumerable<IProject> GetReferencingProjects(this IProject project) =>
+            project.TargetFrameworkIds
+                .SelectMany(x => project.GetReferencingProjectsEx(x))
+                .Select(x => x.Value)
+                .ToList();
 
-            var targetFramework = project.TargetFrameworkIds;
-
-            foreach (var frameworkId in targetFramework)
-            {
-                var referencingProjects = project
-                    .GetReferencingProjectsEx(frameworkId)
-                    .Select(pair => pair.Value)
-                    .Where(proj => !proj.IsNetStandard())
-                    .ToList();
-
-                referencingProjects.ForEach(x => linkedList.AddLast(x));
-            }
-
-            var result = linkedList.Distinct();
-
-            return result;
-        }
-
-        private static bool IsNetStandard(this IProject project)
-        {
-            var containsNetStandardTarget = project.TargetFrameworkIds
-                .Any(x => x.IsNetStandard);
-
-            return containsNetStandardTarget;
-        }
+        private static bool IsNetStandard(this IProject project) =>
+            project.TargetFrameworkIds.Any(x => x.IsNetStandard);
     }
 }
