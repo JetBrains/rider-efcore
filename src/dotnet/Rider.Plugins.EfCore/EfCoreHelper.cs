@@ -24,14 +24,26 @@ namespace Rider.Plugins.EfCore
                 .Where(StartupProjectPackagesInstalled)
                 .ToList();
 
-            var startupProjects = new LinkedList<IProject>(projectsWithInstalledNugetPacks);
+            var projectsLinkedList = new LinkedList<IProject>(projectsWithInstalledNugetPacks);
 
-            foreach (var project in projectsWithInstalledNugetPacks)
+            var referencingProjects = projectsWithInstalledNugetPacks.SelectMany(GetReferencingProjects);
+
+            foreach (var project in referencingProjects)
             {
-                FillStartupProjectsList(startupProjects, project);
+                if (project.IsNetStandard21())
+                {
+                    continue;
+                }
+
+                if (projectsLinkedList.Contains(project))
+                {
+                    continue;
+                }
+
+                projectsLinkedList.AddLast(project);
             }
 
-            return startupProjects;
+            return projectsLinkedList;
         }
 
         private static IEnumerable<IProject> GetSupportedDotnetProjects(this IProjectCollection solution,
@@ -58,24 +70,33 @@ namespace Rider.Plugins.EfCore
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
             || project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreDesignNugetId) != default;
 
-        private static void FillStartupProjectsList(LinkedList<IProject> startupProjects, IProject project)
+        private static IEnumerable<IProject> GetReferencingProjects(IProject project)
         {
+            var linkedList = new LinkedList<IProject>();
+
             var targetFramework = project.TargetFrameworkIds;
 
             foreach (var frameworkId in targetFramework)
             {
-                var referencingProjectsEx = project
+                var referencingProjects = project
                     .GetReferencingProjectsEx(frameworkId)
+                    .Select(x => x.Value)
                     .ToList();
 
-                referencingProjectsEx.ForEach(x =>
-                {
-                    if (!startupProjects.Contains(x.Value))
-                    {
-                        startupProjects.AddLast(x.Value);
-                    }
-                });
+                referencingProjects.ForEach(x => linkedList.AddLast(x));
             }
+
+            var result = linkedList.Distinct();
+
+            return result;
+        }
+
+        private static bool IsNetStandard21(this IProject project)
+        {
+            var containsNetStandardTarget = project.TargetFrameworkIds
+                .Any(x => x.UniqueString == EfCoreSupportedTarget.NetStandard21);
+
+            return containsNetStandardTarget;
         }
     }
 }
