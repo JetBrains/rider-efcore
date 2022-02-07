@@ -19,15 +19,14 @@ namespace Rider.Plugins.EfCore
 
         public static IEnumerable<IProject> GetSupportedStartupProjects(ISolution solution)
         {
-            var projectsWithNugetPacks = solution
-                .GetSupportedDotnetProjects(IsStartupProjectSupported)
+            var projectsWithNugetPacks = solution.GetAllProjects()
                 .Where(StartupProjectPackagesInstalled)
                 .ToList();
 
             var referencingProjects = projectsWithNugetPacks.SelectMany(GetReferencingProjects);
 
             var result = projectsWithNugetPacks.Concat(referencingProjects)
-                .Where(proj => !proj.IsNetStandard())
+                .Where(proj => proj.TargetFrameworkIds.Any(IsStartupProjectSupported))
                 .Distinct();
 
             return result;
@@ -62,8 +61,5 @@ namespace Rider.Plugins.EfCore
                 .SelectMany(x => project.GetReferencingProjectsEx(x))
                 .Select(x => x.Value)
                 .ToList();
-
-        private static bool IsNetStandard(this IProject project) =>
-            project.TargetFrameworkIds.Any(x => x.IsNetStandard);
     }
 }
