@@ -25,8 +25,9 @@ namespace Rider.Plugins.EfCore
 
             var referencingProjects = projectsWithNugetPacks.SelectMany(GetReferencingProjects);
 
-            var result = projectsWithNugetPacks.Concat(referencingProjects)
-                .Where(proj => proj.TargetFrameworkIds.Any(IsStartupProjectSupported))
+            var result = projectsWithNugetPacks
+                .Concat(referencingProjects)
+                .Where(project => project.TargetFrameworkIds.Any(IsStartupProjectSupported))
                 .Distinct();
 
             return result;
