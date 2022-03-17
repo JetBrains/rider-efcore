@@ -61,7 +61,9 @@ namespace Rider.Plugins.EfCore
                         project.Name,
                         project.ProjectFileLocation.FullPath,
                         project.TargetFrameworkIds
-                            .Select(fr => fr.MapTargetFrameworkId()).ToList(),
+                            .Where(frameworkId => !frameworkId.IsNetStandard)
+                            .Select(frameworkId => frameworkId.MapTargetFrameworkId())
+                            .ToList(),
                         project.GetDefaultNamespace() ?? string.Empty))
                     .ToList();
 
