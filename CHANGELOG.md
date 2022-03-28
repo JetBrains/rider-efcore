@@ -1,3 +1,13 @@
+<h2>1.3.0</h2>
+<p>
+  <ul>
+    <li>Add ability to open EF Core action under Tools application menu entry</li>
+    <li>Add EF Core Quick Actions window</li>
+    <li>Improve Startup project detection logic (#59 by @kolosovpetro)</li>
+    <li>Remove migration parent folder after Remove Last Migration if there are no migrations (#51 by @kolosovpetro)</li>
+    <li>Show only migrations related to selected DbContext in Update Database's Target migration autocompletion (#50 by @kolosovpetro)</li>
+  </ul>
+</p>
 <h2>1.2.1</h2>
 <p>
   <ul>
