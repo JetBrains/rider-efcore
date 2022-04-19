@@ -5,7 +5,8 @@
   This plugin introduces Entity Framework Core commands' UI inside JetBrains Rider.
   <br /><br />
   <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg" alt="Build (Stable)"></a>
-  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg" alt="Build (EAP)"></a>
+
+[//]: # (  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg" alt="Build &#40;EAP&#41;"></a>)
 </div>
 
 ---
@@ -23,7 +24,8 @@ There are a couple of UI stuff for:
 ### How to install
 
 #### Using marketplace:
-> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing
+
+[//]: # (> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing)
 
 1. Go to `Settings` / `Plugins` / `Marketplace`
 1. Search for "Entity Framework Core UI"
@@ -58,14 +60,15 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2021.3.2+**
+- JetBrains Rider **2022.1+**
 
-  or JetBrains Rider **2022.1 EAP1**
+[//]: # (  or JetBrains Rider **2022.1 EAP1**)
 - EF Core **5.0+** with projects under such target frameworks:
   - `net6.0`
   - `net5.0`
   - `netcoreapp3.1`
   - `netstandard2.1` (only for Migrations projects)
+
 
 - EF Core global tools (`dotnet ef`) **5.0+** installed
 
@@ -81,14 +84,15 @@ More about features and available dialogs you could read in [**the blog post**](
 
 #### Building plugin parts
 
-- for stable version of Rider:
+[//]: # (- for stable version of Rider:)
 
   `./gradlew buildPlugin`
 
 
-- for EAP version of Rider:
+[//]: # (- for EAP version of Rider:)
 
-  `./gradlew buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT`
+[//]: # ()
+[//]: # (  `./gradlew buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT`)
 
 It will build both frontend and backend parts.
 

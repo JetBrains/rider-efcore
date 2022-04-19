@@ -1,9 +1,9 @@
 <idea-plugin require-restart="false">
   <id>me.seclerp.rider.plugins.efcore</id>
   <name>Entity Framework Core UI</name>
-  <version>1.3.0</version>
+  <version>1.3.1</version>
   <vendor url="https://github.com/seclerp">Andrew Rublyov</vendor>
-  <idea-version since-build="2021.3.2" />
+  <idea-version since-build="2022.1" />
   <depends>com.intellij.modules.rider</depends>
 
   <description>

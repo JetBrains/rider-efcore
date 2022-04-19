@@ -1,3 +1,9 @@
+<h2>1.3.1</h2>
+<p>
+  <ul>
+    <li>Bump version of Rider SDK to support 2022.1 version</li>
+  </ul>
+</p>
 <h2>1.3.0</h2>
 <p>
   <ul>
