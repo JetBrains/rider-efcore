@@ -2,7 +2,6 @@
 <p>
   <ul>
     <li>Enable support for Rider 2022.1</li>
-    <li>Disable required restart after plugin installation</li>
   </ul>
 </p>
 <h2>1.3.0</h2>
