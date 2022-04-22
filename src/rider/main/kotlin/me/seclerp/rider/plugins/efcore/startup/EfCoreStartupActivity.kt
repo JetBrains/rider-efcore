@@ -7,6 +7,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
+import com.jetbrains.rd.framework.impl.RpcTimeouts
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
@@ -18,7 +19,7 @@ class EfCoreStartupActivity : StartupActivity, DumbAware {
     override fun runActivity(intellijProject: Project) {
         var efCoreStartupProjects: List<StartupProjectInfo>? = null
             ApplicationManager.getApplication().invokeAndWait {
-                efCoreStartupProjects = intellijProject.solution.riderEfCoreModel.getAvailableStartupProjects.sync(Unit)
+                efCoreStartupProjects = intellijProject.solution.riderEfCoreModel.getAvailableStartupProjects.sync(Unit, RpcTimeouts.longRunning)
             }
 
         if (efCoreStartupProjects?.isEmpty() != false) {
