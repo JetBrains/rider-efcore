@@ -8,7 +8,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import java.nio.charset.Charset
 
 @Service
-class ManagementClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient() {
+class ManagementClient : BaseEfCoreClient() {
     fun getEfCoreVersion(): DotnetEfVersion? {
         val generalCommandLine =
             GeneralCommandLine("dotnet", "ef", "--version")
@@ -16,9 +16,10 @@ class ManagementClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClien
 
         val command = CliCommand(generalCommandLine)
         val result = command.execute()
+        val match = SEMVER_REGEX.find(result.output) ?: return null
 
         return if (result.succeeded)
-            DotnetEfVersion.fromString(result.output.split("\n")[1])
+            DotnetEfVersion.fromStrings(match.groups[1]!!.value, match.groups[2]!!.value, match.groups[3]!!.value)
         else
             null
     }
@@ -30,5 +31,9 @@ class ManagementClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClien
 
         val command = CliCommand(generalCommandLine)
         return command.execute()
+    }
+
+    companion object {
+        val SEMVER_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)(?:-([\\dA-Za-z-]+(?:\\.[\\dA-Za-z-]+)*))?(?:\\+[\\dA-Za-z-]+)?")
     }
 }
