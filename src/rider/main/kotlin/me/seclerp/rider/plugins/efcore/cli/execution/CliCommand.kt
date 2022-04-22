@@ -7,8 +7,11 @@ import java.io.IOException
 class CliCommand(private val command: GeneralCommandLine) {
     fun execute(): CliCommandResult {
         return try {
-            val result = ExecUtil.execAndGetOutput(command)
+            val configuredCommand = command
+                .withEnvironment("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "true")
+                .withEnvironment("DOTNET_NOLOGO", "true")
 
+            val result = ExecUtil.execAndGetOutput(configuredCommand)
             val output = result.stdout
             val error = result.stderr
             val exitCode = result.exitCode
