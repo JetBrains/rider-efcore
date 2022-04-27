@@ -1,3 +1,9 @@
+<h2>1.3.2</h2>
+<p>
+  <ul>
+    <li>Fix: projects with platform-specific target frameworks not presented in dropdowns</li>
+  </ul>
+</p>
 <h2>1.3.1</h2>
 <p>
   <ul>

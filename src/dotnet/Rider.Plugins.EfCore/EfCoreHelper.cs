@@ -34,24 +34,20 @@ namespace Rider.Plugins.EfCore
         }
 
         private static IEnumerable<IProject> GetSupportedDotnetProjects(this IProjectCollection solution,
-            Func<TargetFrameworkId, bool> condition)
-        {
-            var supportedDotnetProjects = solution.GetAllProjects()
+            Func<TargetFrameworkId, bool> condition) =>
+            solution.GetAllProjects()
                 .Where(project => project.TargetFrameworkIds.Any(condition));
 
-            return supportedDotnetProjects;
-        }
-
         private static bool IsMigrationProjectSupported(TargetFrameworkId targetFrameworkId) =>
-            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetStandard21;
+            targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net5)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net6)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.NetCore31)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.NetStandard21);
 
         private static bool IsStartupProjectSupported(TargetFrameworkId targetFrameworkId) =>
-            targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net5
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.Net6
-            || targetFrameworkId.UniqueString == EfCoreSupportedTarget.NetCore31;
+            targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net5)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net6)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.NetCore31);
 
         private static bool StartupProjectPackagesInstalled(IProject project) =>
             project.GetInstalledPackage(EfCoreRequiredPackages.EfCoreToolsNugetId) != default
