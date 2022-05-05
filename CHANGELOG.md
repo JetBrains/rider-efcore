@@ -1,6 +1,8 @@
-<h2>1.3.2</h2>
+<h2>1.4.0</h2>
 <p>
   <ul>
+    <li>Enable support of .NET 7 projects (#78 by @Maruf61)</li>
+    <li>Fix: RPC timeout when trying to load startup projects on Rider startup</li>
     <li>Fix: projects with platform-specific target frameworks not presented in dropdowns</li>
   </ul>
 </p>
