@@ -66,7 +66,7 @@ More about features and available dialogs you could read in [**the blog post**](
 - EF Core **5.0+** with projects under such target frameworks:
   - `net6.0`
   - `net5.0`
-  - `net7.0` (execute `dotnet tool update --global dotnet-ef --prerelease` first)
+  - `net7.0` (preview)
   - `netcoreapp3.1`
   - `netstandard2.1` (only for Migrations projects)
 
