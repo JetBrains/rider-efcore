@@ -47,8 +47,8 @@ namespace Rider.Plugins.EfCore
 
         private static bool IsStartupProjectSupported(TargetFrameworkId targetFrameworkId) =>
             targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net5)
-            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net7)
             || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net6)
+            || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.Net7)
             || targetFrameworkId.UniqueString.StartsWith(EfCoreSupportedTarget.NetCore31);
 
         private static bool StartupProjectPackagesInstalled(IProject project) =>
