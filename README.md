@@ -64,6 +64,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 [//]: # (  or JetBrains Rider **2022.1 EAP1**)
 - EF Core **5.0+** with projects under such target frameworks:
+  - `net7.0` (preview)
   - `net6.0`
   - `net5.0`
   - `netcoreapp3.1`
