@@ -19,4 +19,4 @@ jobs:
       - name: 🏗 Build Plugin (EAP)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: buildPlugin -PRiderSdkVersion=2022.1.0-eap07 -PProductVersion=2022.1-EAP7-SNAPSHOT
+          arguments: buildPlugin -PRiderSdkVersion=2022.2.0-eap01 -PProductVersion=2022.1-EAP1-SNAPSHOT
