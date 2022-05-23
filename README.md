@@ -6,7 +6,7 @@
   <br /><br />
   <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-stable.yml/badge.svg" alt="Build (Stable)"></a>
 
-[//]: # (  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg" alt="Build &#40;EAP&#41;"></a>)
+  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build-eap.yml/badge.svg" alt="Build (EAP)"></a>
 </div>
 
 ---
@@ -25,7 +25,7 @@ There are a couple of UI stuff for:
 
 #### Using marketplace:
 
-[//]: # (> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing)
+> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing
 
 1. Go to `Settings` / `Plugins` / `Marketplace`
 1. Search for "Entity Framework Core UI"
@@ -62,7 +62,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 - JetBrains Rider **2022.1+**
 
-[//]: # (  or JetBrains Rider **2022.1 EAP1**)
+  or JetBrains Rider **2022.2 EAP**
 - EF Core **5.0+** with projects under such target frameworks:
   - `net7.0` (preview)
   - `net6.0`
@@ -85,15 +85,14 @@ More about features and available dialogs you could read in [**the blog post**](
 
 #### Building plugin parts
 
-[//]: # (- for stable version of Rider:)
+- for stable version of Rider:
 
   `./gradlew buildPlugin`
 
 
-[//]: # (- for EAP version of Rider:)
+- for EAP version of Rider:
 
-[//]: # ()
-[//]: # (  `./gradlew buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT`)
+  `./gradlew buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT`
 
 It will build both frontend and backend parts.
 
