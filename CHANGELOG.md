@@ -1,3 +1,9 @@
+<h2>1.4.1</h2>
+<p>
+  <ul>
+    <li>Fix: Rider 2022.2 EAP3 compatibility issue</li>
+  </ul>
+</p>
 <h2>1.4.0</h2>
 <p>
   <ul>
