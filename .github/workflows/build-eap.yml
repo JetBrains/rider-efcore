@@ -16,7 +16,7 @@ jobs:
       - name: 🛠 Prepare Build Environment
         uses: ./.github/workflows/prepare-build-env
 
-      - name: 🏗 Build Plugin (EAP)
+      - name: 🏗 Build Plugin for EAP
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: buildPlugin -PRiderSdkVersion=2022.2.0-eap01 -PProductVersion=2022.2-EAP1-SNAPSHOT
+          arguments: buildPlugin -PRiderSdkVersion=2022.2.0-eap04 -PProductVersion=2022.2-EAP4-SNAPSHOT
