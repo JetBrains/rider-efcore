@@ -92,7 +92,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 - for EAP version of Rider:
 
-  `./gradlew buildPlugin -PRiderSdkVersion=2022.1.0-eap1 -PProductVersion=2022.1-EAP1-SNAPSHOT`
+  `./gradlew buildPlugin -PRiderSdkVersion=2022.2.0-eap04 -PProductVersion=2022.2-EAP4-SNAPSHOT`
 
 It will build both frontend and backend parts.
 
@@ -119,7 +119,7 @@ This project uses modified version of **trunk-based git strategy**.
 
 ### See also
 
+- [**Entity Framework Core inside Rider: UI Way**](https://blog.jetbrains.com/dotnet/2022/01/31/entity-framework-core-inside-rider-ui-way/) _(recommended tutorial)_
 - [**Marketplace page**](https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui)
 - [**Changelog**](CHANGELOG.md)
 - [**Roadmap**](docs/ROADMAP.md)
-- [**Entity Framework Core inside Rider: UI Way**](https://blog.jetbrains.com/dotnet/2022/01/31/entity-framework-core-inside-rider-ui-way/) _(recommended tutorial)_
