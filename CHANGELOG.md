@@ -1,3 +1,11 @@
+<h2>222.1.0</h2>
+<p>
+  <ul>
+    <li>General: add support for `dotnet ef` as local tool</li>
+    <li>General: add SQL script generation for given migrations range</li>
+    <li>Change version numbering to reflect Rider version in it</li>
+  </ul>
+</p>
 <h2>1.4.1</h2>
 <p>
   <ul>

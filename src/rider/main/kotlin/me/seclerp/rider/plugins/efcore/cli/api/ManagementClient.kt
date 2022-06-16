@@ -15,13 +15,9 @@ class ManagementClient : BaseEfCoreClient() {
                 .withCharset(Charset.forName("UTF-8"))
 
         val command = CliCommand(generalCommandLine)
-        val result = command.execute()
-        val match = SEMVER_REGEX.find(result.output) ?: return null
+        val commandResult = command.execute()
 
-        return if (result.succeeded)
-            DotnetEfVersion.fromStrings(match.groups[1]!!.value, match.groups[2]!!.value, match.groups[3]!!.value)
-        else
-            null
+        return DotnetEfVersion.parse(commandResult.output)
     }
 
     fun installEfCoreTools(): CliCommandResult {
@@ -31,9 +27,5 @@ class ManagementClient : BaseEfCoreClient() {
 
         val command = CliCommand(generalCommandLine)
         return command.execute()
-    }
-
-    companion object {
-        val SEMVER_REGEX = Regex("(\\d+)\\.(\\d+)\\.(\\d+)(?:-([\\dA-Za-z-]+(?:\\.[\\dA-Za-z-]+)*))?(?:\\+[\\dA-Za-z-]+)?")
     }
 }

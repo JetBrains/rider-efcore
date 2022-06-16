@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Core;
+using JetBrains.DataFlow;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.NuGet.DotNetTools;
 using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Rider.Backend.Features.Xamarin;
 using JetBrains.RiderTutorials.Utils;
+using JetBrains.Threading;
 using JetBrains.Util;
 using Rider.Plugins.EfCore.Exceptions;
 using Rider.Plugins.EfCore.Extensions;
@@ -22,9 +26,18 @@ namespace Rider.Plugins.EfCore
     {
         private readonly ISolution _solution;
 
-        public EfCoreSolutionComponent(ISolution solution, ILogger logger)
+        private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
+
+        public EfCoreSolutionComponent(
+            Lifetime lifetime,
+            ISolution solution,
+            NuGetDotnetToolsTracker dotnetToolsTracker,
+            ProjectPropertiesListener projectPropertiesListener,
+            ILogger logger)
         {
             _solution = solution;
+
+            ProjectUpdatedListener
 
             var riderProjectOutputModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
 
@@ -33,6 +46,34 @@ namespace Rider.Plugins.EfCore
             riderProjectOutputModel.HasAvailableMigrations.Set(HasAvailableMigrations);
             riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
             riderProjectOutputModel.GetAvailableDbContexts.Set(GetAvailableDbContexts);
+
+            dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, args =>
+            {
+                if (!args.HasNew || args.New is null) return;
+                using var _ = _lock.UsingWriteLock();
+
+                var cache = args.New;
+                var allLocalTools = cache.ToolLocalCache.GetAllLocalTools();
+                if (allLocalTools is null) return;
+
+                var dotnetEfLocalTool = allLocalTools.FirstOrDefault(tool => tool.PackageId == "dotnet-ef");
+                if (dotnetEfLocalTool is null)
+                {
+                    var dotnetEfGlobalTool = cache.ToolGlobalCache.GetGlobalTool("dotnet-ef");
+                    if (dotnetEfGlobalTool is null)
+                    {
+                        riderProjectOutputModel.EfToolsVersion.Value = string.Empty;
+                    }
+                    else
+                    {
+                        riderProjectOutputModel.EfToolsVersion.Value = dotnetEfGlobalTool[0].Version.ToString();
+                    }
+                }
+                else
+                {
+                    riderProjectOutputModel.EfToolsVersion.Value = dotnetEfLocalTool.Version;
+                }
+            });
         }
 
         private RdTask<List<MigrationsProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)

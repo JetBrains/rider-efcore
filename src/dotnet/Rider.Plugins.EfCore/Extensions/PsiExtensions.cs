@@ -23,7 +23,7 @@ namespace Rider.Plugins.EfCore.Extensions
 
             var dbContextClass = dbContextAttribute.PositionParameter(0).TypeValue?.GetScalarType()?
                 .GetClrName();
-            
+
             if (migrationLongName is null || dbContextClass is null)
             {
                 return null;
@@ -34,9 +34,9 @@ namespace Rider.Plugins.EfCore.Extensions
                 .GetLocation().Directory.FileAccessPath;
 
             return new MigrationInfo(
-                dbContextClass.FullName, 
-                migrationShortName, 
-                migrationLongName, 
+                dbContextClass.FullName,
+                migrationShortName,
+                migrationLongName,
                 migrationFolderAbsolutePath);
         }
 
