@@ -9,7 +9,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using Rider.Plugins.EfCore.Rd;
 
-namespace Rider.Plugins.EfCore.Extensions
+namespace Rider.Plugins.EfCore.Migrations
 {
     public static class PsiExtensions
     {

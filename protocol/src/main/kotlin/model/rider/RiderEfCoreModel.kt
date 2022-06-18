@@ -40,16 +40,25 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("fullName", string)
     }
 
+    private val EfToolDefinition = structdef {
+        field("version", string)
+        field("toolKind", enum {
+            +"None"
+            +"Local"
+            +"Global"
+        })
+    }
+
     init {
         setting(CSharp50Generator.Namespace, "Rider.Plugins.EfCore.Rd")
         setting(Kotlin11Generator.Namespace, "me.seclerp.rider.plugins.efcore.rd")
 
-        call("getAvailableMigrationsProjects", void, immutableList(MigrationsProjectInfo))
-        call("getAvailableStartupProjects", void, immutableList(StartupProjectInfo))
+        property("efToolsDefinition", EfToolDefinition)
+        property("availableStartupProjects", immutableList(StartupProjectInfo))
+        property("availableMigrationProjects", immutableList(MigrationsProjectInfo))
+
         call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
         call("getAvailableDbContexts", string, immutableList(DbContextInfo))
-
-        property("efToolsVersion", string)
     }
 }

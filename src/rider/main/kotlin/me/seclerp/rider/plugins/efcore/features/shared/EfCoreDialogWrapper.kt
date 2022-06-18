@@ -8,6 +8,7 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
+import com.jetbrains.rd.util.reactive.hasValue
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.Event
@@ -15,6 +16,7 @@ import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectD
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.ToolKind
 import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
 import javax.swing.DefaultComboBoxModel
@@ -37,14 +39,14 @@ abstract class EfCoreDialogWrapper(
     //
     // Internal data
     private val availableMigrationsProjects =
-        beModel.getAvailableMigrationsProjects
-            .sync(Unit)
+        beModel.availableMigrationProjects
+            .valueOrEmpty()
             .map { MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath)) }
             .toTypedArray()
 
     private val availableStartupProjects =
-        beModel.getAvailableStartupProjects
-            .sync(Unit)
+        beModel.availableStartupProjects
+            .valueOrEmpty()
             .map { StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks)) }
             .toTypedArray()
 
@@ -173,6 +175,7 @@ abstract class EfCoreDialogWrapper(
                 panel {
                     createAdditionalGroup()
                     createBuildOptions()
+                    createToolLabelRow()
                 }
             }
         }
@@ -234,6 +237,23 @@ abstract class EfCoreDialogWrapper(
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
             }.enabledIf(noBuildCheck!!.selected.not())
+        }
+    }
+
+    protected fun Panel.createToolLabelRow() {
+        val toolLabel =
+            if (beModel.efToolsDefinition.hasValue) {
+                val efToolsDefinition = beModel.efToolsDefinition.valueOrNull!!
+                when (efToolsDefinition.toolKind) {
+                    ToolKind.None -> "None"
+                    else -> "${efToolsDefinition.toolKind.name}, ${efToolsDefinition.version}"
+                }
+            } else {
+                "None"
+            }
+
+        row("EF Core tool:") {
+            label(toolLabel)
         }
     }
 

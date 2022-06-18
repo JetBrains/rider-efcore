@@ -1,7 +1,7 @@
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 
-namespace Rider.Plugins.EfCore
+namespace Rider.Plugins.EfCore.Migrations
 {
     public static class EfCoreKnownTypeNames
     {

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Core;
-using JetBrains.DataFlow;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.DotNetTools;
@@ -11,12 +9,12 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Rider.Backend.Features.Xamarin;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Threading;
 using JetBrains.Util;
+using Rider.Plugins.EfCore.Compatibility;
 using Rider.Plugins.EfCore.Exceptions;
-using Rider.Plugins.EfCore.Extensions;
+using Rider.Plugins.EfCore.Migrations;
 using Rider.Plugins.EfCore.Rd;
 
 namespace Rider.Plugins.EfCore
@@ -27,25 +25,22 @@ namespace Rider.Plugins.EfCore
         private readonly ISolution _solution;
 
         private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
+        private readonly RiderEfCoreModel _efCoreModel;
 
         public EfCoreSolutionComponent(
             Lifetime lifetime,
             ISolution solution,
             NuGetDotnetToolsTracker dotnetToolsTracker,
-            ProjectPropertiesListener projectPropertiesListener,
+            SolutionStructureChangedListener solutionStructureChangedListener,
             ILogger logger)
         {
             _solution = solution;
 
-            ProjectUpdatedListener
+            _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
 
-            var riderProjectOutputModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
-
-            riderProjectOutputModel.GetAvailableMigrationsProjects.Set(GetAvailableMigrationsProjects);
-            riderProjectOutputModel.GetAvailableStartupProjects.Set(GetAvailableStartupProjects);
-            riderProjectOutputModel.HasAvailableMigrations.Set(HasAvailableMigrations);
-            riderProjectOutputModel.GetAvailableMigrations.Set(GetAvailableMigrations);
-            riderProjectOutputModel.GetAvailableDbContexts.Set(GetAvailableDbContexts);
+            _efCoreModel.HasAvailableMigrations.Set(HasAvailableMigrations);
+            _efCoreModel.GetAvailableMigrations.Set(GetAvailableMigrations);
+            _efCoreModel.GetAvailableDbContexts.Set(GetAvailableDbContexts);
 
             dotnetToolsTracker.DotNetToolCache.Change.Advise(lifetime, args =>
             {
@@ -53,64 +48,84 @@ namespace Rider.Plugins.EfCore
                 using var _ = _lock.UsingWriteLock();
 
                 var cache = args.New;
-                var allLocalTools = cache.ToolLocalCache.GetAllLocalTools();
-                if (allLocalTools is null) return;
-
-                var dotnetEfLocalTool = allLocalTools.FirstOrDefault(tool => tool.PackageId == "dotnet-ef");
-                if (dotnetEfLocalTool is null)
-                {
-                    var dotnetEfGlobalTool = cache.ToolGlobalCache.GetGlobalTool("dotnet-ef");
-                    if (dotnetEfGlobalTool is null)
-                    {
-                        riderProjectOutputModel.EfToolsVersion.Value = string.Empty;
-                    }
-                    else
-                    {
-                        riderProjectOutputModel.EfToolsVersion.Value = dotnetEfGlobalTool[0].Version.ToString();
-                    }
-                }
-                else
-                {
-                    riderProjectOutputModel.EfToolsVersion.Value = dotnetEfLocalTool.Version;
-                }
+                InvalidateEfToolsDefinition(cache);
             });
+
+            solutionStructureChangedListener.SolutionChanged += InvalidateProjects;
+            InvalidateProjects();
         }
 
-        private RdTask<List<MigrationsProjectInfo>> GetAvailableMigrationsProjects(Lifetime lifetime, Unit _)
+        private void InvalidateEfToolsDefinition(DotNetToolCache cache)
         {
-            using (ReadLockCookie.Create())
-            {
-                var allProjectNames = EfCoreHelper.GetSupportedMigrationProjects(_solution)
-                    .Select(project => new MigrationsProjectInfo(
-                        project.Guid,
-                        project.Name,
-                        project.ProjectFileLocation.FullPath,
-                        project.GetDefaultNamespace() ?? string.Empty))
-                    .ToList();
+            var allLocalTools = cache.ToolLocalCache.GetAllLocalTools();
+            if (allLocalTools is null) return;
 
-                return RdTask<List<MigrationsProjectInfo>>.Successful(allProjectNames);
+            var dotnetEfLocalTool = allLocalTools.FirstOrDefault(tool => tool.PackageId == "dotnet-ef");
+
+            var toolKind = ToolKind.None;
+            var version = string.Empty;
+            if (dotnetEfLocalTool is {})
+            {
+                toolKind = ToolKind.Local;
+                version = dotnetEfLocalTool.Version;
             }
+            else
+            {
+                var dotnetEfGlobalTool = cache.ToolGlobalCache.GetGlobalTool("dotnet-ef");
+                if (dotnetEfGlobalTool is { Count: 1 })
+                {
+                    toolKind = ToolKind.Global;
+                    version = dotnetEfGlobalTool[0].Version.ToString();
+                }
+            }
+
+            _efCoreModel.EfToolsDefinition.Value = new EfToolDefinition(version, toolKind);
         }
 
-        private RdTask<List<StartupProjectInfo>> GetAvailableStartupProjects(Lifetime lifetime, Unit _)
+        private void InvalidateProjects()
         {
-            using (ReadLockCookie.Create())
-            {
-                var allProjectNames = EfCoreHelper.GetSupportedStartupProjects(_solution)
-                    .Select(project => new StartupProjectInfo(
-                        project.Guid,
-                        project.Name,
-                        project.ProjectFileLocation.FullPath,
-                        project.TargetFrameworkIds
-                            .Where(frameworkId => !frameworkId.IsNetStandard)
-                            .Select(frameworkId => frameworkId.MapTargetFrameworkId())
-                            .ToList(),
-                        project.GetDefaultNamespace() ?? string.Empty))
-                    .ToList();
-
-                return RdTask<List<StartupProjectInfo>>.Successful(allProjectNames);
-            }
+            InvalidateStartupProjects();
+            InvalidateMigrationsProjects();
         }
+
+        private void InvalidateStartupProjects()
+        {
+            using var cookie = ReadLockCookie.Create();
+
+            var allProjectNames = _solution
+                .GetSupportedStartupProjects()
+                .Select(project => new StartupProjectInfo(
+                    project.Guid,
+                    project.Name,
+                    project.ProjectFileLocation.FullPath,
+                    project.TargetFrameworkIds
+                        .Where(frameworkId => !frameworkId.IsNetStandard)
+                        .Select(frameworkId => frameworkId.MapTargetFrameworkId())
+                        .ToList(),
+                    project.GetDefaultNamespace() ?? string.Empty))
+                .ToList();
+
+            _efCoreModel.AvailableStartupProjects.Value = allProjectNames;
+        }
+
+        private void InvalidateMigrationsProjects()
+        {
+            using var cookie = ReadLockCookie.Create();
+
+            var allProjectNames = _solution
+                .GetSupportedMigrationProjects()
+                .Select(project => new MigrationsProjectInfo(
+                    project.Guid,
+                    project.Name,
+                    project.ProjectFileLocation.FullPath,
+                    project.GetDefaultNamespace() ?? string.Empty))
+                .ToList();
+
+            _efCoreModel.AvailableMigrationProjects.Value = allProjectNames;
+        }
+
+        //
+        // Calls implementations
 
         private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
         {
