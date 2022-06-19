@@ -60,5 +60,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
         call("getAvailableDbContexts", string, immutableList(DbContextInfo))
+
+        callback("onMissingEfCoreToolsDetected", void, void)
     }
 }

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.DotNetTools;
+using JetBrains.ProjectModel.Tasks;
 using JetBrains.Rd.Tasks;
 using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Psi;
@@ -22,18 +24,23 @@ namespace Rider.Plugins.EfCore
     [SolutionComponent]
     public class EfCoreSolutionComponent
     {
+        private readonly Lifetime _lifetime;
         private readonly ISolution _solution;
 
         private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
         private readonly RiderEfCoreModel _efCoreModel;
+
+        private bool _toolsNotInstalledNotified = false;
 
         public EfCoreSolutionComponent(
             Lifetime lifetime,
             ISolution solution,
             NuGetDotnetToolsTracker dotnetToolsTracker,
             SolutionStructureChangedListener solutionStructureChangedListener,
+            ISolutionLoadTasksScheduler solutionLoadTasksScheduler,
             ILogger logger)
         {
+            _lifetime = lifetime;
             _solution = solution;
 
             _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
@@ -51,8 +58,35 @@ namespace Rider.Plugins.EfCore
                 InvalidateEfToolsDefinition(cache);
             });
 
-            solutionStructureChangedListener.SolutionChanged += InvalidateProjects;
-            InvalidateProjects();
+            solutionLoadTasksScheduler.EnqueueTask(
+                new SolutionLoadTask(
+                    $"{nameof(EfCoreSolutionComponent)}.{nameof(InvalidateProjects)}",
+                    SolutionLoadTaskKinds.Done,
+                    () =>
+                    {
+                        InvalidateProjects();
+
+                        var efToolsDefinitionValue = _efCoreModel.EfToolsDefinition.Value;
+                        if (efToolsDefinitionValue != null)
+                        {
+                            CheckToolsInstalled(efToolsDefinitionValue);
+                        }
+
+                        _efCoreModel.EfToolsDefinition.Advise(lifetime, CheckToolsInstalled);
+                        solutionStructureChangedListener.SolutionChanged += InvalidateProjects;
+                    }
+                ));
+        }
+
+        private void CheckToolsInstalled(EfToolDefinition efToolsDefinition)
+        {
+            var startupProjects = _efCoreModel.AvailableStartupProjects.Value;
+
+            if (!_toolsNotInstalledNotified && startupProjects.Count > 0 && efToolsDefinition.ToolKind == ToolKind.None)
+            {
+                _toolsNotInstalledNotified = true;
+                _efCoreModel.OnMissingEfCoreToolsDetected.Start(_lifetime, Unit.Instance);
+            }
         }
 
         private void InvalidateEfToolsDefinition(DotNetToolCache cache)

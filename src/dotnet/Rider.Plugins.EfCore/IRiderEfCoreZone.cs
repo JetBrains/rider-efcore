@@ -1,4 +1,5 @@
 using JetBrains.Application.BuildScript.Application.Zones;
+using JetBrains.Platform.RdFramework.Actions.Backend;
 using JetBrains.ProjectModel.NuGet;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
@@ -11,7 +12,8 @@ namespace Rider.Plugins.EfCore
     public interface IRiderEfCoreZone : IPsiLanguageZone,
         IRequire<ILanguageCSharpZone>,
         IRequire<DaemonZone>,
-        IRequire<INuGetZone>
+        IRequire<INuGetZone>,
+        IRequire<IRdActionsBackendZone>
     {
     }
 }

@@ -12,12 +12,11 @@ import com.intellij.openapi.project.Project
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.getService
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
-import me.seclerp.rider.plugins.efcore.cli.api.ManagementClient
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.rd.ToolKind
 
 abstract class EfCoreAction : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
@@ -39,13 +38,14 @@ abstract class EfCoreAction : AnAction() {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, "Getting dotnet ef version...", false) {
             override fun run(progress: ProgressIndicator) {
-                val efCoreVersion = actionEvent.project!!.getService<ManagementClient>().getEfCoreVersion()
+                val efCoreDefinition = actionEvent.project!!.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
 
-                if (efCoreVersion == null) {
+                if (efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None) {
                     notifyDotnetEfIsNotInstalled(actionEvent.project!!)
                 } else {
+                    val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version)!!
                     ApplicationManager.getApplication().invokeLater {
-                        ready(actionEvent, efCoreVersion)
+                        ready(actionEvent, toolsVersion)
                     }
                 }
             }

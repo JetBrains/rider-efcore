@@ -9,17 +9,6 @@ import java.nio.charset.Charset
 
 @Service
 class ManagementClient : BaseEfCoreClient() {
-    fun getEfCoreVersion(): DotnetEfVersion? {
-        val generalCommandLine =
-            GeneralCommandLine("dotnet", "ef", "--version")
-                .withCharset(Charset.forName("UTF-8"))
-
-        val command = CliCommand(generalCommandLine)
-        val commandResult = command.execute()
-
-        return DotnetEfVersion.parse(commandResult.output)
-    }
-
     fun installEfCoreTools(): CliCommandResult {
         val generalCommandLine =
             GeneralCommandLine("dotnet", "tool", "install", "--global", "dotnet-ef")

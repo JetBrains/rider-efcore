@@ -6,7 +6,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 
 @Service
-class MigrationsClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient() {
+class MigrationsClient : BaseEfCoreClient() {
     fun add(options: CommonOptions, migrationName: String, outputDirectory: String? = null, namespace: String? = null): CliCommandResult {
         val command = createCommand(KnownEfCommands.Migrations.add, options) {
             add(migrationName)
