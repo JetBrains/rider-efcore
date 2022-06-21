@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.Disposer
@@ -13,25 +14,25 @@ import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
+import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
+import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
 
-@Suppress("UnstableApiUsage")
 class ScaffoldDbContextDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
-    beModel: RiderEfCoreModel,
-    private val intellijProject: Project,
+    intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : EfCoreDialogWrapper("Scaffold DbContext", beModel, intellijProject, selectedDotnetProjectName,
+) : BaseDialogWrapper("Scaffold DbContext", intellijProject, selectedDotnetProjectName,
     requireMigrationsInProject = false, requireDbContext = false
 ) {
+    val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
 
     //
     // Data binding
@@ -71,9 +72,28 @@ class ScaffoldDbContextDialogWrapper(
         init()
     }
 
+    override fun generateCommand(): CliCommand {
+        val commonOptions = getCommonOptions()
+
+        return dbContextCommandFactory.scaffold(
+            efCoreVersion, commonOptions,
+            model.connection,
+            model.provider,
+            model.outputFolder,
+            model.useAttributes,
+            model.useDatabaseNames,
+            model.generateOnConfiguring,
+            model.usePluralizer,
+            model.dbContextName,
+            model.dbContextFolder,
+            model.scaffoldAllTables,
+            model.tablesList.map { it.data },
+            model.scaffoldAllSchemas,
+            model.schemasList.map { it.data })
+    }
+
     //
     // UI
-    @OptIn(ExperimentalStdlibApi::class)
     override fun createCenterPanel(): JComponent {
         val tabbedPane = JBTabbedPane()
 

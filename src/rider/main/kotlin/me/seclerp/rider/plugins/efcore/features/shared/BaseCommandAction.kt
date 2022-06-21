@@ -13,60 +13,62 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
-import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
-import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
+import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
 import me.seclerp.rider.plugins.efcore.rd.ToolKind
 
-abstract class EfCoreAction : AnAction() {
+abstract class BaseCommandAction(
+    private val actionPerformingText: String,
+    private val actionPerformedText: String
+) : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
         actionEvent.presentation.isVisible = actionEvent.isEfCoreActionContext()
     }
 
-    fun getCommonOptions(dialog: EfCoreDialogWrapper): CommonOptions {
-        val common = dialog.commonOptions
-        return CommonOptions(
-            common.migrationsProject!!.data.fullPath,
-            common.startupProject!!.data.fullPath,
-            common.dbContext?.data,
-            common.buildConfiguration!!.displayName,
-            common.targetFramework!!.data,
-            common.noBuild
-        )
-    }
-
     override fun actionPerformed(actionEvent: AnActionEvent) {
+        val intellijProject = actionEvent.project!!
         ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, "Getting dotnet ef version...", false) {
             override fun run(progress: ProgressIndicator) {
-                val efCoreDefinition = actionEvent.project!!.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
+                val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
 
                 if (efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None) {
-                    notifyDotnetEfIsNotInstalled(actionEvent.project!!)
+                    notifyDotnetEfIsNotInstalled(intellijProject)
                 } else {
                     val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version)!!
                     ApplicationManager.getApplication().invokeLater {
-                        ready(actionEvent, toolsVersion)
+                        openDialog(actionEvent, toolsVersion)
                     }
                 }
             }
         })
     }
 
-    protected abstract fun ready(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion)
+    abstract fun createDialog(
+        intellijProject: Project,
+        efCoreVersion: DotnetEfVersion,
+        model: RiderEfCoreModel,
+        currentDotnetProjectName: String?): BaseDialogWrapper
+
+    private fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
+        val intellijProject = actionEvent.project!!
+        val model = getEfCoreRiderModel(actionEvent)
+        val currentDotnetProjectName = actionEvent.getDotnetProjectName()
+        val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
+
+        if (dialog.showAndGet()) {
+            executeCommandUnderProgress(actionEvent.project!!, actionPerformingText, actionPerformedText) {
+                val result = dialog.generateCommand().execute()
+                dialog.postCommandExecute(result)
+                result
+            }
+        }
+    }
 
     private fun getEfCoreRiderModel(actionEvent: AnActionEvent): RiderEfCoreModel {
         // TODO: Validate
 
         return actionEvent.project?.solution?.riderEfCoreModel!!
-    }
-
-    protected fun <R> buildDialogInstance(actionEvent: AnActionEvent, dialogFactory: DialogBuildParameters.() -> R): R {
-        val model = getEfCoreRiderModel(actionEvent)
-        val currentDotnetProjectName = actionEvent.getDotnetProjectName()
-        // TODO: Handle case when there is no appropriate projects
-        val params = DialogBuildParameters(model, currentDotnetProjectName)
-
-        return dialogFactory(params)
     }
 
     private fun notifyDotnetEfIsNotInstalled(intellijProject: Project) {
@@ -75,9 +77,4 @@ abstract class EfCoreAction : AnAction() {
             .addAction(InstallDotnetEfAction())
             .notify(intellijProject)
     }
-
-    data class DialogBuildParameters(
-        val model: RiderEfCoreModel,
-        val currentDotnetProjectName: String?
-    )
 }

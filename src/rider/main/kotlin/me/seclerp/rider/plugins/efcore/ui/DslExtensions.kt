@@ -8,11 +8,9 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.TextFieldWithAutoCompletion
-import com.intellij.ui.dsl.builder.Cell
-import com.intellij.ui.dsl.builder.Row
-import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.components.fields.ExpandableTextField
+import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
@@ -94,6 +92,7 @@ fun Row.textFieldWithCompletion(
 ): Cell<TextFieldWithCompletion> {
     val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(completions, icon)
     val textField = TextFieldWithCompletion(project, provider, binding.get(), true, true, false, false)
+    textField.editor
     textField.addDocumentListener(object : DocumentListener {
         override fun documentChanged(event: DocumentEvent) {
             binding.set(event.document.text)
@@ -136,3 +135,33 @@ fun Row.textFieldForRelativeFolder(
 
     return textFieldWithBrowseButtonCell
 }
+
+fun Row.readonlyExpandableTextField(
+    getter: () -> String
+): Cell<ExpandableTextField> =
+    simpleExpandableTextField(getter, {})
+        .applyToComponent {
+            isEditable = false
+        }
+
+fun Row.simpleExpandableTextField(
+    getter: () -> String,
+    setter: (String) -> Unit
+): Cell<ExpandableTextField> {
+    return simpleExpandableTextFieldBase()
+        .bindText(getter, setter)
+}
+
+fun Row.simpleExpandableTextField(
+    property: KMutableProperty0<String>,
+): Cell<ExpandableTextField> {
+    return simpleExpandableTextFieldBase()
+        .bindText(property)
+}
+
+private fun Row.simpleExpandableTextFieldBase(): Cell<ExpandableTextField> =
+    expandableTextField({ mutableListOf(it) }, { it[0] } )
+        .applyToComponent {
+            setMonospaced(true)
+            caretPosition = 0
+        }

@@ -5,6 +5,14 @@ import com.intellij.execution.util.ExecUtil
 import java.io.IOException
 
 class CliCommand(private val command: GeneralCommandLine) {
+    val workingDirectory: String
+    val commandText: String
+
+    init {
+        workingDirectory = command.workDirectory.toString()
+        commandText = command.commandLineString
+    }
+
     fun execute(): CliCommandResult {
         return try {
             val configuredCommand = command

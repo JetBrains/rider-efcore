@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.database.update
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
@@ -8,28 +9,29 @@ import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
+import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import me.seclerp.rider.plugins.efcore.ui.textFieldWithCompletion
 
-@Suppress("UnstableApiUsage")
 class UpdateDatabaseDialogWrapper(
     private val efCoreVersion: DotnetEfVersion,
-    private val beModel: RiderEfCoreModel,
-    private val intellijProject: Project,
+    intellijProject: Project,
     selectedDotnetProjectName: String?
-) : EfCoreDialogWrapper("Update Database", beModel, intellijProject, selectedDotnetProjectName, true) {
+) : BaseDialogWrapper("Update Database", intellijProject, selectedDotnetProjectName, true) {
+
+    val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
 
     //
     // Data binding
-    val model = UpdateDatabaseModel("", true, "")
+    private val model = UpdateDatabaseModel("", true, "")
 
     //
     // Internal data
@@ -48,6 +50,14 @@ class UpdateDatabaseDialogWrapper(
         addDbContextChangedListener(::onDbContextChanged)
 
         init()
+    }
+
+    override fun generateCommand(): CliCommand {
+        val commonOptions = getCommonOptions()
+        val targetMigration = model.targetMigration.trim()
+        val connection = if (model.useDefaultConnection) null else model.connection
+
+        return databaseCommandFactory.update(efCoreVersion, commonOptions, targetMigration, connection)
     }
 
     //
@@ -90,7 +100,9 @@ class UpdateDatabaseDialogWrapper(
 
     private fun Row.createTargetMigrationField(): Cell<TextFieldWithCompletion> =
         textFieldWithCompletion(model::targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
-            .applyToComponent { targetMigrationTextField = this }
+            .applyToComponent {
+                targetMigrationTextField = this
+            }
 
     //
     // Event listeners

@@ -1,19 +1,22 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.remove
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.features.shared.EfCoreDialogWrapper
+import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
+import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 
 class RemoveLastMigrationDialogWrapper(
-    private val model: RiderEfCoreModel,
-    private val intellijProject: Project,
+    intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : EfCoreDialogWrapper("Remove Last Migration", model, intellijProject, selectedDotnetProjectName, true) {
+) : BaseDialogWrapper("Remove Last Migration", intellijProject, selectedDotnetProjectName, true) {
+    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     var availableMigrationsList = listOf<MigrationInfo>()
 
@@ -34,6 +37,21 @@ class RemoveLastMigrationDialogWrapper(
         refreshCurrentDbContextMigrations(dbContext)
     }
 
+    override fun generateCommand(): CliCommand {
+        val commonOptions = getCommonOptions()
+
+        return migrationsCommandFactory.removeLast(commonOptions)
+    }
+
+    override fun postCommandExecute(commandResult: CliCommandResult) {
+        if (!commandResult.succeeded) {
+            return
+        }
+
+        val folderService = intellijProject.service<RemoveLastMigrationFolderService>()
+        folderService.deleteMigrationsFolderIfEmpty(availableMigrationsList.first())
+    }
+
     //
     // Methods
     private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
@@ -51,7 +69,7 @@ class RemoveLastMigrationDialogWrapper(
             return
         }
 
-        availableMigrationsList = model.getAvailableMigrations.runUnderProgress(
+        availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(
             migrationsIdentity,
             intellijProject,
             "Loading migrations...",
