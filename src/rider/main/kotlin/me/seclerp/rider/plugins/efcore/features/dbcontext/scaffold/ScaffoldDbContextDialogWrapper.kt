@@ -26,10 +26,10 @@ import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
 
 class ScaffoldDbContextDialogWrapper(
-    private val efCoreVersion: DotnetEfVersion,
+    toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : BaseDialogWrapper("Scaffold DbContext", intellijProject, selectedDotnetProjectName,
+) : BaseDialogWrapper(toolsVersion, "Scaffold DbContext", intellijProject, selectedDotnetProjectName,
     requireMigrationsInProject = false, requireDbContext = false
 ) {
     val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()

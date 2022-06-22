@@ -2,7 +2,11 @@
 <p>
   <ul>
     <li>General: add support for `dotnet ef` as local tool</li>
-    <li>General: add SQL script generation for given migrations range</li>
+    <li>General: add ability to preview commands before executing</li>
+    <li>General: add ability to pass additional command line arguments for Startup project</li>
+    <li>Migrations: add SQL script generation for given migrations range</li>
+    <li>Migrations: support F# migrations projects</li>
+    <li>Fix: incorrect behaviour of EF Core tools version retrieval (#71)</li>
     <li>Change version numbering to reflect Rider version in it</li>
   </ul>
 </p>

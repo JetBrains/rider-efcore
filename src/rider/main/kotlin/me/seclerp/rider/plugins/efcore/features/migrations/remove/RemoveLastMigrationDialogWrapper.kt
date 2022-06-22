@@ -4,6 +4,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
 import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
@@ -13,9 +14,10 @@ import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 
 class RemoveLastMigrationDialogWrapper(
+    toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : BaseDialogWrapper("Remove Last Migration", intellijProject, selectedDotnetProjectName, true) {
+) : BaseDialogWrapper(toolsVersion, "Remove Last Migration", intellijProject, selectedDotnetProjectName, true) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     var availableMigrationsList = listOf<MigrationInfo>()

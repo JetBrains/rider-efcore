@@ -8,6 +8,7 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
@@ -20,9 +21,10 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 class AddMigrationDialogWrapper(
+    toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : BaseDialogWrapper("Add Migration", intellijProject, selectedDotnetProjectName, false) {
+) : BaseDialogWrapper(toolsVersion, "Add Migration", intellijProject, selectedDotnetProjectName, false) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //

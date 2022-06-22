@@ -22,10 +22,10 @@ import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import me.seclerp.rider.plugins.efcore.ui.textFieldWithCompletion
 
 class UpdateDatabaseDialogWrapper(
-    private val efCoreVersion: DotnetEfVersion,
+    toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?
-) : BaseDialogWrapper("Update Database", intellijProject, selectedDotnetProjectName, true) {
+) : BaseDialogWrapper(toolsVersion, "Update Database", intellijProject, selectedDotnetProjectName, true) {
 
     val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
 

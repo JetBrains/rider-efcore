@@ -4,13 +4,15 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 
 class DropDatabaseDialogWrapper(
+    toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?,
-) : BaseDialogWrapper("Drop Database", intellijProject, selectedDotnetProjectName, false) {
+) : BaseDialogWrapper(toolsVersion, "Drop Database", intellijProject, selectedDotnetProjectName, false) {
 
     val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
 
