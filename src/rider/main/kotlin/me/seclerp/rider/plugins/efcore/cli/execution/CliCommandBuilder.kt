@@ -1,18 +1,23 @@
 package me.seclerp.rider.plugins.efcore.cli.execution
 
 import com.intellij.execution.configurations.GeneralCommandLine
+import com.jetbrains.rider.run.FormatPreservingCommandLine
+import com.jetbrains.rider.run.withRawParameters
 import java.nio.charset.Charset
+import java.nio.file.Paths
 
-class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
+class CliCommandBuilder(private val solutionDirectory: String, baseCommand: String, private val commonOptions: CommonOptions) {
     private var generalCommandLine: GeneralCommandLine =
-        GeneralCommandLine(KnownEfCommands.dotnet)
+        FormatPreservingCommandLine()
+            .withExePath(KnownEfCommands.dotnet)
             .withParameters(KnownEfCommands.ef)
             .withParameters(baseCommand.split(" "))
             .withCharset(Charset.forName("UTF-8"))
+            .withWorkDirectory(solutionDirectory)
 
     init {
-        addNamed("--project", commonOptions.migrationsProject)
-        addNamed("--startup-project", commonOptions.startupProject)
+        addNamed("--project", makeRelativeProjectPath(commonOptions.migrationsProject))
+        addNamed("--startup-project", makeRelativeProjectPath(commonOptions.startupProject))
         addNamedNullable("--context", commonOptions.dbContext)
         addNamed("--configuration", commonOptions.buildConfiguration)
         addNamedNullable("--framework", commonOptions.targetFramework)
@@ -46,6 +51,18 @@ class CliCommandBuilder(baseCommand: String, commonOptions: CommonOptions) {
     }
 
     fun build(): CliCommand {
+        if (commonOptions.additionalArguments.isNotEmpty()) {
+            add("--")
+            generalCommandLine = generalCommandLine.withRawParameters(commonOptions.additionalArguments)
+        }
         return CliCommand(generalCommandLine)
+    }
+
+    private fun makeRelativeProjectPath(projectDirectory: String): String {
+        val base = Paths.get(solutionDirectory)
+        val absolute = Paths.get(projectDirectory)
+        val relative = base.relativize(absolute)
+
+        return relative.toString()
     }
 }

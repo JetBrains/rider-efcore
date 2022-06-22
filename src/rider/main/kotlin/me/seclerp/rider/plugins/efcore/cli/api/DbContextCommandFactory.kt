@@ -1,18 +1,20 @@
 package me.seclerp.rider.plugins.efcore.cli.api
 
 import com.intellij.openapi.components.Service
-import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
+import com.intellij.openapi.project.Project
+import com.jetbrains.rider.projectView.solutionDirectoryPath
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 
 @Service
-class DbContextClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient() {
+class DbContextCommandFactory(intellijProject: Project) : BaseCommandFactory(intellijProject.solutionDirectoryPath.toString()) {
     fun scaffold(efCoreVersion: DotnetEfVersion, options: CommonOptions, connection: String, provider: String,
                  outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
                  usePluralizer: Boolean, dbContextName: String, dbContextFolder: String, scaffoldAllTables: Boolean,
-                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommandResult {
-        val command = createCommand(KnownEfCommands.DbContext.scaffold, options) {
+                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommand =
+        createCommand(KnownEfCommands.DbContext.scaffold, options) {
             add(connection)
             add(provider)
 
@@ -41,7 +43,4 @@ class DbContextClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient
                 addIf("--no-pluralize", !usePluralizer)
             }
         }
-
-        return command.execute()
-    }
 }

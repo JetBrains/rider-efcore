@@ -1,6 +1,6 @@
-﻿namespace Rider.Plugins.EfCore
+﻿namespace Rider.Plugins.EfCore.Compatibility
 {
-    public static class EfCoreSupportedTarget
+    public static class SupportedTargetFrameworks
     {
         public const string Net5 = "net5.0";
         public const string Net6 = "net6.0";

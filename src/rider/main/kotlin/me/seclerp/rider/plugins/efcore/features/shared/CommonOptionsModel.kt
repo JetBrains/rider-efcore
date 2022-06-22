@@ -8,5 +8,6 @@ data class CommonOptionsModel(
     var dbContext: DbContextItem? = null,
     var buildConfiguration: BuildConfigurationItem? = null,
     var targetFramework: BaseTargetFrameworkItem? = null,
-    var noBuild: Boolean = false
+    var noBuild: Boolean = false,
+    var additionalArguments: String = ""
 )

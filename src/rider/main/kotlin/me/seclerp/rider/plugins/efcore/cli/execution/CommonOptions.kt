@@ -6,5 +6,6 @@ data class CommonOptions(
     val dbContext: String?,
     val buildConfiguration: String,
     val targetFramework: String?,
-    val noBuild: Boolean = false
+    val noBuild: Boolean = false,
+    val additionalArguments: String = ""
 )

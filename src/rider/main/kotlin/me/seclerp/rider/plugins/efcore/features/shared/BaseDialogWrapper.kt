@@ -5,30 +5,44 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
+import com.jetbrains.rd.util.reactive.hasValue
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.Event
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
+import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
+import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
+import me.seclerp.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.ToolKind
+import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
+import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
+import java.awt.event.ActionEvent
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComponent
 
-@Suppress("UnstableApiUsage", "MemberVisibilityCanBePrivate")
-abstract class EfCoreDialogWrapper(
+@Suppress("MemberVisibilityCanBePrivate")
+abstract class BaseDialogWrapper(
+    protected val efCoreVersion: DotnetEfVersion,
     titleText: String,
-    private val beModel: RiderEfCoreModel,
-    private val intellijProject: Project,
+    protected val intellijProject: Project,
     private val selectedDotnetProjectName: String?,
     requireMigrationsInProject: Boolean = false,
     private val requireDbContext: Boolean = true
 ) : DialogWrapper(true) {
+
+    protected val beModel = intellijProject.solution.riderEfCoreModel
 
     //
     // Data binding
@@ -37,14 +51,14 @@ abstract class EfCoreDialogWrapper(
     //
     // Internal data
     private val availableMigrationsProjects =
-        beModel.getAvailableMigrationsProjects
-            .sync(Unit)
+        beModel.availableMigrationProjects
+            .valueOrEmpty()
             .map { MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath)) }
             .toTypedArray()
 
     private val availableStartupProjects =
-        beModel.getAvailableStartupProjects
-            .sync(Unit)
+        beModel.availableStartupProjects
+            .valueOrEmpty()
             .map { StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks)) }
             .toTypedArray()
 
@@ -75,6 +89,10 @@ abstract class EfCoreDialogWrapper(
     //
     // Preferences
     private val preferredProjectsManager = PreferredProjectsManager(intellijProject)
+
+    //
+    // UI
+    private lateinit var panel: DialogPanel
 
     //
     // Constructor
@@ -160,19 +178,42 @@ abstract class EfCoreDialogWrapper(
     }
 
     //
+    // Command lifetime
+    abstract fun generateCommand(): CliCommand
+
+    open fun postCommandExecute(commandResult: CliCommandResult) {}
+
+    //
     // UI
-    override fun createCenterPanel(): JComponent = createMainUI()
+    override fun createCenterPanel(): JComponent = createMainUI().apply { panel = this }
+
+    override fun createLeftSideActions(): Array<Action> {
+        val commandPreviewAction = object : AbstractAction("Preview") {
+            override fun actionPerformed(e: ActionEvent?) {
+                panel.apply()
+                if (panel.validateAll().isEmpty()) {
+                    val dialog = CommandPreviewDialogWrapper(generateCommand())
+                    dialog.show()
+                }
+            }
+        }
+
+        return arrayOf(commandPreviewAction)
+    }
 
     protected fun createMainUI(): DialogPanel {
         return panel {
             panel {
-                createPrimaryOptions()
-                // TODO: Find better place to load preferences keeping component lifetime in mind
-                initPreferredProjects()
-                createDefaultMainRows()
+                groupRowsRange("Common") {
+                    createPrimaryOptions()
+                    // TODO: Find better place to load preferences keeping component lifetime in mind
+                    initPreferredProjects()
+                    createDefaultMainRows()
+                }
                 panel {
                     createAdditionalGroup()
                     createBuildOptions()
+                    createExecutionRow()
                 }
             }
         }
@@ -234,6 +275,30 @@ abstract class EfCoreDialogWrapper(
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
             }.enabledIf(noBuildCheck!!.selected.not())
+        }
+    }
+
+    protected fun Panel.createExecutionRow() {
+        val toolLabel =
+            if (beModel.efToolsDefinition.hasValue) {
+                val efToolsDefinition = beModel.efToolsDefinition.valueOrNull!!
+                when (efToolsDefinition.toolKind) {
+                    ToolKind.None -> "None"
+                    else -> "${efToolsDefinition.toolKind.name}, ${efToolsDefinition.version}"
+                }
+            } else "None"
+
+        groupRowsRange("Execution") {
+            if (efCoreVersion.major >= 5) {
+                row("Additional arguments:") {
+                    simpleExpandableTextField(commonOptions::additionalArguments)
+                        .horizontalAlign(HorizontalAlign.FILL)
+
+                }
+            }
+            row("EF Core tools:") {
+                label(toolLabel)
+            }
         }
     }
 
@@ -311,5 +376,17 @@ abstract class EfCoreDialogWrapper(
     private fun dbContextChanged(dbContext: DbContextItem?) {
         dbContextModel.selectedItem = dbContext
     }
+
+    //
+    // Helpers
+    protected fun getCommonOptions(): CommonOptions = CommonOptions(
+        commonOptions.migrationsProject!!.data.fullPath,
+        commonOptions.startupProject!!.data.fullPath,
+        commonOptions.dbContext?.data,
+        commonOptions.buildConfiguration!!.displayName,
+        commonOptions.targetFramework!!.data,
+        commonOptions.noBuild,
+        commonOptions.additionalArguments
+    )
 }
 
