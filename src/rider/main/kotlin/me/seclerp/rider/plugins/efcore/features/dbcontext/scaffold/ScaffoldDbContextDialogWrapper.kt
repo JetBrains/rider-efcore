@@ -3,7 +3,6 @@ package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.util.Disposer
 import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
@@ -25,6 +24,7 @@ import java.io.File
 import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
 
+@Suppress("UnstableApiUsage")
 class ScaffoldDbContextDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
@@ -114,29 +114,15 @@ class ScaffoldDbContextDialogWrapper(
                     .verticalAlign(VerticalAlign.FILL)
             }.resizableRow()
         }.apply {
-            validateCallbacks = buildList {
-                addAll(mainTab.validateCallbacks)
-                addAll(dbContextTab.validateCallbacks)
-                addAll(tablesTab.validateCallbacks)
-                addAll(schemaTab.validateCallbacks)
-            }
+            registerIntegratedPanel(mainTab)
+            registerIntegratedPanel(dbContextTab)
+            registerIntegratedPanel(tablesTab)
+            registerIntegratedPanel(schemaTab)
+            panel = this
         }
     }
 
-    override fun doOKAction() {
-        if (okAction.isEnabled) {
-            mainTab.apply()
-            dbContextTab.apply()
-            tablesTab.apply()
-            schemaTab.apply()
-        }
-
-        super.doOKAction()
-    }
-
-    private fun createMainTab(): DialogPanel =
-        createMainUI()
-            .apply(::configureValidation)
+    private fun createMainTab(): DialogPanel = createMainUI()
 
     override fun Panel.createPrimaryOptions() {
         row("Connection:") {
@@ -211,7 +197,7 @@ class ScaffoldDbContextDialogWrapper(
                 .validationOnInput(validator.dbContextFolderValidation())
                 .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
         }
-    }.apply(::configureValidation)
+    }
 
     private fun createTablesTab(): DialogPanel {
         return createToggleableTablePanel(tablesModel, "Scaffold all tables", model::scaffoldAllTables)
@@ -243,8 +229,8 @@ class ScaffoldDbContextDialogWrapper(
             row {
                 enabledCheckbox =
                     checkBox(checkboxText)
-                    .bindSelected(checkboxProperty)
-                    .component
+                        .bindSelected(checkboxProperty)
+                        .component
             }
 
             enabledCheckbox!!.selected.addListener {
@@ -259,17 +245,11 @@ class ScaffoldDbContextDialogWrapper(
                     .verticalAlign(VerticalAlign.FILL)
                     .enabledIf(enabledCheckbox!!.selected.not())
             }.resizableRow()
-        }.apply(::configureValidation)
+        }
     }
 
     //
     // Methods
-    private fun configureValidation(panel: DialogPanel) {
-        val disposable = Disposer.newDisposable()
-        panel.registerValidators(disposable)
-        Disposer.register(myDisposable, disposable)
-    }
-
     private fun currentMigrationsProjectFolderGetter(): String {
         val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
 

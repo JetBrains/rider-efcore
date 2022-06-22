@@ -4,6 +4,7 @@ pluginManagement {
         maven { url "https://cache-redirector.jetbrains.com/plugins.gradle.org" }
         maven { url "https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap" }
         maven { url "https://cache-redirector.jetbrains.com/myget.org.rd-snapshots.maven" }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     }
     resolutionStrategy {
         eachPlugin {

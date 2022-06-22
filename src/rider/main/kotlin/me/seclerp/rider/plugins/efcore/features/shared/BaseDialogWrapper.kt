@@ -92,7 +92,7 @@ abstract class BaseDialogWrapper(
 
     //
     // UI
-    private lateinit var panel: DialogPanel
+    protected lateinit var panel: DialogPanel
 
     //
     // Constructor
@@ -190,7 +190,8 @@ abstract class BaseDialogWrapper(
     override fun createLeftSideActions(): Array<Action> {
         val commandPreviewAction = object : AbstractAction("Preview") {
             override fun actionPerformed(e: ActionEvent?) {
-                panel.apply()
+                applyFields()
+                contentPanel
                 if (panel.validateAll().isEmpty()) {
                     val dialog = CommandPreviewDialogWrapper(generateCommand())
                     dialog.show()
