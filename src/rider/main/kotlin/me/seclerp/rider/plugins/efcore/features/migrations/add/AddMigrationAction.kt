@@ -9,9 +9,9 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 class AddMigrationAction : BaseCommandAction("Creating migration...", "New migration has been created") {
     override fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
     ): BaseDialogWrapper =
-        AddMigrationDialogWrapper(intellijProject, currentDotnetProjectName)
+        AddMigrationDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

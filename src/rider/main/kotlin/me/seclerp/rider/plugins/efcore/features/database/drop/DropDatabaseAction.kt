@@ -9,9 +9,9 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 class DropDatabaseAction : BaseCommandAction("Deleting database...", "Database has been deleted") {
     override fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
     ): BaseDialogWrapper =
-        DropDatabaseDialogWrapper(intellijProject, currentDotnetProjectName)
+        DropDatabaseDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

@@ -9,9 +9,9 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 class UpdateDatabaseAction : BaseCommandAction("Updating database...", "Database has been updated") {
     override fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
     ): BaseDialogWrapper =
-        UpdateDatabaseDialogWrapper(efCoreVersion, intellijProject, currentDotnetProjectName)
+        UpdateDatabaseDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

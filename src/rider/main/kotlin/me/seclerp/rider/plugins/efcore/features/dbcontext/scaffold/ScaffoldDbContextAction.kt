@@ -9,9 +9,9 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 class ScaffoldDbContextAction : BaseCommandAction("Scaffolding DbContext...", "DbContext has been scaffolded") {
     override fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
     ): BaseDialogWrapper =
-        ScaffoldDbContextDialogWrapper(efCoreVersion, intellijProject, currentDotnetProjectName)
+        ScaffoldDbContextDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

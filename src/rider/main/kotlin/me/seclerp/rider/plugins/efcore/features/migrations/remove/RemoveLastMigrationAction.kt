@@ -9,9 +9,9 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 class RemoveLastMigrationAction : BaseCommandAction("Removing migration...", "Last migration has been removed") {
     override fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
     ): BaseDialogWrapper =
-        RemoveLastMigrationDialogWrapper(intellijProject, currentDotnetProjectName)
+        RemoveLastMigrationDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

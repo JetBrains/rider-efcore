@@ -46,7 +46,7 @@ abstract class BaseCommandAction(
 
     abstract fun createDialog(
         intellijProject: Project,
-        efCoreVersion: DotnetEfVersion,
+        toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?): BaseDialogWrapper
 
