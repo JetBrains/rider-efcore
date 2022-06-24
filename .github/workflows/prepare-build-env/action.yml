@@ -9,16 +9,16 @@ runs:
     - name: 🧐 Validate Gradle wrapper
       uses: gradle/wrapper-validation-action@v1
 
-    - name: 🛠 Setup JDK 11
-      uses: actions/setup-java@v2
+    - name: 🛠 Setup JDK 17
+      uses: actions/setup-java@v3
       with:
-        java-version: 11
-        distribution: 'adopt'
+        java-version: '17'
+        distribution: 'corretto'
 
     - name: 🛠 Setup .NET SDK
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.100'
+        dotnet-version: '6.0.301'
 
     - name: 🏗 Generate RD protocol data
       uses: gradle/gradle-build-action@v2
