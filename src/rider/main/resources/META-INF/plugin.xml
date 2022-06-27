@@ -5,6 +5,7 @@
   <vendor url="https://github.com/seclerp">Andrew Rublyov</vendor>
   <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
+  <depends optional="true" config-file="with-fsharp.xml">com.jetbrains.rider.fsharp</depends>
 
   <description>
 <![CDATA[

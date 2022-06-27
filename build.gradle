@@ -99,7 +99,13 @@ intellij {
     downloadSources = false
     instrumentCode = false
     // TODO: add plugins
-    // plugins = ["uml", "com.jetbrains.ChooseRuntime:1.0.9"]
+    // HACK: -- Load F# plugin from custom repository (our local disk)
+    plugins = ["com.jetbrains.rider.fsharp"]
+    pluginsRepositories {
+        marketplace()
+        custom(new File("${buildDir}/dependencies").toURI().toURL().toString())
+    }
+    // /--
 
     patchPluginXml {
         changeNotes = changelog.get(PluginVersion).toHTML()
