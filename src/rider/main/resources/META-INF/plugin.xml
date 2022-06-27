@@ -50,6 +50,11 @@
               text="Remove Last Migration"
               description="Removes last created migration">
       </action>
+      <action id="EfCore.Features.Migrations.GenerateScriptAction"
+              class="me.seclerp.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"
+              text="Generate SQL Script"
+              description="Generates file with SQL script generated from a set of migrations">
+      </action>
       <separator />
       <action id="EfCore.Features.Database.UpdateDatabaseAction"
               class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"

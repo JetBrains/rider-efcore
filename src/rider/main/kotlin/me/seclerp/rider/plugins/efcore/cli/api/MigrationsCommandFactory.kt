@@ -3,6 +3,7 @@ package me.seclerp.rider.plugins.efcore.cli.api
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.projectView.solutionDirectoryPath
+import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
@@ -19,5 +20,17 @@ class MigrationsCommandFactory(intellijProject: Project) : BaseCommandFactory(in
     fun removeLast(options: CommonOptions): CliCommand =
         createCommand(KnownEfCommands.Migrations.remove, options) {
             add("--force")
+        }
+
+    fun generateScript(efCoreVersion: DotnetEfVersion, options: CommonOptions, fromMigration: String, toMigration: String?,
+                       outputFile: String, idempotent: Boolean, noTransactions: Boolean): CliCommand =
+        createCommand(KnownEfCommands.Migrations.remove, options) {
+            add(fromMigration)
+            addNullable(toMigration)
+            addNamed("--output", outputFile)
+            addIf("--idempotent", idempotent)
+            if (efCoreVersion.major >= 5) {
+                addIf("--no-transactions", noTransactions)
+            }
         }
 }

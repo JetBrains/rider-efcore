@@ -30,6 +30,13 @@ class CliCommandBuilder(private val solutionDirectory: String, baseCommand: Stri
         return this
     }
 
+    fun addNullable(value: String?): CliCommandBuilder {
+        if (value != null)
+            generalCommandLine = generalCommandLine.withParameters(value)
+
+        return this
+    }
+
     fun addIf(key: String, condition: Boolean): CliCommandBuilder {
         if (condition)
             generalCommandLine = generalCommandLine.withParameters(key)
