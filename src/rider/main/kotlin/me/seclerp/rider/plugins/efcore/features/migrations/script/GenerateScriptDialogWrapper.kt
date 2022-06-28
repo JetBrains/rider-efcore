@@ -17,7 +17,9 @@ import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
+import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
+import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import me.seclerp.rider.plugins.efcore.ui.textFieldWithCompletion
 import kotlin.reflect.KMutableProperty0
@@ -37,12 +39,12 @@ class GenerateScriptDialogWrapper(
     //
     // Internal data
     private var availableMigrationsList = listOf<MigrationInfo>()
-    private val currentDbContextMigrationsList = mutableListOf<String>()
-    private lateinit var targetMigrationTextField: TextFieldWithCompletion
+    private lateinit var fromMigrationTextField: TextFieldWithCompletion
+    private lateinit var toMigrationTextField: TextFieldWithCompletion
 
     //
     // Validation
-    private val validator = GenerateScriptValidator(currentDbContextMigrationsList)
+    private val validator = GenerateScriptValidator()
 
     //
     // Constructor
@@ -74,14 +76,7 @@ class GenerateScriptDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options") {
             if (efCoreVersion.major >= 5) {
-                var useDefaultConnectionCheckbox: JBCheckBox? = null
                 row {
-                    useDefaultConnectionCheckbox =
-                        checkBox("Use default connection of startup project")
-                            .bindSelected(model::useDefaultConnection)
-                            .component
-                }
-                row("Connection:") {
                     textField()
                         .bindText(model::connection)
                         .validationOnInput(validator.connectionValidation())
@@ -94,9 +89,8 @@ class GenerateScriptDialogWrapper(
 
     private fun Panel.createMigrationsRow() {
         row("From migration:") {
-            createMigrationField()
+            iconComboBox(availableMigrationsList, { commonOptions.migrationsProject }, ::migrationsProjectSetter)
                 .horizontalAlign(HorizontalAlign.FILL)
-                .comment("Use '0' as a target migration to undo all applied migrations")
                 .focused()
                 .validationOnInput(validator.targetMigrationValidation())
                 .validationOnApply(validator.targetMigrationValidation())
@@ -106,7 +100,7 @@ class GenerateScriptDialogWrapper(
     private fun Row.createMigrationField(migrationProperty: KMutableProperty0<String>): Cell<TextFieldWithCompletion> =
         textFieldWithCompletion(migrationProperty, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
             .applyToComponent {
-                targetMigrationTextField = this
+                fromMigrationTextField = this
             }
 
     //
@@ -143,7 +137,7 @@ class GenerateScriptDialogWrapper(
 
         currentDbContextMigrationsList.add("0")
 
-        targetMigrationTextField.text = model.targetMigration
+        fromMigrationTextField.text = model.targetMigration
     }
 
     private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
