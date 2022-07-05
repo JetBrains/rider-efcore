@@ -2,11 +2,9 @@ package me.seclerp.rider.plugins.efcore.features.migrations.script
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBCheckBox
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.ui.layout.not
-import com.intellij.ui.layout.selected
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
@@ -15,14 +13,11 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
-import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
-import me.seclerp.rider.plugins.efcore.ui.iconComboBox
+import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import me.seclerp.rider.plugins.efcore.ui.textFieldWithCompletion
-import kotlin.reflect.KMutableProperty0
+import javax.swing.DefaultComboBoxModel
 
 class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,
@@ -34,13 +29,12 @@ class GenerateScriptDialogWrapper(
 
     //
     // Data binding
-    private val model = GenerateScriptModel("", "", "script.sql", false, false)
+    private val model = GenerateScriptModel(null, null, "script.sql", false, false)
 
     //
     // Internal data
-    private var availableMigrationsList = listOf<MigrationInfo>()
-    private lateinit var fromMigrationTextField: TextFieldWithCompletion
-    private lateinit var toMigrationTextField: TextFieldWithCompletion
+    private var fromMigrationsModel: DefaultComboBoxModel<MigrationItem> = DefaultComboBoxModel()
+    private var toMigrationsModel: DefaultComboBoxModel<MigrationItem> = DefaultComboBoxModel()
 
     //
     // Validation
@@ -57,8 +51,8 @@ class GenerateScriptDialogWrapper(
 
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
-        val fromMigration = model.fromMigration.trim()
-        val toMigration = model.toMigration?.trim()
+        val fromMigration = model.fromMigration!!.data.trim()
+        val toMigration = model.toMigration?.data?.trim()
         val outputFile = model.outputFilePath
         val idempotent = model.idempotent
         val noTransactions = model.noTransactions
@@ -70,38 +64,45 @@ class GenerateScriptDialogWrapper(
     //
     // UI
     override fun Panel.createPrimaryOptions() {
-        createMigrationsRow()
+        createMigrationRows()
     }
 
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options") {
+            row("Output file") {
+                textField()
+                    .bindText(model::outputFilePath)
+                    .validationOnApply(validator.outputFileValidation())
+                    .validationOnInput(validator.outputFileValidation())
+            }
+            row {
+                checkBox("Make script idempotent")
+                    .bindSelected(model::idempotent)
+            }
             if (efCoreVersion.major >= 5) {
                 row {
-                    textField()
-                        .bindText(model::connection)
-                        .validationOnInput(validator.connectionValidation())
-                        .validationOnApply(validator.connectionValidation())
-                        .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
+                    checkBox("No transactions")
+                        .bindSelected(model::noTransactions)
                 }
             }
         }
     }
 
-    private fun Panel.createMigrationsRow() {
+    private fun Panel.createMigrationRows() {
         row("From migration:") {
-            iconComboBox(availableMigrationsList, { commonOptions.migrationsProject }, ::migrationsProjectSetter)
+            iconComboBox(fromMigrationsModel, model::fromMigration)
+                .validationOnApply(validator.fromMigrationValidation())
+                .validationOnInput(validator.fromMigrationValidation())
                 .horizontalAlign(HorizontalAlign.FILL)
                 .focused()
-                .validationOnInput(validator.targetMigrationValidation())
-                .validationOnApply(validator.targetMigrationValidation())
+        }
+
+        row("To migration:") {
+            iconComboBox(toMigrationsModel, model::toMigration)
+                .horizontalAlign(HorizontalAlign.FILL)
+                .focused()
         }
     }
-
-    private fun Row.createMigrationField(migrationProperty: KMutableProperty0<String>): Cell<TextFieldWithCompletion> =
-        textFieldWithCompletion(migrationProperty, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
-            .applyToComponent {
-                fromMigrationTextField = this
-            }
 
     //
     // Event listeners
@@ -114,7 +115,8 @@ class GenerateScriptDialogWrapper(
     }
 
     private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
-        currentDbContextMigrationsList.clear()
+        fromMigrationsModel.removeAllElements()
+        toMigrationsModel.removeAllElements()
 
         if (dbContext == null) {
             return
@@ -125,35 +127,29 @@ class GenerateScriptDialogWrapper(
         val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
 
         val availableDbContextMigrations = loadMigrationsByContextName(migrationsIdentity)
-            .map { it.migrationLongName }
+            .map { MigrationItem(it.migrationLongName) }
 
-        if (availableDbContextMigrations.isEmpty()) {
-            model.targetMigration = ""
-        } else {
-            val lastMigration = availableDbContextMigrations.first()
-            model.targetMigration = lastMigration
-            currentDbContextMigrationsList.addAll(0, availableDbContextMigrations)
+        fromMigrationsModel.addAll(0, availableDbContextMigrations)
+        toMigrationsModel.addAll(0, availableDbContextMigrations)
+
+        fromMigrationsModel.selectedItem = null
+        if (availableDbContextMigrations.size > 0) {
+            fromMigrationsModel.selectedItem = fromMigrationsModel.getElementAt(availableDbContextMigrations.size - 1)
         }
-
-        currentDbContextMigrationsList.add("0")
-
-        fromMigrationTextField.text = model.targetMigration
+        toMigrationsModel.selectedItem = toMigrationsModel.getElementAt(0)
     }
 
     private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
         if (migrationsIdentity.dbContextClassFullName.isEmpty()) {
-            availableMigrationsList = listOf()
-            return availableMigrationsList
+            return listOf()
         }
 
-        availableMigrationsList = beModel.getAvailableMigrations
+        return beModel.getAvailableMigrations
             .runUnderProgress(
                 migrationsIdentity, intellijProject, "Loading migrations...",
                 isCancelable = true,
                 throwFault = true
             )?.sortedByDescending { it.migrationLongName } ?: listOf()
-
-        return availableMigrationsList
     }
 
     companion object {

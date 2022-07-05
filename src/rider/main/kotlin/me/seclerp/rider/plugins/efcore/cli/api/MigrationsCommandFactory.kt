@@ -24,7 +24,7 @@ class MigrationsCommandFactory(intellijProject: Project) : BaseCommandFactory(in
 
     fun generateScript(efCoreVersion: DotnetEfVersion, options: CommonOptions, fromMigration: String, toMigration: String?,
                        outputFile: String, idempotent: Boolean, noTransactions: Boolean): CliCommand =
-        createCommand(KnownEfCommands.Migrations.remove, options) {
+        createCommand(KnownEfCommands.Migrations.script, options) {
             add(fromMigration)
             addNullable(toMigration)
             addNamed("--output", outputFile)
