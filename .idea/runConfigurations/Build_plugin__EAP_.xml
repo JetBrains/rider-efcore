@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-PRiderSdkVersion=2022.2.0-eap06 -PProductVersion=2022.2-EAP6-SNAPSHOT" />
+      <option name="scriptParameters" value="-PRiderSdkVersion=2022.2.0-eap08 -PProductVersion=2022.2-EAP8-SNAPSHOT" />
       <option name="taskDescriptions">
         <list />
       </option>
