@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Core;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.DotNetTools;
@@ -26,6 +27,7 @@ namespace Rider.Plugins.EfCore
     {
         private readonly Lifetime _lifetime;
         private readonly ISolution _solution;
+        private readonly ILogger _logger;
 
         private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
         private readonly RiderEfCoreModel _efCoreModel;
@@ -37,11 +39,13 @@ namespace Rider.Plugins.EfCore
             ISolution solution,
             NuGetDotnetToolsTracker dotnetToolsTracker,
             SolutionStructureChangedListener solutionStructureChangedListener,
+            NugetDependenciesListener nuGetPackageReferenceTracker,
             ISolutionLoadTasksScheduler solutionLoadTasksScheduler,
             ILogger logger)
         {
             _lifetime = lifetime;
             _solution = solution;
+            _logger = logger;
 
             _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
 
@@ -57,6 +61,8 @@ namespace Rider.Plugins.EfCore
                 var cache = args.New;
                 InvalidateEfToolsDefinition(cache);
             });
+
+            nuGetPackageReferenceTracker.ProjectsUpdated += InvalidateStartupProjects;
 
             solutionLoadTasksScheduler.EnqueueTask(
                 new SolutionLoadTask(
@@ -94,7 +100,7 @@ namespace Rider.Plugins.EfCore
             var allLocalTools = cache.ToolLocalCache.GetAllLocalTools();
             if (allLocalTools is null) return;
 
-            var dotnetEfLocalTool = allLocalTools.FirstOrDefault(tool => tool.PackageId == "dotnet-ef");
+            var dotnetEfLocalTool = allLocalTools.FirstOrDefault(tool => tool.PackageId == KnownDotnetTools.EfCoreTools);
 
             var toolKind = ToolKind.None;
             var version = string.Empty;
@@ -105,7 +111,7 @@ namespace Rider.Plugins.EfCore
             }
             else
             {
-                var dotnetEfGlobalTool = cache.ToolGlobalCache.GetGlobalTool("dotnet-ef");
+                var dotnetEfGlobalTool = cache.ToolGlobalCache.GetGlobalTool(KnownDotnetTools.EfCoreTools);
                 if (dotnetEfGlobalTool is { Count: 1 })
                 {
                     toolKind = ToolKind.Global;
@@ -127,7 +133,7 @@ namespace Rider.Plugins.EfCore
             using var cookie = ReadLockCookie.Create();
 
             var allProjectNames = _solution
-                .GetSupportedStartupProjects()
+                .GetSupportedStartupProjects(_logger)
                 .Select(project => new StartupProjectInfo(
                     project.Guid,
                     project.Name,
@@ -140,6 +146,9 @@ namespace Rider.Plugins.EfCore
                 .ToList();
 
             _efCoreModel.AvailableStartupProjects.Value = allProjectNames;
+
+            _logger.Log(LoggingLevel.WARN, "[EF Core]: Startup projects invalidated:" +
+                                           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableStartupProjects.Value.Select(project => project.Name))}");
         }
 
         private void InvalidateMigrationsProjects()
@@ -156,6 +165,9 @@ namespace Rider.Plugins.EfCore
                 .ToList();
 
             _efCoreModel.AvailableMigrationProjects.Value = allProjectNames;
+
+            _logger.Log(LoggingLevel.WARN, "[EF Core]: Migration projects invalidated:" +
+                                           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableMigrationProjects.Value.Select(project => project.Name))}");
         }
 
         //

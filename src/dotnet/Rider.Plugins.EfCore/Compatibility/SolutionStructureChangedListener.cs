@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace Rider.Plugins.EfCore.Compatibility
 {
-    [SolutionInstanceComponent]
+    [SolutionComponent]
     public class SolutionStructureChangedListener : SolutionHostSyncListener
     {
         private readonly ILogger _logger;
@@ -20,28 +20,28 @@ namespace Rider.Plugins.EfCore.Compatibility
 
         public override void AfterUpdateProject(ProjectHostChange change)
         {
-            _logger.Log(LoggingLevel.TRACE, "SolutionStructureChangedListener.AfterUpdateProject");
+            _logger.Log(LoggingLevel.WARN, "SolutionStructureChangedListener.AfterUpdateProject");
 
             SolutionChanged?.Invoke();
         }
 
         public override void AfterUpdateProjects(ProjectStructureChange change)
         {
-            _logger.Log(LoggingLevel.TRACE, "SolutionStructureChangedListener.AfterUpdateProjects");
+            _logger.Log(LoggingLevel.WARN, "SolutionStructureChangedListener.AfterUpdateProjects");
 
             SolutionChanged?.Invoke();
         }
 
         public override void AfterUpdateSolution(SolutionStructureChange change)
         {
-            _logger.Log(LoggingLevel.TRACE, "SolutionStructureChangedListener.AfterUpdateSolution");
+            _logger.Log(LoggingLevel.WARN, "SolutionStructureChangedListener.AfterUpdateSolution");
 
             SolutionChanged?.Invoke();
         }
 
         public override void AfterRemoveProject(ProjectHostChange change)
         {
-            _logger.Log(LoggingLevel.TRACE, "SolutionStructureChangedListener.AfterRemoveProject");
+            _logger.Log(LoggingLevel.WARN, "SolutionStructureChangedListener.AfterRemoveProject");
 
             SolutionChanged?.Invoke();
         }

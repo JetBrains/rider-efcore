@@ -10,7 +10,6 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import com.intellij.ui.RelativeFont
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.dsl.builder.*
@@ -19,7 +18,6 @@ import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rdclient.util.idea.toIOFile
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
-import java.awt.Font
 import java.awt.event.ItemEvent
 import java.io.File
 import javax.swing.DefaultComboBoxModel

@@ -2,10 +2,8 @@ package me.seclerp.rider.plugins.efcore.features.migrations.script
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
@@ -150,9 +148,5 @@ class GenerateScriptDialogWrapper(
                 isCancelable = true,
                 throwFault = true
             )?.sortedByDescending { it.migrationLongName } ?: listOf()
-    }
-
-    companion object {
-        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
     }
 }

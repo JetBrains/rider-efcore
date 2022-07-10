@@ -1,6 +1,5 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.script
 
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 
 data class GenerateScriptModel(
