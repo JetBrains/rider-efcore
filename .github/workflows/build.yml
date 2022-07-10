@@ -1,9 +1,9 @@
-name: Build (EAP)
+name: Build (Stable)
 on:
   push:
-    branches: [ develop ]
+    branches: [ release/* ]
   pull_request:
-    branches: [ develop ]
+    branches: [ release/* ]
   workflow_dispatch:
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: 🛠 Prepare Build Environment
         uses: ./.github/workflows/prepare-build-env
 
-      - name: 🏗 Build Plugin for EAP
+      - name: 🏗 Build Plugin (Stable)
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: buildPlugin -PRiderSdkVersion=2022.2.0-eap08 -PProductVersion=2022.2-EAP8-SNAPSHOT
+          arguments: buildPlugin

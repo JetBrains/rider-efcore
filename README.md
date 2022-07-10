@@ -110,12 +110,11 @@ It's better to create an issue with description of your bug/feature before creat
 
 #### About branching
 
-This project uses modified version of **trunk-based git strategy**.
+This project uses customized git strategy.
 
-- `develop` branch play main development branch role. When creating any feature or bugfix, please make your branch from `develop`.
+Each `release/*` branch plays main development branch role for specific release.
 
-- `master` branch stands for stable releases. `develop` branch will be merged into it before every release.
-- `eap` branch stands for EAP release. `develop` branch will be also merged into it before every release (if EAP build of Rider is available to use)
+For example, `release/222` means that branch is related to `222.*` release cycle for `2022.2` Rider version.
 
 ### See also
 
