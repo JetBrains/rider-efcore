@@ -1,4 +1,4 @@
-name: Deploy (Stable)
+name: Deploy
 on:
   workflow_dispatch:
 

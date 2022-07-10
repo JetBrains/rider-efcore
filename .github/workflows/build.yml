@@ -1,4 +1,4 @@
-name: Build (Stable)
+name: Build
 on:
   push:
     branches: [ release/* ]
