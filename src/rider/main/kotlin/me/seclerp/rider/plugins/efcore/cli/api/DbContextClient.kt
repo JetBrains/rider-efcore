@@ -11,7 +11,7 @@ class DbContextClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient
     fun scaffold(efCoreVersion: DotnetEfVersion, options: CommonOptions, connection: String, provider: String,
                  outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
                  usePluralizer: Boolean, dbContextName: String, dbContextFolder: String, scaffoldAllTables: Boolean,
-                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommandResult {
+                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>, forceOverride: Boolean): CliCommandResult {
         val command = createCommand(KnownEfCommands.DbContext.scaffold, options) {
             add(connection)
             add(provider)
@@ -19,7 +19,7 @@ class DbContextClient : me.seclerp.rider.plugins.efcore.cli.api.BaseEfCoreClient
             addIf("--data-annotations", useAttributes)
             addNamed("--context", dbContextName)
             addNamed("--context-dir", dbContextFolder)
-            //addIf("--force", force)
+            addIf("--force", forceOverride)
             addNamed("--output-dir", outputFolder)
 
             if (!scaffoldAllSchemas) {

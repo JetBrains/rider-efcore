@@ -34,7 +34,8 @@ class ScaffoldDbContextAction : EfCoreAction() {
                     model.scaffoldAllTables,
                     model.tablesList.map { it.data },
                     model.scaffoldAllSchemas,
-                    model.schemasList.map { it.data })
+                    model.schemasList.map { it.data },
+                    model.overrideExisting)
             }
         }
     }

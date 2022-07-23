@@ -19,5 +19,7 @@ data class ScaffoldDbContextModel(
     val schemasList: MutableList<SimpleItem>,
 
     var scaffoldAllTables: Boolean,
-    var scaffoldAllSchemas: Boolean
+    var scaffoldAllSchemas: Boolean,
+
+    var overrideExisting: Boolean
 )
