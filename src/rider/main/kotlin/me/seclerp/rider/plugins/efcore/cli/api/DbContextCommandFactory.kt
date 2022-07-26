@@ -13,7 +13,7 @@ class DbContextCommandFactory(intellijProject: Project) : BaseCommandFactory(int
     fun scaffold(efCoreVersion: DotnetEfVersion, options: CommonOptions, connection: String, provider: String,
                  outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
                  usePluralizer: Boolean, dbContextName: String, dbContextFolder: String, scaffoldAllTables: Boolean,
-                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommand =
+                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>, forceOverride: Boolean): CliCommand =
         createCommand(KnownEfCommands.DbContext.scaffold, options) {
             add(connection)
             add(provider)
@@ -21,7 +21,7 @@ class DbContextCommandFactory(intellijProject: Project) : BaseCommandFactory(int
             addIf("--data-annotations", useAttributes)
             addNamed("--context", dbContextName)
             addNamed("--context-dir", dbContextFolder)
-            //addIf("--force", force)
+            addIf("--force", forceOverride)
             addNamed("--output-dir", outputFolder)
 
             if (!scaffoldAllSchemas) {

@@ -20,6 +20,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
+import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import java.io.File
 import javax.swing.JComponent
 import kotlin.reflect.KMutableProperty0
@@ -46,10 +47,11 @@ class ScaffoldDbContextDialogWrapper(
         usePluralizer = true,
         dbContextName = "MyDbContext",
         dbContextFolder = "Context",
+        overrideExisting = false,
         tablesList = mutableListOf(),
         schemasList = mutableListOf(),
         scaffoldAllTables = true,
-        scaffoldAllSchemas = true,
+        scaffoldAllSchemas = true
     )
 
     //
@@ -67,8 +69,23 @@ class ScaffoldDbContextDialogWrapper(
     private val validator = ScaffoldDbContextValidator()
 
     //
+    // ProjectsManager
+    private val preferredProjectsManager = PreferredProjectsManager(intellijProject)
+
+    //
     // Constructor
     init {
+        model.connection = preferredProjectsManager.getScaffoldString(CONNECTION_STRING)
+        model.provider = preferredProjectsManager.getScaffoldString(CONTEXT_PROVIDER)
+        model.outputFolder = preferredProjectsManager.getScaffoldString(OUTPUT_FOLDER)
+        model.useAttributes = preferredProjectsManager.getScaffoldBoolean(USE_ATTRIBUTES)
+        model.useDatabaseNames = preferredProjectsManager.getScaffoldBoolean(USE_DATABASE_NAMES)
+        model.generateOnConfiguring = preferredProjectsManager.getScaffoldBoolean(GENERATE_ON_CONFIGURING)
+        model.usePluralizer = preferredProjectsManager.getScaffoldBoolean(USE_PLURALIZER)
+        model.dbContextName = preferredProjectsManager.getScaffoldString(CONTEXT_NAME)
+        model.dbContextFolder = preferredProjectsManager.getScaffoldString(CONTEXT_FOLDER)
+        model.overrideExisting = preferredProjectsManager.getScaffoldBoolean(FORCE_FILE_OVERRIDE)
+
         init()
     }
 
@@ -89,7 +106,8 @@ class ScaffoldDbContextDialogWrapper(
             model.scaffoldAllTables,
             model.tablesList.map { it.data },
             model.scaffoldAllSchemas,
-            model.schemasList.map { it.data })
+            model.schemasList.map { it.data },
+            model.overrideExisting)
     }
 
     //
@@ -123,6 +141,26 @@ class ScaffoldDbContextDialogWrapper(
     }
 
     private fun createMainTab(): DialogPanel = createMainUI()
+
+    override fun doOKAction() {
+        // Main Tab
+        preferredProjectsManager.setScaffoldString(CONNECTION_STRING, model::connection.get())
+        preferredProjectsManager.setScaffoldString(CONTEXT_PROVIDER, model::provider.get())
+
+        // Additional Options
+        preferredProjectsManager.setScaffoldString(OUTPUT_FOLDER, model::outputFolder.get())
+        preferredProjectsManager.setScaffoldBoolean(USE_ATTRIBUTES, model::useAttributes.get())
+        preferredProjectsManager.setScaffoldBoolean(USE_DATABASE_NAMES, model::useDatabaseNames.get())
+        preferredProjectsManager.setScaffoldBoolean(GENERATE_ON_CONFIGURING, model::generateOnConfiguring.get())
+        preferredProjectsManager.setScaffoldBoolean(USE_PLURALIZER, model::usePluralizer.get())
+        preferredProjectsManager.setScaffoldBoolean(FORCE_FILE_OVERRIDE, model::overrideExisting.get())
+
+        // DbContext Tab
+        preferredProjectsManager.setScaffoldString(CONTEXT_NAME, model::dbContextName.get())
+        preferredProjectsManager.setScaffoldString(CONTEXT_FOLDER, model::dbContextFolder.get())
+
+        super.doOKAction()
+    }
 
     override fun Panel.createPrimaryOptions() {
         row("Connection:") {
@@ -174,6 +212,11 @@ class ScaffoldDbContextDialogWrapper(
                     checkBox("Use the pluralizer")
                         .bindSelected(model::usePluralizer)
                 }
+            }
+
+            row {
+                checkBox("Override existing files")
+                    .bindSelected(model::overrideExisting)
             }
         }
     }
@@ -254,5 +297,18 @@ class ScaffoldDbContextDialogWrapper(
         val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
 
         return File(currentMigrationsProject).parentFile.path
+    }
+
+    companion object{
+        const val CONNECTION_STRING = "connectionString"
+        const val CONTEXT_PROVIDER = "contextProvider"
+        const val OUTPUT_FOLDER = "outputFolder"
+        const val CONTEXT_NAME = "contextName"
+        const val CONTEXT_FOLDER = "contextFolder"
+        const val USE_ATTRIBUTES = "attributes"
+        const val USE_DATABASE_NAMES = "databaseNames"
+        const val GENERATE_ON_CONFIGURING = "generateOnConfiguring"
+        const val USE_PLURALIZER = "pluralizer"
+        const val FORCE_FILE_OVERRIDE = "override"
     }
 }
