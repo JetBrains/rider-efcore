@@ -17,11 +17,6 @@ jobs:
         run: |
           echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=PluginVersion: ).*')" >> $GITHUB_ENV
 
-#       - name: 🚀 Publish Plugin
-#         uses: gradle/gradle-build-action@v2
-#         with:
-#           arguments: buildPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
-
       - name: 🏗 Build Plugin for 2022.1
         uses: gradle/gradle-build-action@v2
         with:
@@ -35,3 +30,8 @@ jobs:
           draft: true
           artifacts: "output/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀 Publish Plugin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
