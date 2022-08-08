@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Core;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
+using JetBrains.Platform.RdFramework.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.DotNetTools;
 using JetBrains.ProjectModel.Tasks;
@@ -27,6 +28,7 @@ namespace Rider.Plugins.EfCore
     {
         private readonly Lifetime _lifetime;
         private readonly ISolution _solution;
+        private readonly ShellRdDispatcher _shellRdDispatcher;
         private readonly ILogger _logger;
 
         private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
@@ -41,10 +43,12 @@ namespace Rider.Plugins.EfCore
             SolutionStructureChangedListener solutionStructureChangedListener,
             NugetDependenciesListener nuGetPackageReferenceTracker,
             ISolutionLoadTasksScheduler solutionLoadTasksScheduler,
+            ShellRdDispatcher shellRdDispatcher,
             ILogger logger)
         {
             _lifetime = lifetime;
             _solution = solution;
+            _shellRdDispatcher = shellRdDispatcher;
             _logger = logger;
 
             _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
@@ -62,7 +66,7 @@ namespace Rider.Plugins.EfCore
                 InvalidateEfToolsDefinition(cache);
             });
 
-            nuGetPackageReferenceTracker.ProjectsUpdated += InvalidateStartupProjects;
+            nuGetPackageReferenceTracker.ProjectsUpdated += InvalidateProjects;
 
             solutionLoadTasksScheduler.EnqueueTask(
                 new SolutionLoadTask(
@@ -145,10 +149,12 @@ namespace Rider.Plugins.EfCore
                     project.GetDefaultNamespace() ?? string.Empty))
                 .ToList();
 
-            _efCoreModel.AvailableStartupProjects.Value = allProjectNames;
-
-            _logger.Log(LoggingLevel.WARN, "[EF Core]: Startup projects invalidated:" +
-                                           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableStartupProjects.Value.Select(project => project.Name))}");
+            _shellRdDispatcher.Queue(() =>
+            {
+                _efCoreModel.AvailableStartupProjects.Value = allProjectNames;
+                _logger.Log(LoggingLevel.WARN, "[EF Core]: Startup projects invalidated:" +
+                                               $"\n\t{string.Join("\n\t", _efCoreModel.AvailableStartupProjects.Value.Select(project => project.Name))}");
+            });
         }
 
         private void InvalidateMigrationsProjects()
@@ -164,10 +170,12 @@ namespace Rider.Plugins.EfCore
                     project.GetDefaultNamespace() ?? string.Empty))
                 .ToList();
 
-            _efCoreModel.AvailableMigrationProjects.Value = allProjectNames;
-
-            _logger.Log(LoggingLevel.WARN, "[EF Core]: Migration projects invalidated:" +
-                                           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableMigrationProjects.Value.Select(project => project.Name))}");
+            _shellRdDispatcher.Queue(() =>
+            {
+                _efCoreModel.AvailableMigrationProjects.Value = allProjectNames;
+                _logger.Log(LoggingLevel.WARN, "[EF Core]: Migration projects invalidated:" +
+                                               $"\n\t{string.Join("\n\t", _efCoreModel.AvailableMigrationProjects.Value.Select(project => project.Name))}");
+            });
         }
 
         //
