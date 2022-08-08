@@ -9,7 +9,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 
 @Service
-class MigrationsCommandFactory(intellijProject: Project) : BaseCommandFactory(intellijProject.solutionDirectoryPath.toString()) {
+class MigrationsCommandFactory(intellijProject: Project) : BaseToolsCommandFactory(intellijProject.solutionDirectoryPath.toString()) {
     fun add(options: CommonOptions, migrationName: String, outputDirectory: String? = null, namespace: String? = null): CliCommand =
         createCommand(KnownEfCommands.Migrations.add, options) {
             add(migrationName)

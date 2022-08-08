@@ -4,7 +4,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandBuilder
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 
-abstract class BaseCommandFactory(private val workingDirectory: String) {
+abstract class BaseToolsCommandFactory(private val workingDirectory: String) {
     protected fun createCommand(command: String, commonOptions: CommonOptions): CliCommand {
         return createCommand(command, commonOptions) { }
     }

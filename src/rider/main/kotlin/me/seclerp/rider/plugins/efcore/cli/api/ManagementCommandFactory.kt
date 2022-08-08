@@ -8,13 +8,16 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import java.nio.charset.Charset
 
 @Service
-class ManagementCommandFactory(intellijProject: Project) : BaseCommandFactory(intellijProject.solutionDirectoryPath.toString()) {
-    fun installEfCoreTools(): CliCommand {
+class ManagementCommandFactory(private val intellijProject: Project) {
+    fun installEfCoreTools(): CliCommand =
+        createManagementCommand("dotnet", "tool", "install", "--global", "dotnet-ef")
+
+    private fun createManagementCommand(vararg command: String): CliCommand {
         val generalCommandLine =
-            GeneralCommandLine("dotnet", "tool", "install", "--global", "dotnet-ef")
+            GeneralCommandLine(*command)
+                .withWorkDirectory(intellijProject.solutionDirectoryPath.toString())
                 .withCharset(Charset.forName("UTF-8"))
 
-        val command = CliCommand(generalCommandLine)
-        return command
+        return CliCommand(generalCommandLine)
     }
 }
