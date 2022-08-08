@@ -1,3 +1,11 @@
+<h2>222.1.0</h2>
+<p>
+  <ul>
+    <li>General: add support for .NET Standard 2.0 projects (Migrations projects only) (#101 by @Sander0542)</li>
+    <li>Fix: exception when trying to install EF Core tools from plugin (#103)</li>
+    <li>Fix: data inconsistency in projects dropdowns after changing solution structure</li>
+  </ul>
+</p>
 <h2>222.0.0</h2>
 <p>
   <ul>
