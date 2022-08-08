@@ -68,6 +68,7 @@ More about features and available dialogs you could read in [**the blog post**](
   - `net6.0`
   - `net5.0`
   - `netcoreapp3.1`
+  - `netstandard2.0` (only for Migrations projects)
   - `netstandard2.1` (only for Migrations projects)
 
 
