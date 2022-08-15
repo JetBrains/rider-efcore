@@ -60,9 +60,8 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2022.1+**
+- JetBrains Rider **2022.2+**
 
-  or JetBrains Rider **2022.2 EAP**
 - EF Core **5.0+** with projects under such target frameworks:
   - `net7.0` (preview)
   - `net6.0`
@@ -70,7 +69,6 @@ More about features and available dialogs you could read in [**the blog post**](
   - `netcoreapp3.1`
   - `netstandard2.1` (only for Migrations projects)
   - `netstandard2.0` (only for Migrations projects)
-
 
 - EF Core global tools (`dotnet ef`) **5.0+** installed
 
