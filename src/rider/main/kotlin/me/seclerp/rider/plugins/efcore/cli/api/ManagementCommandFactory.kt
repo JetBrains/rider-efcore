@@ -10,7 +10,12 @@ import java.nio.charset.Charset
 @Service
 class ManagementCommandFactory(private val intellijProject: Project) {
     fun installEfCoreTools(): CliCommand =
-        createManagementCommand("dotnet", "tool", "install", "--global", "dotnet-ef")
+        createManagementCommand(
+            "dotnet", "tool", "install",
+            "--ignore-failed-sources",
+            "--add-source", "https://api.nuget.org/v3/index.json",
+            "--global",
+            "dotnet-ef")
 
     private fun createManagementCommand(vararg command: String): CliCommand {
         val generalCommandLine =
