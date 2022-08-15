@@ -1,3 +1,11 @@
+<h2>222.1.1</h2>
+<p>
+  <ul>
+    <li>Fix: project structure synchronization issues</li>
+    <li>Fix: SQL script generation dialog is missing '0' case for "From migration" dropdown</li>
+    <li>Fix: `dotnet tool install` command failure on unauthorized feeds</li>
+  </ul>
+</p>
 <h2>222.1.0</h2>
 <p>
   <ul>
