@@ -20,6 +20,7 @@ namespace Rider.Plugins.EfCore.DbContext
         var foundDbContexts = project
           .GetPsiModules()
           .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
+          .Where(dbContextClass => !dbContextClass.IsAbstract)
           .Distinct(dbContextClass =>
             dbContextClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
           .Select(dbContextClass =>
