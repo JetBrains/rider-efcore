@@ -15,7 +15,7 @@ class DatabaseCommandFactory(intellijProject: Project) : BaseToolsCommandFactory
             add(targetMigration)
 
             if (efCoreVersion.major >= 5 && connectionString != null) {
-                addNamed("--connection", "\"${connectionString}\"")
+                addNamed("--connection", connectionString)
             }
         }
 
