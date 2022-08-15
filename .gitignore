@@ -13,10 +13,8 @@ output
 *.cache
 
 # IDEs
-**/.idea/*.iml
-**/.idea/*.xml
-**/.idea/.idea.*/*.iml
-**/.idea/.idea.*/.idea/*.xml
+**/.idea/
+!**/.idea/runConfigurations/
 .vs
 _ReSharper*
 _dotTrace*
