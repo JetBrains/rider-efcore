@@ -11,13 +11,19 @@ using NUnit.Framework;
 
 namespace Rider.Plugins.EfCore.Tests
 {
+  [ZoneDefinition]
+  public class RiderEfCoreTestEnvironmentZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>, IRequire<IRiderEfCoreZone>
+  {
+  }
 
-    [ZoneDefinition]
-    public class RiderEfCoreTestEnvironmentZone : ITestsEnvZone, IRequire<PsiFeatureTestZone>, IRequire<IRiderEfCoreZone> { }
+  [ZoneMarker]
+  public class ZoneMarker : IRequire<ICodeEditingZone>, IRequire<ILanguageCSharpZone>,
+    IRequire<RiderEfCoreTestEnvironmentZone>
+  {
+  }
 
-    [ZoneMarker]
-    public class ZoneMarker : IRequire<ICodeEditingZone>, IRequire<ILanguageCSharpZone>, IRequire<RiderEfCoreTestEnvironmentZone> { }
-    
-    [SetUpFixture]
-    public class RiderEfCoreTestsAssembly : ExtensionTestEnvironmentAssembly<RiderEfCoreTestEnvironmentZone> { }
+  [SetUpFixture]
+  public class RiderEfCoreTestsAssembly : ExtensionTestEnvironmentAssembly<RiderEfCoreTestEnvironmentZone>
+  {
+  }
 }

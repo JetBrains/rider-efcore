@@ -4,8 +4,9 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;
 using JetBrains.Util;
+using Rider.Plugins.EfCore.Logging;
 
-namespace Rider.Plugins.EfCore.Compatibility
+namespace Rider.Plugins.EfCore.Tracking
 {
   [SolutionComponent]
   public class NugetDependenciesListener
@@ -17,9 +18,9 @@ namespace Rider.Plugins.EfCore.Compatibility
     public Action ProjectsUpdated { get; set; }
 
     public NugetDependenciesListener(
-        NuGetPackageReferenceTracker nuGetPackageReferenceTracker,
-        Lifetime lifetime,
-        ILogger logger)
+      NuGetPackageReferenceTracker nuGetPackageReferenceTracker,
+      Lifetime lifetime,
+      ILogger logger)
     {
       _nuGetPackageReferenceTracker = nuGetPackageReferenceTracker;
       _lifetime = lifetime;
@@ -34,7 +35,8 @@ namespace Rider.Plugins.EfCore.Compatibility
       {
         if (args.New && !args.Old)
         {
-          _logger.Log(LoggingLevel.WARN, "[EF Core]: NugetDependenciesListener.InitialProcessingIsCompleted");
+          _logger.LogFlow($"{nameof(NugetDependenciesListener)}.InitialProcessingIsCompleted.Change",
+            $"Calling {nameof(ProjectsUpdated)}");
           ProjectsUpdated?.Invoke();
           SetupUpdateListeners();
         }
@@ -45,19 +47,22 @@ namespace Rider.Plugins.EfCore.Compatibility
     {
       _nuGetPackageReferenceTracker.ProjectsUpdated.Advise(_lifetime, array =>
       {
-        _logger.Log(LoggingLevel.WARN, "[EF Core]: NugetDependenciesListener.ProjectsUpdated");
+        _logger.LogFlow($"{nameof(NuGetPackageReferenceTracker)}.ProjectsUpdated",
+          $"Calling {nameof(ProjectsUpdated)}");
         ProjectsUpdated?.Invoke();
       });
 
       _nuGetPackageReferenceTracker.ProjectsUpdatedWithChanges.Advise(_lifetime, array =>
       {
-        _logger.Log(LoggingLevel.WARN, "[EF Core]: NugetDependenciesListener.ProjectsUpdatedWithChanges");
+        _logger.LogFlow($"{nameof(NuGetPackageReferenceTracker)}.ProjectsUpdatedWithChanges",
+          $"Calling {nameof(ProjectsUpdated)}");
         ProjectsUpdated?.Invoke();
       });
 
       _nuGetPackageReferenceTracker.ProjectsUpdatedInitial.Advise(_lifetime, array =>
       {
-        _logger.Log(LoggingLevel.WARN, "[EF Core]: NugetDependenciesListener.ProjectsUpdatedInitial");
+        _logger.LogFlow($"{nameof(NuGetPackageReferenceTracker)}.ProjectsUpdatedInitial",
+          $"Calling {nameof(ProjectsUpdated)}");
         ProjectsUpdated?.Invoke();
       });
     }

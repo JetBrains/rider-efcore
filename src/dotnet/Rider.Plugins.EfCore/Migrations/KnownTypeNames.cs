@@ -3,9 +3,12 @@ using JetBrains.Metadata.Reader.Impl;
 
 namespace Rider.Plugins.EfCore.Migrations
 {
-    public static class EfCoreKnownTypeNames
-    {
-        public static readonly IClrTypeName MigrationBaseClass = new ClrTypeName("Microsoft.EntityFrameworkCore.Migrations.Migration");
-        public static readonly IClrTypeName DbContextBaseClass = new ClrTypeName("Microsoft.EntityFrameworkCore.DbContext");
-    }
+  public static class EfCoreKnownTypeNames
+  {
+    public static readonly IClrTypeName MigrationBaseClass =
+      new ClrTypeName("Microsoft.EntityFrameworkCore.Migrations.Migration");
+
+    public static readonly IClrTypeName DbContextBaseClass =
+      new ClrTypeName("Microsoft.EntityFrameworkCore.DbContext");
+  }
 }
