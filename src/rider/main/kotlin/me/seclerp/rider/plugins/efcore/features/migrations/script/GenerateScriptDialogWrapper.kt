@@ -91,6 +91,7 @@ class GenerateScriptDialogWrapper(
             iconComboBox(fromMigrationsModel, model::fromMigration)
                 .validationOnApply(validator.fromMigrationValidation())
                 .validationOnInput(validator.fromMigrationValidation())
+                .comment("'0' means before the first migration")
                 .horizontalAlign(HorizontalAlign.FILL)
                 .focused()
         }
@@ -128,11 +129,12 @@ class GenerateScriptDialogWrapper(
             .map { MigrationItem(it.migrationLongName) }
 
         fromMigrationsModel.addAll(0, availableDbContextMigrations)
+        fromMigrationsModel.addElement(MigrationItem("0"))
         toMigrationsModel.addAll(0, availableDbContextMigrations)
 
         fromMigrationsModel.selectedItem = null
         if (availableDbContextMigrations.size > 0) {
-            fromMigrationsModel.selectedItem = fromMigrationsModel.getElementAt(availableDbContextMigrations.size - 1)
+            fromMigrationsModel.selectedItem = fromMigrationsModel.getElementAt(fromMigrationsModel.size - 1)
         }
         toMigrationsModel.selectedItem = toMigrationsModel.getElementAt(0)
     }
