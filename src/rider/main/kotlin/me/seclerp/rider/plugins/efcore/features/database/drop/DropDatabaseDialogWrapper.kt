@@ -24,9 +24,10 @@ class DropDatabaseDialogWrapper(
 
     override fun doOKAction() {
         if (showYesNoDialog(
-                "Confirmation",
-             "Are you sure that you want to drop database, used by ${commonOptions.dbContext!!.displayName}? This action can't be undone.",
-                     intellijProject)) {
+            "Confirmation",
+            "Are you sure that you want to drop database, used by ${commonCtx.dbContext.value!!.name}? This action can't be undone.",
+            intellijProject)
+        ) {
             super.doOKAction()
         }
     }

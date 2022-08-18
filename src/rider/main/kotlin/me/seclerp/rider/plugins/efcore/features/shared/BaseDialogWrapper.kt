@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.shared
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
@@ -8,21 +9,21 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
-import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rd.util.reactive.hasValue
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.Event
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectData
+import me.seclerp.rider.plugins.efcore.features.shared.models.ReactiveProperty
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
-import me.seclerp.rider.plugins.efcore.rd.ToolKind
-import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
+import me.seclerp.rider.plugins.efcore.rd.*
+import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
+import me.seclerp.rider.plugins.efcore.state.DialogsStateService
+import me.seclerp.rider.plugins.efcore.ui.firstOrNull
 import me.seclerp.rider.plugins.efcore.ui.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
 import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
@@ -35,60 +36,57 @@ import javax.swing.JComponent
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class BaseDialogWrapper(
     protected val efCoreVersion: DotnetEfVersion,
-    titleText: String,
+    dialogTitle: String,
     protected val intellijProject: Project,
     private val selectedDotnetProjectName: String?,
     requireMigrationsInProject: Boolean = false,
     private val requireDbContext: Boolean = true
 ) : DialogWrapper(true) {
 
+    private val dialogId = dialogTitle.replace(" ", "")
+
     protected val beModel = intellijProject.solution.riderEfCoreModel
 
     //
     // Data binding
-    val commonOptions = CommonOptionsModel()
+    val commonCtx = BaseDataContext(intellijProject, beModel, requireDbContext)
 
     //
     // Internal data
-    private val availableMigrationsProjects =
-        beModel.availableMigrationProjects
-            .valueOrEmpty()
-            .map { MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath)) }
-            .toTypedArray()
+    private val migrationsProjectsModel = DefaultComboBoxModel(
+        commonCtx.availableMigrationsProjects.map {
+            MigrationsProjectItem(it.name, MigrationsProjectData(it.id, it.fullPath))
+        }.toTypedArray()
+    )
 
-    private val availableStartupProjects =
-        beModel.availableStartupProjects
-            .valueOrEmpty()
-            .map { StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks)) }
-            .toTypedArray()
+    private val startupProjectsModel = DefaultComboBoxModel(
+        commonCtx.availableStartupProjects.map {
+            StartupProjectItem(it.name, StartupProjectData(it.id, it.fullPath, it.targetFrameworks))
+        }.toTypedArray()
+    )
 
-    private val availableBuildConfigurations =
-        intellijProject.solution.solutionProperties.configurationsAndPlatformsCollection
-            .valueOrEmpty()
-            .distinctBy { it.configuration } // To get around of different platforms for the same configurations
-            .map { BuildConfigurationItem(it.configuration) }
-            .toTypedArray()
+    private var targetFrameworkModel = DefaultComboBoxModel<BaseTargetFrameworkItem>()
+    private var dbContextModel = DefaultComboBoxModel<DbContextItem>()
+    private var buildConfigurationModel = DefaultComboBoxModel(
+        commonCtx.availableBuildConfigurations.map { BuildConfigurationItem(it) }.toTypedArray())
 
-    private var targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem> = DefaultComboBoxModel()
-    private var dbContextModel: DefaultComboBoxModel<DbContextItem> = DefaultComboBoxModel()
+    private val selectedMigrationsProject = ReactiveProperty<MigrationsProjectItem>(null)
+    private val selectedStartupProject = ReactiveProperty<StartupProjectItem>(null)
+    private val selectedTargetFramework = ReactiveProperty<BaseTargetFrameworkItem>(null)
+    private val selectedDbContext = ReactiveProperty<DbContextItem>(null)
+    private val selectedBuildConfiguration = ReactiveProperty<BuildConfigurationItem>(null)
 
     private val isSolutionLevelMode = selectedDotnetProjectName == null
 
     //
-    // Events
-    private val migrationsProjectChangedEvent: Event<MigrationsProjectItem> = Event()
-    private val startupProjectChangedEvent: Event<StartupProjectItem> = Event()
-    private val dbContextChangedEvent: Event<DbContextItem?> = Event()
-
-    //
     // Validation
-    private val validator = EfCoreDialogValidator(
-        commonOptions, beModel, intellijProject, requireMigrationsInProject, dbContextModel,
-        availableBuildConfigurations, targetFrameworkModel)
+    private val validator = BaseDialogValidator(commonCtx, beModel, intellijProject, requireMigrationsInProject)
 
     //
     // Preferences
-    private val preferredProjectsManager = PreferredProjectsManager(intellijProject)
+    private val preferredProjectsManager = intellijProject.service<PreferredProjectsManager>()
+    private val settingsStateService = service<EfCoreUiSettingsStateService>()
+    private val dialogsStateService = intellijProject.service<DialogsStateService>()
 
     //
     // UI
@@ -97,25 +95,45 @@ abstract class BaseDialogWrapper(
     //
     // Constructor
     init {
-        title = titleText
+        title = dialogTitle
 
-        if (requireDbContext) {
-            addMigrationsProjectChangedListener(::migrationsProjectChanged)
-            addDbContextChangedListener(::dbContextChanged)
+        selectedMigrationsProject.bindNullable(true, commonCtx.migrationsProject,
+            { migrationsProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
+            { commonCtx.availableMigrationsProjects.firstOrNull { info -> info.id == it?.data?.id } })
+
+        selectedStartupProject.bindNullable(true, commonCtx.startupProject,
+            { startupProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
+            { commonCtx.availableStartupProjects.firstOrNull { info -> info.id == it?.data?.id } })
+
+        selectedTargetFramework.bindNullable(true, commonCtx.targetFramework,
+            { targetFrameworkModel.firstOrNull { item -> item.data == it } },
+            { commonCtx.availableTargetFrameworks.value?.firstOrNull { tgFm -> tgFm == it?.data } })
+
+        selectedDbContext.bindNullable(true, commonCtx.dbContext,
+            { dbContextModel.firstOrNull { item -> item.data == it?.fullName } },
+            { commonCtx.availableDbContexts.value?.firstOrNull { info -> info.fullName == it?.data } })
+
+        selectedBuildConfiguration.bindNullable(true, commonCtx.buildConfiguration,
+            { buildConfigurationModel.firstOrNull { item -> item.displayName == it } },
+            { commonCtx.availableBuildConfigurations.firstOrNull { buildConfig -> buildConfig == it?.displayName } })
+
+        commonCtx.availableTargetFrameworks.afterChange(warmUp = true) {
+            targetFrameworkModel.removeAllElements()
+            if (it != null) {
+                val targetFrameworks = it.map { it.toTargetFrameworkViewItem() }
+                targetFrameworkModel.addAll(targetFrameworks)
+            }
         }
 
-        addStartupProjectChangedListener(::startupProjectChanged)
+        commonCtx.availableDbContexts.afterChange(warmUp = true) {
+            dbContextModel.removeAllElements()
+            if (it != null) {
+                val dbContextItems = it.map { it.toViewItem() }
+                dbContextModel.addAll(dbContextItems)
+            }
+        }
 
-        initSelectedBuildConfiguration()
-    }
-
-    private fun initSelectedBuildConfiguration() {
-        val currentBuilderConfiguration = intellijProject.solution.solutionProperties.activeConfigurationPlatform.value
-
-        commonOptions.buildConfiguration =
-            availableBuildConfigurations.find {
-                it.displayName == currentBuilderConfiguration?.configuration
-            } ?: availableBuildConfigurations.firstOrNull()
+        initPreferredProjects()
     }
 
     private fun initPreferredProjects() {
@@ -128,45 +146,42 @@ abstract class BaseDialogWrapper(
 
     private fun initSolutionLevelPreferredProjects() {
         val (preferredMigrationsProject, preferredStartupProject) =
-            preferredProjectsManager.getGlobalProjectPair(availableMigrationsProjects, availableStartupProjects)
+            preferredProjectsManager.getGlobalProjectPair(
+                commonCtx.availableMigrationsProjects,
+                commonCtx.availableStartupProjects)
 
         refreshProjectsPair(preferredMigrationsProject, preferredStartupProject)
     }
 
     private fun initProjectLevelPreferredProjects() {
+        val migrationsProjects = commonCtx.availableMigrationsProjects
+        val startupProjects = commonCtx.availableStartupProjects
+
         val selectedDotnetProject =
-            availableMigrationsProjects.find { it.displayName == selectedDotnetProjectName }
+            migrationsProjects.find { it.name == selectedDotnetProjectName }
 
         val (preferredMigrationsProject, preferredStartupProject) =
-            preferredProjectsManager.getProjectPair(selectedDotnetProject?.data?.id, availableMigrationsProjects, availableStartupProjects)
+            preferredProjectsManager.getProjectPair(selectedDotnetProject?.id, migrationsProjects, startupProjects)
 
         refreshProjectsPair(preferredMigrationsProject, preferredStartupProject)
     }
 
-    private fun refreshProjectsPair(migrationsProject: MigrationsProjectItem?, startupProject: StartupProjectItem?) {
-        migrationsProjectSetter(migrationsProject)
-        startupProjectSetter(startupProject)
+    private fun refreshProjectsPair(migrationsProject: MigrationsProjectInfo?, startupProject: StartupProjectInfo?) {
+        commonCtx.migrationsProject.value = migrationsProject
+        commonCtx.startupProject.value = startupProject
     }
+
+    protected open fun loadDialogState(dialogState: DialogsStateService.SpecificDialogState) {}
+
+    protected open fun saveDialogState(dialogState: DialogsStateService.SpecificDialogState) {}
 
     //
     // Methods
-    protected fun addMigrationsProjectChangedListener(listener: (MigrationsProjectItem) -> Unit) {
-        migrationsProjectChangedEvent += listener
-    }
-
-    protected fun addStartupProjectChangedListener(listener: (StartupProjectItem) -> Unit) {
-        startupProjectChangedEvent += listener
-    }
-
-    protected fun addDbContextChangedListener(listener: (DbContextItem?) -> Unit) {
-        dbContextChangedEvent += listener
-    }
-
     override fun doOKAction() {
         super.doOKAction()
 
-        val migrationsProject = commonOptions.migrationsProject
-        val startupProject = commonOptions.startupProject
+        val migrationsProject = commonCtx.migrationsProject.value
+        val startupProject = commonCtx.startupProject.value
 
         if (migrationsProject != null && startupProject != null) {
             if (isSolutionLevelMode) {
@@ -174,6 +189,9 @@ abstract class BaseDialogWrapper(
             } else {
                 preferredProjectsManager.setProjectPair(migrationsProject, startupProject)
             }
+
+            commonCtx.saveState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
+            saveDialogState(dialogsStateService.forDialog(dialogId))
         }
     }
 
@@ -185,7 +203,16 @@ abstract class BaseDialogWrapper(
 
     //
     // UI
-    override fun createCenterPanel(): JComponent = createMainUI().apply { panel = this }
+    override fun createCenterPanel(): JComponent =
+        createMainUI()
+            .apply {
+                panel = this
+
+                if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
+                    commonCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
+                    loadDialogState(dialogsStateService.forDialog(dialogId))
+                }
+            }
 
     override fun createLeftSideActions(): Array<Action> {
         val commandPreviewAction = object : AbstractAction("Preview") {
@@ -207,8 +234,6 @@ abstract class BaseDialogWrapper(
             panel {
                 groupRowsRange("Common") {
                     createPrimaryOptions()
-                    // TODO: Find better place to load preferences keeping component lifetime in mind
-                    initPreferredProjects()
                     createDefaultMainRows()
                 }
                 panel {
@@ -230,17 +255,19 @@ abstract class BaseDialogWrapper(
 
     protected fun Panel.createMigrationsProjectRow() {
         row("Migrations project:") {
-            iconComboBox(availableMigrationsProjects, { commonOptions.migrationsProject }, ::migrationsProjectSetter)
+            iconComboBox(migrationsProjectsModel, selectedMigrationsProject.getter, selectedMigrationsProject.setter)
                 .validationOnInput(validator.migrationsProjectValidation())
                 .validationOnApply(validator.migrationsProjectValidation())
+                .applyToComponent { selectedMigrationsProject.afterChange { this.selectedItem = it } }
         }
     }
 
     protected fun Panel.createStartupProjectRow() {
         row("Startup project:") {
-            iconComboBox(availableStartupProjects, { commonOptions.startupProject }, ::startupProjectSetter)
+            iconComboBox(startupProjectsModel, selectedStartupProject.getter, selectedStartupProject.setter)
                 .validationOnInput(validator.startupProjectValidation())
                 .validationOnApply(validator.startupProjectValidation())
+                .applyToComponent { selectedStartupProject.afterChange { this.selectedItem = it } }
                 .comment(
                     "Your project is not listed? " +
                     "<a href='https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui/f-a-q#why-i-cant-see-my-project-in-a-startup-projects-field'>" +
@@ -251,9 +278,10 @@ abstract class BaseDialogWrapper(
 
     protected fun Panel.createDbContextProjectRow() {
         row("DbContext class:") {
-            iconComboBox(dbContextModel, { commonOptions.dbContext }, ::dbContextSetter)
+            iconComboBox(dbContextModel, selectedDbContext.getter, selectedDbContext.setter)
                 .validationOnInput(validator.dbContextValidation())
                 .validationOnApply(validator.dbContextValidation())
+                .applyToComponent { selectedDbContext.afterChange { this.selectedItem = it } }
         }
     }
 
@@ -265,21 +293,24 @@ abstract class BaseDialogWrapper(
         groupRowsRange("Build Options") {
             var noBuildCheck: JBCheckBox? = null
             row {
-                noBuildCheck = checkBox("Skip project build process (--no-build)")
-                    .bindSelected(commonOptions::noBuild)
+                noBuildCheck = checkBox("Skip project build process (<code>--no-build</code>)")
+                    .bindSelected({ commonCtx.noBuild.value!! }, commonCtx.noBuild.setter)
+                    .applyToComponent { commonCtx.noBuild.afterChange { this.isSelected = it!! } }
                     .component
             }
 
             row("Build configuration:") {
-                iconComboBox(availableBuildConfigurations, { commonOptions.buildConfiguration }, ::buildConfigurationSetter)
+                iconComboBox(buildConfigurationModel, selectedBuildConfiguration.getter, selectedBuildConfiguration.setter)
                     .validationOnInput(validator.buildConfigurationValidation())
                     .validationOnApply(validator.buildConfigurationValidation())
+                    .applyToComponent { selectedBuildConfiguration.afterChange { this.selectedItem = it } }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row("Target framework:") {
-                iconComboBox(targetFrameworkModel, { commonOptions.targetFramework }, ::targetFrameworkSetter)
+                iconComboBox(targetFrameworkModel, selectedTargetFramework.getter, selectedTargetFramework.setter)
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
+                    .applyToComponent { selectedTargetFramework.afterChange { this.selectedItem = it } }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }
@@ -297,8 +328,9 @@ abstract class BaseDialogWrapper(
         groupRowsRange("Execution") {
             if (efCoreVersion.major >= 5) {
                 row("Additional arguments:") {
-                    simpleExpandableTextField(commonOptions::additionalArguments)
+                    simpleExpandableTextField({ commonCtx.additionalArguments.value!! }, commonCtx.additionalArguments.setter)
                         .horizontalAlign(HorizontalAlign.FILL)
+                        .apply { commonCtx.additionalArguments.afterChange { this.component.text = it } }
 
                 }
             }
@@ -309,90 +341,26 @@ abstract class BaseDialogWrapper(
     }
 
     //
-    // Setters
-    private fun migrationsProjectSetter(project: MigrationsProjectItem?) {
-        if (project == commonOptions.migrationsProject) return
-
-        commonOptions.migrationsProject = project
-        migrationsProjectChangedEvent.invoke(commonOptions.migrationsProject!!)
-    }
-
-    private fun startupProjectSetter(project: StartupProjectItem?) {
-        if (project == commonOptions.startupProject) return
-
-        commonOptions.startupProject = project
-        startupProjectChangedEvent.invoke(commonOptions.startupProject!!)
-    }
-
-    private fun dbContextSetter(context: DbContextItem?) {
-        if (context == commonOptions.dbContext) return
-
-        commonOptions.dbContext = context
-        dbContextChangedEvent.invoke(commonOptions.dbContext)
-    }
-
-    private fun buildConfigurationSetter(configuration: BuildConfigurationItem?) {
-        if (configuration == commonOptions.buildConfiguration) return
-
-        commonOptions.buildConfiguration = configuration
-    }
-
-    private fun targetFrameworkSetter(framework: BaseTargetFrameworkItem?) {
-        if (framework == commonOptions.targetFramework) return
-
-        commonOptions.targetFramework = framework
-    }
-
-    //
-    // Event listeners
-    private fun migrationsProjectChanged(project: MigrationsProjectItem?) {
-        dbContextModel.removeAllElements()
-
-        if (project == null) return
-
-        val dbContexts = beModel.getAvailableDbContexts.runUnderProgress(
-            commonOptions.migrationsProject!!.displayName, intellijProject, "Loading DbContext classes...",
-            isCancelable = true,
-            throwFault = true
-        )
-
-        val dbContextIconItems = dbContexts!!.map { DbContextItem(it.name, it.fullName) }
-
-        dbContextModel.addAll(dbContextIconItems)
-        val firstDbContext = dbContextIconItems.firstOrNull()
-        dbContextSetter(firstDbContext)
-    }
-
-    private fun startupProjectChanged(project: StartupProjectItem?) {
-        targetFrameworkModel.removeAllElements()
-
-        if (project == null) return
-
-        val baseTargetFrameworkItems = project.data.targetFrameworks
-            .map { TargetFrameworkItem(it, it) } as List<BaseTargetFrameworkItem>
-
-        val defaultFramework = DefaultTargetFrameworkItem()
-
-        targetFrameworkModel.addElement(defaultFramework)
-        targetFrameworkModel.addAll(baseTargetFrameworkItems)
-        commonOptions.targetFramework = defaultFramework
-        targetFrameworkModel.selectedItem = commonOptions.targetFramework
-    }
-
-    private fun dbContextChanged(dbContext: DbContextItem?) {
-        dbContextModel.selectedItem = dbContext
-    }
-
-    //
     // Helpers
     protected fun getCommonOptions(): CommonOptions = CommonOptions(
-        commonOptions.migrationsProject!!.data.fullPath,
-        commonOptions.startupProject!!.data.fullPath,
-        commonOptions.dbContext?.data,
-        commonOptions.buildConfiguration!!.displayName,
-        commonOptions.targetFramework!!.data,
-        commonOptions.noBuild,
-        commonOptions.additionalArguments
+        commonCtx.migrationsProject.value!!.fullPath,
+        commonCtx.startupProject.value!!.fullPath,
+        commonCtx.dbContext.value?.fullName,
+        commonCtx.buildConfiguration.value!!,
+        commonCtx.targetFramework.value!!,
+        commonCtx.noBuild.value!!,
+        commonCtx.additionalArguments.value!!
     )
+
+    companion object {
+        val COMMON_DIALOG_ID = "Common"
+
+        private fun DbContextInfo.toViewItem() =
+            DbContextItem(name, fullName)
+
+        private fun String?.toTargetFrameworkViewItem() =
+            if (this == null) DefaultTargetFrameworkItem()
+            else TargetFrameworkItem(this, this)
+    }
 }
 

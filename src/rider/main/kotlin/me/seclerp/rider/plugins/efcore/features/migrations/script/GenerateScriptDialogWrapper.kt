@@ -8,7 +8,6 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.ui.*
@@ -21,7 +20,7 @@ class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedDotnetProjectName: String?
-) : BaseDialogWrapper(toolsVersion, "Generate SQL Script", intellijProject, selectedDotnetProjectName, true) {
+) : BaseDialogWrapper3(toolsVersion, "Generate SQL Script", intellijProject, selectedDotnetProjectName, true) {
 
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
