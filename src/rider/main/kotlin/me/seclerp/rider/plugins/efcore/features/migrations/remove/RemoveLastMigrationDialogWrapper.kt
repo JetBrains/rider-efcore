@@ -7,7 +7,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem

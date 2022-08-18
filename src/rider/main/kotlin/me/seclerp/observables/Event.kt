@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore
+package me.seclerp.observables
 
 class Event<T> {
     private val observers = mutableSetOf<(T) -> Unit>()

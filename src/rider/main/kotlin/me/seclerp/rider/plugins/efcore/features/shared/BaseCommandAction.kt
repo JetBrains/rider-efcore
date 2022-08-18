@@ -16,6 +16,7 @@ import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.ToolKind
 
 abstract class BaseCommandAction(

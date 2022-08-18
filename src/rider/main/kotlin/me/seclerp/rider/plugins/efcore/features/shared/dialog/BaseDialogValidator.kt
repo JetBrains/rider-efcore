@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.shared
+package me.seclerp.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -10,7 +10,7 @@ import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.items.*
 
 class BaseDialogValidator(
-    private val dataCtx: BaseDataContext,
+    private val dataCtx: CommonDataContext,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
     private val shouldHaveMigrationsInProject: Boolean
@@ -23,8 +23,8 @@ class BaseDialogValidator(
                 null
             else {
                 val migrationsIdentity = MigrationsIdentity(
-                    dataCtx.migrationsProject.value!!.name,
-                    dataCtx.dbContext.value!!.fullName)
+                    dataCtx.migrationsProject.notNullValue.name,
+                    dataCtx.dbContext.notNullValue.fullName)
 
                 val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(
                     migrationsIdentity, intellijProject, "Checking migrations...",
@@ -48,7 +48,7 @@ class BaseDialogValidator(
     }
 
     fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
-        if (dataCtx.dbContext.value == null || dataCtx.availableDbContexts.value!!.isEmpty())
+        if (dataCtx.dbContext.value == null || dataCtx.availableDbContexts.notNullValue.isEmpty())
             error("Migrations project should have at least 1 DbContext")
         else
             null
@@ -62,7 +62,7 @@ class BaseDialogValidator(
     }
 
     fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? = {
-        if (it.isEnabled && (dataCtx.targetFramework.value == null || dataCtx.availableTargetFrameworks.value!!.isEmpty()))
+        if (it.isEnabled && (dataCtx.targetFramework.value == null || dataCtx.availableTargetFrameworks.notNullValue.isEmpty()))
             error("Startup project should have at least 1 supported target framework")
         else
             null

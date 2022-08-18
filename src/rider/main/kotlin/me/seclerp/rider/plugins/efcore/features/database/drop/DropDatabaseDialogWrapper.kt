@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 
 class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
@@ -25,7 +25,7 @@ class DropDatabaseDialogWrapper(
     override fun doOKAction() {
         if (showYesNoDialog(
             "Confirmation",
-            "Are you sure that you want to drop database, used by ${commonCtx.dbContext.value!!.name}? This action can't be undone.",
+            "Are you sure that you want to drop database, used by ${commonCtx.dbContext.notNullValue.name}? This action can't be undone.",
             intellijProject)
         ) {
             super.doOKAction()

@@ -1,17 +1,17 @@
-package me.seclerp.rider.plugins.efcore.features.shared
+package me.seclerp.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.rider.plugins.efcore.features.shared.models.ReactiveProperty
+import me.seclerp.observables.ObservableProperty
 import me.seclerp.rider.plugins.efcore.rd.DbContextInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.StartupProjectInfo
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 
-class BaseDataContext(
+class CommonDataContext(
     intellijProject: Project,
     beModel: RiderEfCoreModel,
     private val requireDbContext: Boolean
@@ -24,16 +24,16 @@ class BaseDataContext(
             .map { it.configuration }
             .distinct() // To get around of different platforms for the same configurations
             .toTypedArray()
-    val availableDbContexts = ReactiveProperty<List<DbContextInfo>>(listOf())
-    val availableTargetFrameworks = ReactiveProperty<List<String?>>(listOf())
+    val availableDbContexts = ObservableProperty<List<DbContextInfo>>(listOf())
+    val availableTargetFrameworks = ObservableProperty<List<String?>>(listOf())
 
-    val migrationsProject = ReactiveProperty<MigrationsProjectInfo>(null)
-    val startupProject = ReactiveProperty<StartupProjectInfo>(null)
-    val dbContext = ReactiveProperty<DbContextInfo>(null) // Depends on Migrations project
-    val buildConfiguration = ReactiveProperty<String>(null)
-    val targetFramework = ReactiveProperty<String>(null) // Depends on Startup project
-    val noBuild = ReactiveProperty(false)
-    val additionalArguments = ReactiveProperty("")
+    val migrationsProject = ObservableProperty<MigrationsProjectInfo>(null)
+    val startupProject = ObservableProperty<StartupProjectInfo>(null)
+    val dbContext = ObservableProperty<DbContextInfo>(null) // Depends on Migrations project
+    val buildConfiguration = ObservableProperty<String>(null)
+    val targetFramework = ObservableProperty<String>(null) // Depends on Startup project
+    val noBuild = ObservableProperty(false)
+    val additionalArguments = ObservableProperty("")
 
     init {
         startupProject.afterChange {
@@ -69,12 +69,12 @@ class BaseDataContext(
     }
 
     fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
-        val migrationsProjectId = migrationsProject.value!!.id
-        val startupProjectId = startupProject.value!!.id
+        val migrationsProjectId = migrationsProject.notNullValue.id
+        val startupProjectId = startupProject.notNullValue.id
 
         if (requireDbContext) {
             val dbContextName = commonDialogState.get("${migrationsProjectId}:${KnownStateKeys.DB_CONTEXT}")
-            val dbContext = availableDbContexts.value!!.firstOrNull { it.fullName == dbContextName }
+            val dbContext = availableDbContexts.notNullValue.firstOrNull { it.fullName == dbContextName }
             if (dbContext != null) {
                 this.dbContext.value = dbContext
             }
@@ -87,7 +87,7 @@ class BaseDataContext(
         }
 
         val targetFrameworkName = commonDialogState.get("${startupProjectId}:${KnownStateKeys.TARGET_FRAMEWORK}")
-        val targetFramework = availableTargetFrameworks.value!!.firstOrNull { it == targetFrameworkName }
+        val targetFramework = availableTargetFrameworks.notNullValue.firstOrNull { it == targetFrameworkName }
         if (targetFramework != null) {
             this.targetFramework.value = targetFramework
         }
@@ -101,15 +101,15 @@ class BaseDataContext(
 
     fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
         if (requireDbContext && dbContext.value != null) {
-            commonDialogState.set(KnownStateKeys.DB_CONTEXT, dbContext.value!!.fullName)
+            commonDialogState.set(KnownStateKeys.DB_CONTEXT, dbContext.notNullValue.fullName)
         }
 
         if (buildConfiguration.value != null) {
-            commonDialogState.set(KnownStateKeys.BUILD_CONFIGURATION, buildConfiguration.value!!)
+            commonDialogState.set(KnownStateKeys.BUILD_CONFIGURATION, buildConfiguration.notNullValue)
         }
 
         if (targetFramework.value != null) {
-            commonDialogState.set(KnownStateKeys.TARGET_FRAMEWORK, targetFramework.value!!)
+            commonDialogState.set(KnownStateKeys.TARGET_FRAMEWORK, targetFramework.notNullValue)
         }
 
         commonDialogState.set(KnownStateKeys.NO_BUILD, noBuild.value.toString())

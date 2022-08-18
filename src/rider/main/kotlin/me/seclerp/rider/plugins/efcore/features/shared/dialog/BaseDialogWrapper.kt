@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.shared
+package me.seclerp.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -17,16 +17,15 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import me.seclerp.rider.plugins.efcore.features.shared.models.MigrationsProjectData
-import me.seclerp.rider.plugins.efcore.features.shared.models.ReactiveProperty
+import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.bindNullable
 import me.seclerp.rider.plugins.efcore.features.shared.models.StartupProjectData
 import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import me.seclerp.rider.plugins.efcore.rd.*
 import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
-import me.seclerp.rider.plugins.efcore.ui.firstOrNull
-import me.seclerp.rider.plugins.efcore.ui.iconComboBox
+import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.*
-import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -49,7 +48,7 @@ abstract class BaseDialogWrapper(
 
     //
     // Data binding
-    val commonCtx = BaseDataContext(intellijProject, beModel, requireDbContext)
+    val commonCtx = CommonDataContext(intellijProject, beModel, requireDbContext)
 
     //
     // Internal data
@@ -70,11 +69,11 @@ abstract class BaseDialogWrapper(
     private var buildConfigurationModel = DefaultComboBoxModel(
         commonCtx.availableBuildConfigurations.map { BuildConfigurationItem(it) }.toTypedArray())
 
-    private val selectedMigrationsProject = ReactiveProperty<MigrationsProjectItem>(null)
-    private val selectedStartupProject = ReactiveProperty<StartupProjectItem>(null)
-    private val selectedTargetFramework = ReactiveProperty<BaseTargetFrameworkItem>(null)
-    private val selectedDbContext = ReactiveProperty<DbContextItem>(null)
-    private val selectedBuildConfiguration = ReactiveProperty<BuildConfigurationItem>(null)
+    private val selectedMigrationsProject = ObservableProperty<MigrationsProjectItem>(null)
+    private val selectedStartupProject = ObservableProperty<StartupProjectItem>(null)
+    private val selectedTargetFramework = ObservableProperty<BaseTargetFrameworkItem>(null)
+    private val selectedDbContext = ObservableProperty<DbContextItem>(null)
+    private val selectedBuildConfiguration = ObservableProperty<BuildConfigurationItem>(null)
 
     private val isSolutionLevelMode = selectedDotnetProjectName == null
 
@@ -255,19 +254,17 @@ abstract class BaseDialogWrapper(
 
     protected fun Panel.createMigrationsProjectRow() {
         row("Migrations project:") {
-            iconComboBox(migrationsProjectsModel, selectedMigrationsProject.getter, selectedMigrationsProject.setter)
+            iconComboBox(migrationsProjectsModel, selectedMigrationsProject)
                 .validationOnInput(validator.migrationsProjectValidation())
                 .validationOnApply(validator.migrationsProjectValidation())
-                .applyToComponent { selectedMigrationsProject.afterChange { this.selectedItem = it } }
         }
     }
 
     protected fun Panel.createStartupProjectRow() {
         row("Startup project:") {
-            iconComboBox(startupProjectsModel, selectedStartupProject.getter, selectedStartupProject.setter)
+            iconComboBox(startupProjectsModel, selectedStartupProject)
                 .validationOnInput(validator.startupProjectValidation())
                 .validationOnApply(validator.startupProjectValidation())
-                .applyToComponent { selectedStartupProject.afterChange { this.selectedItem = it } }
                 .comment(
                     "Your project is not listed? " +
                     "<a href='https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui/f-a-q#why-i-cant-see-my-project-in-a-startup-projects-field'>" +
@@ -278,10 +275,9 @@ abstract class BaseDialogWrapper(
 
     protected fun Panel.createDbContextProjectRow() {
         row("DbContext class:") {
-            iconComboBox(dbContextModel, selectedDbContext.getter, selectedDbContext.setter)
+            iconComboBox(dbContextModel, selectedDbContext)
                 .validationOnInput(validator.dbContextValidation())
                 .validationOnApply(validator.dbContextValidation())
-                .applyToComponent { selectedDbContext.afterChange { this.selectedItem = it } }
         }
     }
 
@@ -294,23 +290,20 @@ abstract class BaseDialogWrapper(
             var noBuildCheck: JBCheckBox? = null
             row {
                 noBuildCheck = checkBox("Skip project build process (<code>--no-build</code>)")
-                    .bindSelected({ commonCtx.noBuild.value!! }, commonCtx.noBuild.setter)
-                    .applyToComponent { commonCtx.noBuild.afterChange { this.isSelected = it!! } }
+                    .bindSelected(commonCtx.noBuild)
                     .component
             }
 
             row("Build configuration:") {
-                iconComboBox(buildConfigurationModel, selectedBuildConfiguration.getter, selectedBuildConfiguration.setter)
+                iconComboBox(buildConfigurationModel, selectedBuildConfiguration)
                     .validationOnInput(validator.buildConfigurationValidation())
                     .validationOnApply(validator.buildConfigurationValidation())
-                    .applyToComponent { selectedBuildConfiguration.afterChange { this.selectedItem = it } }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row("Target framework:") {
-                iconComboBox(targetFrameworkModel, selectedTargetFramework.getter, selectedTargetFramework.setter)
+                iconComboBox(targetFrameworkModel, selectedTargetFramework)
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
-                    .applyToComponent { selectedTargetFramework.afterChange { this.selectedItem = it } }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }
@@ -328,10 +321,8 @@ abstract class BaseDialogWrapper(
         groupRowsRange("Execution") {
             if (efCoreVersion.major >= 5) {
                 row("Additional arguments:") {
-                    simpleExpandableTextField({ commonCtx.additionalArguments.value!! }, commonCtx.additionalArguments.setter)
+                    simpleExpandableTextField(commonCtx.additionalArguments)
                         .horizontalAlign(HorizontalAlign.FILL)
-                        .apply { commonCtx.additionalArguments.afterChange { this.component.text = it } }
-
                 }
             }
             row("EF Core tools:") {
@@ -343,13 +334,13 @@ abstract class BaseDialogWrapper(
     //
     // Helpers
     protected fun getCommonOptions(): CommonOptions = CommonOptions(
-        commonCtx.migrationsProject.value!!.fullPath,
-        commonCtx.startupProject.value!!.fullPath,
+        commonCtx.migrationsProject.notNullValue.fullPath,
+        commonCtx.startupProject.notNullValue.fullPath,
         commonCtx.dbContext.value?.fullName,
-        commonCtx.buildConfiguration.value!!,
-        commonCtx.targetFramework.value!!,
-        commonCtx.noBuild.value!!,
-        commonCtx.additionalArguments.value!!
+        commonCtx.buildConfiguration.notNullValue,
+        commonCtx.targetFramework.notNullValue,
+        commonCtx.noBuild.notNullValue,
+        commonCtx.additionalArguments.notNullValue
     )
 
     companion object {

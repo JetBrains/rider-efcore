@@ -11,12 +11,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.TextFieldWithAutoCompletion
+import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rdclient.util.idea.toIOFile
+import me.seclerp.observables.ObservableProperty
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
 import java.io.File
@@ -46,6 +49,12 @@ fun <T : IconItem<*>> Row.iconComboBox(
             }
         }
 
+fun <T : IconItem<*>> Row.iconComboBox(
+    model: DefaultComboBoxModel<T>,
+    property: ObservableProperty<T>
+): Cell<ComboBox<T>> =
+    iconComboBox(model, property.getter, property.setter)
+        .applyToComponent { property.afterChange { this.selectedItem = it } }
 
 fun <T : IconItem<*>> Row.iconComboBox(
     model: DefaultComboBoxModel<T>,
@@ -68,17 +77,17 @@ fun <T : IconItem<*>> Row.iconComboBox(
 //
 
 fun Row.textFieldWithCompletion(
-    binding: PropertyBinding<String>,
+    getter: () -> String,
+    setter: (String) -> Unit,
     completions: MutableList<String>,
     project: Project? = null,
     icon: Icon? = null
 ): Cell<TextFieldWithCompletion> {
     val provider = TextFieldWithAutoCompletion.StringsCompletionProvider(completions, icon)
-    val textField = TextFieldWithCompletion(project, provider, binding.get(), true, true, false, false)
-    textField.editor
+    val textField = TextFieldWithCompletion(project, provider, getter(), true, true, false, false)
     textField.addDocumentListener(object : DocumentListener {
         override fun documentChanged(event: DocumentEvent) {
-            binding.set(event.document.text)
+            setter(event.document.text)
         }
     })
 
@@ -86,13 +95,22 @@ fun Row.textFieldWithCompletion(
 }
 
 fun Row.textFieldWithCompletion(
-    getter: () -> String,
-    setter: (String) -> Unit,
+    property: ObservableProperty<String>,
     completions: MutableList<String>,
     project: Project? = null,
     icon: Icon? = null
 ): Cell<TextFieldWithCompletion> {
-    return textFieldWithCompletion(PropertyBinding(getter, setter), completions, project, icon)
+    return textFieldWithCompletion({ property.notNullValue }, property.setter, completions, project, icon)
+        .applyToComponent { property.afterChange { this.text = it!! } }
+}
+
+fun Row.textFieldWithCompletion(
+    binding: PropertyBinding<String>,
+    completions: MutableList<String>,
+    project: Project? = null,
+    icon: Icon? = null
+): Cell<TextFieldWithCompletion> {
+    return textFieldWithCompletion(binding.get, binding.set, completions, project, icon)
 }
 
 fun Row.textFieldWithCompletion(
@@ -128,6 +146,14 @@ fun Row.readonlyExpandableTextField(
         }
 
 fun Row.simpleExpandableTextField(
+    property: ObservableProperty<String>,
+): Cell<ExpandableTextField> {
+    return simpleExpandableTextFieldBase()
+        .bindText({ property.notNullValue }, property.setter)
+        .applyToComponent { property.afterChange { this.text = it } }
+}
+
+fun Row.simpleExpandableTextField(
     getter: () -> String,
     setter: (String) -> Unit
 ): Cell<ExpandableTextField> {
@@ -148,6 +174,22 @@ private fun Row.simpleExpandableTextFieldBase(): Cell<ExpandableTextField> =
             caretPosition = 0
         }
         .monospaced()
+
+fun Cell<JBCheckBox>.bindSelected(
+    property: ObservableProperty<Boolean>,
+): Cell<JBCheckBox> {
+    return this
+        .bindSelected({ property.notNullValue }, property.setter)
+        .applyToComponent { property.afterChange { this.isSelected = it!! } }
+}
+
+fun Cell<JBTextField>.bindText(
+    property: ObservableProperty<String>,
+): Cell<JBTextField> {
+    return this
+        .bindText({ property.notNullValue }, property.setter)
+        .applyToComponent { property.afterChange { this.text = it!! } }
+}
 
 
 fun <T : JComponent> Cell<T>.monospaced(): Cell<T> = applyToComponent {
