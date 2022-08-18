@@ -53,8 +53,6 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
     }
 
     companion object {
-        fun getInstance(project: Project) = project.service<CommonOptionsStateService>()
-
         private const val MIGRATIONS_PROJECT_KEY = "migrationsProject"
         private const val STARTUP_PROJECT_KEY = "startupProject"
     }
