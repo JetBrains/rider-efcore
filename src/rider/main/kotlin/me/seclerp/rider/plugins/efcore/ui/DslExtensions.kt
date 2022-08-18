@@ -191,6 +191,15 @@ fun Cell<JBTextField>.bindText(
         .applyToComponent { property.afterChange { this.text = it!! } }
 }
 
+@JvmName("bindTextTextFieldWithBrowseButton")
+fun Cell<TextFieldWithBrowseButton>.bindText(
+    property: ObservableProperty<String>,
+): Cell<TextFieldWithBrowseButton> {
+    return this
+        .bindText({ property.notNullValue }, property.setter)
+        .applyToComponent { property.afterChange { this.text = it!! } }
+}
+
 
 fun <T : JComponent> Cell<T>.monospaced(): Cell<T> = applyToComponent {
     monospaced()
