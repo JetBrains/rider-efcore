@@ -3,9 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.migrations.add
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import me.seclerp.observables.map
 import me.seclerp.observables.mapNullable
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion

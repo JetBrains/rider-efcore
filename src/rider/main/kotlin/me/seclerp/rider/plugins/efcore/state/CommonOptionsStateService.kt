@@ -1,7 +1,6 @@
 package me.seclerp.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
-import com.intellij.openapi.project.Project
 import java.util.*
 
 @Service
