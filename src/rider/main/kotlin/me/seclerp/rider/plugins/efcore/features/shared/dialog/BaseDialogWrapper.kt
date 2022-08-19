@@ -96,23 +96,23 @@ abstract class BaseDialogWrapper(
     init {
         title = dialogTitle
 
-        selectedMigrationsProject.bindNullable(true, commonCtx.migrationsProject,
+        selectedMigrationsProject.bindNullable(commonCtx.migrationsProject,
             { migrationsProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
             { commonCtx.availableMigrationsProjects.firstOrNull { info -> info.id == it?.data?.id } })
 
-        selectedStartupProject.bindNullable(true, commonCtx.startupProject,
+        selectedStartupProject.bindNullable(commonCtx.startupProject,
             { startupProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
             { commonCtx.availableStartupProjects.firstOrNull { info -> info.id == it?.data?.id } })
 
-        selectedTargetFramework.bindNullable(true, commonCtx.targetFramework,
+        selectedTargetFramework.bindNullable(commonCtx.targetFramework,
             { targetFrameworkModel.firstOrNull { item -> item.data == it } },
             { commonCtx.availableTargetFrameworks.value?.firstOrNull { tgFm -> tgFm == it?.data } })
 
-        selectedDbContext.bindNullable(true, commonCtx.dbContext,
+        selectedDbContext.bindNullable(commonCtx.dbContext,
             { dbContextModel.firstOrNull { item -> item.data == it?.fullName } },
             { commonCtx.availableDbContexts.value?.firstOrNull { info -> info.fullName == it?.data } })
 
-        selectedBuildConfiguration.bindNullable(true, commonCtx.buildConfiguration,
+        selectedBuildConfiguration.bindNullable(commonCtx.buildConfiguration,
             { buildConfigurationModel.firstOrNull { item -> item.displayName == it } },
             { commonCtx.availableBuildConfigurations.firstOrNull { buildConfig -> buildConfig == it?.displayName } })
 
