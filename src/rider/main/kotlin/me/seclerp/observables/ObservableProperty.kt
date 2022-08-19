@@ -1,6 +1,6 @@
 package me.seclerp.observables
 
-class ObservableProperty<T : Any>(initialValue: T?) {
+open class ObservableProperty<T : Any>(initialValue: T?) {
     private var internalValue = initialValue
 
     var value: T?

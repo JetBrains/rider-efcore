@@ -28,7 +28,7 @@ class AddMigrationDialogWrapper(
     // Internal data
     private val migrationProjectFolder = commonCtx.migrationsProject.mapNullable {
         if (it == null) {
-            null
+            ""
         } else {
             val currentMigrationsProject = it.fullPath
             File(currentMigrationsProject).parentFile.path

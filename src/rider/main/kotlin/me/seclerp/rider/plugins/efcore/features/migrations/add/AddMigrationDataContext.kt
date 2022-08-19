@@ -19,7 +19,7 @@ class AddMigrationDataContext(
     var migrationsOutputFolder = ObservableProperty("")
 
     init {
-        commonCtx.dbContext.afterChange(true) {
+        commonCtx.dbContext.afterChange {
             val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
             val dbContextName = it!!.fullName
             val migrations = beModel.getAvailableMigrations.runUnderProgress(
