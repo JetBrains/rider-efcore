@@ -67,7 +67,7 @@ class ScaffoldDbContextDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
     }
 
     override fun generateCommand(): CliCommand {

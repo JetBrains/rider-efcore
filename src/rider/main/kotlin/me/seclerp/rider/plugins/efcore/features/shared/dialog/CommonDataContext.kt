@@ -5,6 +5,7 @@ import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.bind
 import me.seclerp.rider.plugins.efcore.rd.DbContextInfo
 import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
@@ -44,6 +45,10 @@ class CommonDataContext(
                     addAll(it.targetFrameworks)
                 }
             }
+        }
+
+        availableTargetFrameworks.afterChange {
+            targetFramework.value = it?.firstOrNull()
         }
 
         if (requireDbContext) {

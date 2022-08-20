@@ -19,7 +19,7 @@ class DropDatabaseDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
     }
 
     override fun doOKAction() {

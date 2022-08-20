@@ -30,48 +30,37 @@ fun <T2 : Any, T : Any> ObservableProperty<T>.mapNullable(mapping: (T?) -> T2?):
 /**
  * @param warmUp if true, additionally to creating mapping, value will be set immediately
  */
-fun <T2 : Any, T : Any> ObservableProperty<T>.bind(warmUp: Boolean, bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T) {
-    bindTo.afterChange(warmUp) {
+fun <T2 : Any, T : Any> ObservableProperty<T>.bind(bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T) {
+    if (bindTo.value != null) {
+        value = mappingTo(bindTo.notNullValue)
+    }
+    bindTo.afterChange {
         if (it == null) value = null
         else value = mappingTo(it)
     }
 }
 
-fun <T2 : Any, T : Any> ObservableProperty<T>.bind(bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T) {
-    bind(warmUp = false, bindTo, mappingTo)
-}
-
 /**
  * @param warmUp if true, additionally to creating mapping, value will be set immediately
  */
-fun <T2 : Any, T : Any> ObservableProperty<T>.bind(warmUp: Boolean, bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T, mappingFrom: (T) -> T2) {
-    bind(warmUp, bindTo, mappingTo)
+fun <T2 : Any, T : Any> ObservableProperty<T>.bind(bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T, mappingFrom: (T) -> T2) {
+    bind(bindTo, mappingTo)
     bindTo.bind(this, mappingFrom)
 }
 
-fun <T2 : Any, T : Any> ObservableProperty<T>.bind(bindTo: ObservableProperty<T2>, mappingTo: (T2) -> T, mappingFrom: (T) -> T2) {
-    bind(warmUp = false, bindTo, mappingTo, mappingFrom)
-}
-
 /**
  * @param warmUp if true, additionally to creating mapping, value will be set immediately
  */
-fun <T2 : Any, T : Any> ObservableProperty<T>.bindNullable(warmUp: Boolean, bindTo: ObservableProperty<T2>, mappingTo: (T2?) -> T?) {
-    bindTo.afterChange(warmUp) { value = mappingTo(it) }
-}
-
 fun <T2 : Any, T : Any> ObservableProperty<T>.bindNullable(bindTo: ObservableProperty<T2>, mappingTo: (T2?) -> T?) {
-    bindNullable(warmUp = false, bindTo, mappingTo)
+    value = mappingTo(bindTo.value)
+    bindTo.afterChange { value = mappingTo(it) }
 }
+
 
 /**
  * @param warmUp if true, additionally to creating mapping, value will be set immediately
  */
-fun <T2 : Any, T : Any> ObservableProperty<T>.bindNullable(warmUp: Boolean, bindTo: ObservableProperty<T2>, mappingTo: (T2?) -> T?, mappingFrom: (T?) -> T2?) {
-    bindNullable(warmUp, bindTo, mappingTo)
-    bindTo.bindNullable(this, mappingFrom)
-}
-
 fun <T2 : Any, T : Any> ObservableProperty<T>.bindNullable(bindTo: ObservableProperty<T2>, mappingTo: (T2?) -> T?, mappingFrom: (T?) -> T2?) {
-    bindNullable(warmUp = false, bindTo, mappingTo, mappingFrom)
+    bindNullable(bindTo, mappingTo)
+    bindTo.bindNullable(this, mappingFrom)
 }

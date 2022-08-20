@@ -41,7 +41,11 @@ class GenerateScriptDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
+    }
+
+    override fun initBindings() {
+        super.initBindings()
 
         dataCtx.availableFromMigrations.afterChange {
             fromMigrationsModel.removeAllElements()

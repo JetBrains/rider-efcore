@@ -42,7 +42,7 @@ class AddMigrationDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
     }
 
     override fun generateCommand(): CliCommand {
@@ -79,7 +79,7 @@ class AddMigrationDialogWrapper(
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
                     .applyToComponent {
-                        commonCtx.migrationsProject.afterChange(warmUp = true) { isEnabled = it != null }
+                        commonCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }
             }
         }

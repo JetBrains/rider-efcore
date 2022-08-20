@@ -20,7 +20,7 @@ class RemoveLastMigrationDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
     }
 
     override fun generateCommand(): CliCommand {

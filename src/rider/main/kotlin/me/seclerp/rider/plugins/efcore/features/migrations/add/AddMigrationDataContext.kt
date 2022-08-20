@@ -20,16 +20,20 @@ class AddMigrationDataContext(
 
     init {
         commonCtx.dbContext.afterChange {
-            val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
-            val dbContextName = it!!.fullName
-            val migrations = beModel.getAvailableMigrations.runUnderProgress(
-                MigrationsIdentity(migrationProjectName, dbContextName), intellijProject, "Loading available migrations...",
-                isCancelable = true,
-                throwFault = true
-            )
+            if (it == null) {
+                availableMigrations.value = listOf()
+            } else {
+                val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
+                val dbContextName = it.fullName
+                val migrations = beModel.getAvailableMigrations.runUnderProgress(
+                    MigrationsIdentity(migrationProjectName, dbContextName), intellijProject, "Loading available migrations...",
+                    isCancelable = true,
+                    throwFault = true
+                )
 
-            if (migrations != null) {
-                availableMigrations.value = migrations
+                if (migrations != null) {
+                    availableMigrations.value = migrations
+                }
             }
         }
 

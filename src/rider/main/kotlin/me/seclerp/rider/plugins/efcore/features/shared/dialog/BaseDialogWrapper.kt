@@ -96,6 +96,16 @@ abstract class BaseDialogWrapper(
     init {
         title = dialogTitle
 
+        initPreferredProjects()
+    }
+
+    protected fun initUi() {
+        init()
+        initBindings()
+        initData()
+    }
+
+    protected open fun initBindings() {
         selectedMigrationsProject.bindNullable(commonCtx.migrationsProject,
             { migrationsProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
             { commonCtx.availableMigrationsProjects.firstOrNull { info -> info.id == it?.data?.id } })
@@ -104,19 +114,19 @@ abstract class BaseDialogWrapper(
             { startupProjectsModel.firstOrNull { item -> item.data.id == it?.id } },
             { commonCtx.availableStartupProjects.firstOrNull { info -> info.id == it?.data?.id } })
 
-        selectedTargetFramework.bindNullable(commonCtx.targetFramework,
-            { targetFrameworkModel.firstOrNull { item -> item.data == it } },
-            { commonCtx.availableTargetFrameworks.value?.firstOrNull { tgFm -> tgFm == it?.data } })
-
         selectedDbContext.bindNullable(commonCtx.dbContext,
             { dbContextModel.firstOrNull { item -> item.data == it?.fullName } },
             { commonCtx.availableDbContexts.value?.firstOrNull { info -> info.fullName == it?.data } })
+
+        selectedTargetFramework.bindNullable(commonCtx.targetFramework,
+            { targetFrameworkModel.firstOrNull { item -> item.data == it } },
+            { commonCtx.availableTargetFrameworks.value?.firstOrNull { tgFm -> tgFm == it?.data } })
 
         selectedBuildConfiguration.bindNullable(commonCtx.buildConfiguration,
             { buildConfigurationModel.firstOrNull { item -> item.displayName == it } },
             { commonCtx.availableBuildConfigurations.firstOrNull { buildConfig -> buildConfig == it?.displayName } })
 
-        commonCtx.availableTargetFrameworks.afterChange(warmUp = true) {
+        commonCtx.availableTargetFrameworks.afterChange {
             targetFrameworkModel.removeAllElements()
             if (it != null) {
                 val targetFrameworks = it.map { it.toTargetFrameworkViewItem() }
@@ -124,15 +134,21 @@ abstract class BaseDialogWrapper(
             }
         }
 
-        commonCtx.availableDbContexts.afterChange(warmUp = true) {
+        commonCtx.availableDbContexts.afterChange {
             dbContextModel.removeAllElements()
             if (it != null) {
                 val dbContextItems = it.map { it.toViewItem() }
                 dbContextModel.addAll(dbContextItems)
             }
         }
+    }
 
+    protected open fun initData() {
         initPreferredProjects()
+        if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
+            commonCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
+            loadDialogState(dialogsStateService.forDialog(dialogId))
+        }
     }
 
     private fun initPreferredProjects() {
@@ -206,11 +222,6 @@ abstract class BaseDialogWrapper(
         createMainUI()
             .apply {
                 panel = this
-
-                if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
-                    commonCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
-                    loadDialogState(dialogsStateService.forDialog(dialogId))
-                }
             }
 
     override fun createLeftSideActions(): Array<Action> {

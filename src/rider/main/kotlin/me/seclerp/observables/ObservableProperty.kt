@@ -20,18 +20,7 @@ open class ObservableProperty<T : Any>(initialValue: T?) {
 
     val onChange: Event<T?> = Event()
 
-    /**
-     * @param warmUp if true, additionally to creating mapping, value will be set immediately
-     */
-    fun afterChange(warmUp: Boolean, effect: (T?) -> Unit) {
-        if (warmUp) {
-            effect(getter())
-        }
-
-        onChange += effect
-    }
-
     fun afterChange(effect: (T?) -> Unit) {
-        afterChange(false, effect)
+        onChange += effect
     }
 }

@@ -36,13 +36,17 @@ class UpdateDatabaseDialogWrapper(
     //
     // Constructor
     init {
+        initUi()
+    }
+
+    override fun initBindings() {
+        super.initBindings()
+
         dataCtx.availableMigrations.afterChange {
             currentDbContextMigrationsList.clear()
             currentDbContextMigrationsList.addAll(it!!.map { it.migrationLongName })
             currentDbContextMigrationsList.add("0")
         }
-
-        init()
     }
 
     override fun generateCommand(): CliCommand {
