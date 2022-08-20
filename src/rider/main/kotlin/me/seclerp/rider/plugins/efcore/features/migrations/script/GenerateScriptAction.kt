@@ -3,7 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.migrations.script
 import com.intellij.openapi.project.Project
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.BaseCommandAction
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
 class GenerateScriptAction : BaseCommandAction("Generating script...", "Script has been generated") {
@@ -12,6 +12,5 @@ class GenerateScriptAction : BaseCommandAction("Generating script...", "Script h
         toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
-    ): BaseDialogWrapper =
-        GenerateScriptDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
+    ) = GenerateScriptDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

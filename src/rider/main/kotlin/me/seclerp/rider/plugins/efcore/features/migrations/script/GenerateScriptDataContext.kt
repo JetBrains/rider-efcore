@@ -1,45 +1,27 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.script
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.observables.ObservableProperty
-import me.seclerp.observables.bind
-import me.seclerp.observables.bindNullable
+import me.seclerp.observables.*
+import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
 class GenerateScriptDataContext(
-    intellijProject: Project,
-    commonCtx: CommonDataContext,
-    beModel: RiderEfCoreModel
-) {
-    val availableMigrations = ObservableProperty(listOf<MigrationInfo>())
+    intellijProject: Project
+): CommonDataContext(intellijProject, true) {
+    val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
+    val availableFromMigrations = observableList<String>()
+    val availableToMigrations = observableList<String>()
 
-    val availableFromMigrations = ObservableProperty(listOf<String>())
-    val availableToMigrations = ObservableProperty(listOf<String>())
+    val fromMigration = observable<String?>(null)
+    val toMigration = observable<String?>(null)
+    val outputFilePath = observable("script.sql")
+    val idempotent = observable(false)
+    val noTransactions = observable(false)
 
-    val fromMigration = ObservableProperty<String>(null)
-    val toMigration = ObservableProperty<String>(null)
-    val outputFilePath = ObservableProperty("script.sql")
-    val idempotent = ObservableProperty(false)
-    val noTransactions = ObservableProperty(false)
+    override fun initBindings() {
+        super.initBindings()
 
-    init {
-        commonCtx.dbContext.afterChange {
-            val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
-            val dbContextName = it!!.fullName
-            val migrations = beModel.getAvailableMigrations.runUnderProgress(
-                MigrationsIdentity(migrationProjectName, dbContextName), intellijProject, "Loading available migrations...",
-                isCancelable = true,
-                throwFault = true
-            )
-
-            if (migrations != null) {
-                availableMigrations.value = migrations
-            }
-        }
+        availableMigrations.initBinding()
 
         availableFromMigrations.bind(availableMigrations) {
             buildList {
@@ -53,8 +35,5 @@ class GenerateScriptDataContext(
                 addAll(it.map { it.migrationLongName })
             }
         }
-
-        fromMigration.bindNullable(availableFromMigrations) { it?.lastOrNull() }
-        toMigration.bindNullable(availableToMigrations) { it?.firstOrNull() }
     }
 }

@@ -10,20 +10,23 @@ import com.intellij.ui.layout.selected
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.*
 
 class UpdateDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?
-) : BaseDialogWrapper(toolsVersion, "Update Database", intellijProject, selectedDotnetProjectName, true) {
+    selectedProjectName: String?
+) : CommonDialogWrapper<UpdateDatabaseDataContext>(
+    UpdateDatabaseDataContext(intellijProject),
+    toolsVersion,
+    "Update Database",
+    intellijProject,
+    selectedProjectName,
+    true
+) {
 
     val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
-
-    //
-    // Data binding
-    private val dataCtx = UpdateDatabaseDataContext(intellijProject, commonCtx, beModel)
 
     //
     // Internal data
@@ -44,15 +47,15 @@ class UpdateDatabaseDialogWrapper(
 
         dataCtx.availableMigrations.afterChange {
             currentDbContextMigrationsList.clear()
-            currentDbContextMigrationsList.addAll(it!!.map { it.migrationLongName })
+            currentDbContextMigrationsList.addAll(it.map { it.migrationLongName })
             currentDbContextMigrationsList.add("0")
         }
     }
 
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
-        val targetMigration = dataCtx.targetMigration.notNullValue.trim()
-        val connection = if (dataCtx.useDefaultConnection.notNullValue) null else dataCtx.connection.notNullValue
+        val targetMigration = dataCtx.targetMigration.value.trim()
+        val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
 
         return databaseCommandFactory.update(efCoreVersion, commonOptions, targetMigration, connection)
     }
@@ -60,7 +63,15 @@ class UpdateDatabaseDialogWrapper(
     //
     // UI
     override fun Panel.createPrimaryOptions() {
-        createTargetMigrationRow()
+        row("Target migration:") {
+            textFieldWithCompletion(dataCtx.targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
+                .horizontalAlign(HorizontalAlign.FILL)
+                .comment("Use <code>0</code> as a target migration to undo all applied migrations")
+                .focused()
+                .validationOnInput(validator.targetMigrationValidation())
+                .validationOnApply(validator.targetMigrationValidation())
+                .monospaced()
+        }
     }
 
     override fun Panel.createAdditionalGroup() {
@@ -81,18 +92,6 @@ class UpdateDatabaseDialogWrapper(
                         .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
                 }
             }
-        }
-    }
-
-    private fun Panel.createTargetMigrationRow() {
-        row("Target migration:") {
-            textFieldWithCompletion(dataCtx.targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
-                .horizontalAlign(HorizontalAlign.FILL)
-                .comment("Use <code>0</code> as a target migration to undo all applied migrations")
-                .focused()
-                .validationOnInput(validator.targetMigrationValidation())
-                .validationOnApply(validator.targetMigrationValidation())
-                .monospaced()
         }
     }
 

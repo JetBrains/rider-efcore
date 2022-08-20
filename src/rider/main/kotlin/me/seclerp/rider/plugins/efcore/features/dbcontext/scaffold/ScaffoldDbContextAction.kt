@@ -3,7 +3,6 @@ package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 import com.intellij.openapi.project.Project
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.BaseCommandAction
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
 class ScaffoldDbContextAction : BaseCommandAction("Scaffolding DbContext...", "DbContext has been scaffolded") {
@@ -12,6 +11,5 @@ class ScaffoldDbContextAction : BaseCommandAction("Scaffolding DbContext...", "D
         toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
         currentDotnetProjectName: String?
-    ): BaseDialogWrapper =
-        ScaffoldDbContextDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
+    ) = ScaffoldDbContextDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
 }

@@ -1,10 +1,13 @@
 package me.seclerp.observables
 
-fun <T2 : Any, T : Any> ObservableCollection<T>.bind(bindTo: ObservableCollection<T2>, mappingTo: (T?) -> T2?) {
-    this.afterAdded { bindTo.add(mappingTo(it)) }
+fun <T> observableList() = ObservableCollection<T>()
+
+fun <T, T2> ObservableCollection<T>.bindElement(bindTo: ObservableCollection<T2>, mappingTo: (T) -> T2) {
+    afterAdded { bindTo.add(mappingTo(it)) }
+    afterRemoved { bindTo.remove(mappingTo(it)) }
 }
 
-fun <T2 : Any, T : Any> ObservableCollection<T>.bind(bindTo: ObservableCollection<T2>, mappingTo: (T?) -> T2?, mappingFrom: (T2?) -> T?) {
-    this.bind(bindTo, mappingTo)
-    bindTo.bind(this, mappingFrom)
+fun <T, T2> ObservableCollection<T>.bindElement(bindTo: ObservableCollection<T2>, mappingTo: (T) -> T2, mappingFrom: (T2) -> T) {
+    this.bindElement(bindTo, mappingTo)
+    bindTo.bindElement(this, mappingFrom)
 }

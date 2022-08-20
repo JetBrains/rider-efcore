@@ -1,18 +1,19 @@
 package me.seclerp.observables
 
 class Event<T> {
-    private val observers = mutableSetOf<(T) -> Unit>()
+    private val observersList = mutableListOf<(T) -> Unit>()
+    val observers: List<(T) -> Unit> get() = observersList
 
     operator fun plusAssign(observer: (T) -> Unit) {
-        observers.add(observer)
+        observersList.add(observer)
     }
 
     operator fun minusAssign(observer: (T) -> Unit) {
-        observers.remove(observer)
+        observersList.remove(observer)
     }
 
     operator fun invoke(value: T) {
-        for (observer in observers)
+        for (observer in observersList)
             observer(value)
     }
 }

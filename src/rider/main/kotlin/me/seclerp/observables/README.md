@@ -7,7 +7,7 @@ This package provides very basic implementation of Observer pattern implemented 
 `ObservableProperty<T>` class provides a wrapper over some arbitary typed value that could be subscribed for updates:
 
 ```kotlin
-val firstName = ObservableProperty<String>("")
+val firstName = observable<String>("")
 ```
 
 Each ObservableProperty instance should have a default value passed in the constructor.
@@ -42,7 +42,7 @@ val nonNullableValue = firstName.notNullValue // the same as firstName.value!!
 You could bind one `ObservableProperty` onto another. They could also have different types:
 
 ```kotlin
-val greetings = ObservableProperty("").bind(firstName) {
+val greetings = observable("").bind(firstName) {
     "Hello, {it}!"
 }
 ```
@@ -50,7 +50,7 @@ val greetings = ObservableProperty("").bind(firstName) {
 Function provided to `bind` would be called only on next `firstName` update. To execute it immediately (to provide correct initial data mapped) you could use optional `warmUp` parameter:
 
 ```kotlin
-val greetings = ObservableProperty("").bind(warmUp = true, firstName) {
+val greetings = observable("").bind(warmUp = true, firstName) {
     "Hello, {it}!"
 }
 ```
@@ -60,7 +60,7 @@ To obtain two-way binding, just provide 2 functions into `bind` call:
 ```kotlin
 data class FirstNameInfo(val firstName: String)
 
-val firstNameInfo = ObservableProperty(FirstNameInfo("")).bind(firstName)
+val firstNameInfo = observable(FirstNameInfo("")).bind(firstName)
     { FirstNameInfo(it) }
     { it.firstName }
 )

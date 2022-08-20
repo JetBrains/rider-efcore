@@ -1,46 +1,27 @@
 package me.seclerp.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.*
+import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
 class AddMigrationDataContext(
-    intellijProject: Project,
-    commonCtx: CommonDataContext,
-    beModel: RiderEfCoreModel
-) {
-    var availableMigrations = ObservableProperty(listOf<MigrationInfo>())
+    intellijProject: Project
+): CommonDataContext(intellijProject, true) {
+    val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
+    val migrationName = observable("").withLogger("migrationName")
+    val migrationsOutputFolder = observable("Migrations").withLogger("migrationsOutputFolder")
 
-    var migrationName = ObservableProperty("")
-    var migrationsOutputFolder = ObservableProperty("")
+    override fun initBindings() {
+        super.initBindings()
 
-    init {
-        commonCtx.dbContext.afterChange {
-            if (it == null) {
-                availableMigrations.value = listOf()
-            } else {
-                val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
-                val dbContextName = it.fullName
-                val migrations = beModel.getAvailableMigrations.runUnderProgress(
-                    MigrationsIdentity(migrationProjectName, dbContextName), intellijProject, "Loading available migrations...",
-                    isCancelable = true,
-                    throwFault = true
-                )
+        availableMigrations.initBinding()
 
-                if (migrations != null) {
-                    availableMigrations.value = migrations
-                }
-            }
-        }
-
-        availableMigrations.afterChange {
-            if (it!!.isEmpty() && migrationName.notNullValue != "") {
-                migrationName.value = "Initial"
-            }
+        migrationName.bind(availableMigrations) {
+            if (it.isEmpty() && migrationName.value.trim() == "")
+                "Initial"
+            else
+                migrationName.value
         }
     }
 }

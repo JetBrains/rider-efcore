@@ -14,13 +14,14 @@ import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
 import me.seclerp.observables.ObservableProperty
-import me.seclerp.observables.mapNullable
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
 import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.bindSelected
 import me.seclerp.rider.plugins.efcore.ui.bindText
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
@@ -31,15 +32,16 @@ import javax.swing.JComponent
 class ScaffoldDbContextDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?,
-) : BaseDialogWrapper(toolsVersion, "Scaffold DbContext", intellijProject, selectedDotnetProjectName,
-    requireMigrationsInProject = false, requireDbContext = false
+    selectedProjectName: String?,
+) : CommonDialogWrapper<ScaffoldDbContextDataContext>(
+    ScaffoldDbContextDataContext(intellijProject),
+    toolsVersion,
+    "Scaffold DbContext",
+    intellijProject,
+    selectedProjectName,
+    requireMigrationsInProject = false
 ) {
     val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
-
-    //
-    // Data binding
-    val dataCtx = ScaffoldDbContextDataContext()
 
     //
     // Internal data
@@ -51,14 +53,7 @@ class ScaffoldDbContextDialogWrapper(
     private val tablesModel = SimpleListTableModel(dataCtx.tablesList)
     private val schemasModel = SimpleListTableModel(dataCtx.schemasList)
 
-    private val migrationProjectFolder = commonCtx.migrationsProject.mapNullable {
-        if (it == null) {
-            ""
-        } else {
-            val currentMigrationsProject = it.fullPath
-            File(currentMigrationsProject).parentFile.path
-        }
-    }
+    private val migrationProjectFolder = observable("")
 
     //
     // Validation
@@ -70,24 +65,35 @@ class ScaffoldDbContextDialogWrapper(
         initUi()
     }
 
+    override fun initBindings() {
+        super.initBindings()
+
+        migrationProjectFolder.bind(dataCtx.migrationsProject) {
+            if (it != null)
+                File(it.fullPath).parentFile.path
+            else
+                ""
+        }
+    }
+
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
 
         return dbContextCommandFactory.scaffold(
             efCoreVersion, commonOptions,
-            dataCtx.connection.notNullValue,
-            dataCtx.provider.notNullValue,
-            dataCtx.outputFolder.notNullValue,
-            dataCtx.useAttributes.notNullValue,
-            dataCtx.useDatabaseNames.notNullValue,
-            dataCtx.generateOnConfiguring.notNullValue,
-            dataCtx.usePluralizer.notNullValue,
-            dataCtx.dbContextName.notNullValue,
-            dataCtx.dbContextFolder.notNullValue,
-            dataCtx.scaffoldAllTables.notNullValue,
-            dataCtx.tablesList.map { it!!.data },
-            dataCtx.scaffoldAllSchemas.notNullValue,
-            dataCtx.schemasList.map { it!!.data })
+            dataCtx.connection.value,
+            dataCtx.provider.value,
+            dataCtx.outputFolder.value,
+            dataCtx.useAttributes.value,
+            dataCtx.useDatabaseNames.value,
+            dataCtx.generateOnConfiguring.value,
+            dataCtx.usePluralizer.value,
+            dataCtx.dbContextName.value,
+            dataCtx.dbContextFolder.value,
+            dataCtx.scaffoldAllTables.value,
+            dataCtx.tablesList.map { it.data },
+            dataCtx.scaffoldAllSchemas.value,
+            dataCtx.schemasList.map { it.data })
     }
 
     //
@@ -144,14 +150,14 @@ class ScaffoldDbContextDialogWrapper(
         groupRowsRange("Additional Options") {
             row("Output folder:") {
                 textFieldForRelativeFolder(
-                    { migrationProjectFolder.notNullValue },
+                    migrationProjectFolder.getter,
                     intellijProject,
                     "Select Output Folder")
                     .bindText(dataCtx.outputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.outputFolderValidation())
                     .validationOnApply(validator.outputFolderValidation())
-                    .applyToComponent { commonCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
+                    .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
             }
 
             row {
@@ -189,14 +195,14 @@ class ScaffoldDbContextDialogWrapper(
 
         row("Generated DbContext folder:") {
             textFieldForRelativeFolder(
-                { migrationProjectFolder.notNullValue },
+                migrationProjectFolder.getter,
                 intellijProject,
                 "Select Generated DbContext Folder")
                 .bindText(dataCtx.dbContextFolder)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
-                .applyToComponent { commonCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
+                .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
         }
     }
 

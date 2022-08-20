@@ -1,26 +1,48 @@
 package me.seclerp.observables
 
-open class ObservableProperty<T : Any>(initialValue: T?) {
-    private var internalValue = initialValue
+import java.util.Random
 
-    var value: T?
+open class ObservableProperty<T>(defaultValue: T) : Observable<T> {
+    private var internalValue = defaultValue
+
+    //
+    // Implementation of Observable
+    override val id = random.nextInt(1000)
+
+    override var value: T
         get() = getter()
         set(value) { setter(value) }
 
-    val notNullValue: T
-        get() = value!!
+    override val getter: () -> T = { internalValue }
 
-    val getter: () -> T? = { internalValue }
-    val setter: (T?) -> Unit = {
-        if (internalValue != it) {
+    override val setter: (T) -> Unit = {
+        if (internalValue != it || !isInitialized) {
             internalValue = it
-            onChange.invoke(value)
+            isInitialized = true
+            onChange.invoke(internalValue)
         }
     }
 
-    val onChange: Event<T?> = Event()
+    override val onChange: Event<T> = Event()
 
-    fun afterChange(effect: (T?) -> Unit) {
+    override var isInitialized: Boolean = false
+        protected set
+
+    override fun afterChange(effect: (T) -> Unit) {
         onChange += effect
+    }
+
+    override fun initialize(value: T)  {
+        if (this.value == value) {
+            isInitialized = true
+            onChange.invoke(value)
+            return
+        }
+
+        this.value = value
+    }
+
+    companion object {
+        private val random = Random()
     }
 }

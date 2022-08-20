@@ -4,35 +4,41 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import me.seclerp.observables.ObservableProperty
-import me.seclerp.observables.bindNullable
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
 import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
+import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import javax.swing.DefaultComboBoxModel
 
 class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?
-) : BaseDialogWrapper(toolsVersion, "Generate SQL Script", intellijProject, selectedDotnetProjectName, true) {
-
+    selectedProjectName: String?
+) : CommonDialogWrapper<GenerateScriptDataContext>(
+    GenerateScriptDataContext(intellijProject),
+    toolsVersion,
+    "Generate SQL Script",
+    intellijProject,
+    selectedProjectName,
+    requireMigrationsInProject = true
+) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //
-    // Data binding
-    private val dataCtx = GenerateScriptDataContext(intellijProject, commonCtx, beModel)
-
-    //
     // Internal data
-    private val fromMigrationsModel = DefaultComboBoxModel(arrayOf<MigrationItem>())
-    private val toMigrationsModel = DefaultComboBoxModel(arrayOf<MigrationItem>())
+    private val fromMigrationsView = observableList<MigrationItem?>()
+    private val toMigrationsView = observableList<MigrationItem?>()
 
-    private val fromMigration = ObservableProperty<MigrationItem>(null)
-    private val toMigration = ObservableProperty<MigrationItem>(null)
+    private val fromMigrationView = observable<MigrationItem?>(null)
+    private val toMigrationView = observable<MigrationItem?>(null)
 
     //
     // Validation
@@ -47,38 +53,25 @@ class GenerateScriptDialogWrapper(
     override fun initBindings() {
         super.initBindings()
 
-        dataCtx.availableFromMigrations.afterChange {
-            fromMigrationsModel.removeAllElements()
+        fromMigrationView.bind(fromMigrationsView) { it.lastOrNull() }
+        toMigrationView.bind(toMigrationsView) { it.firstOrNull() }
 
-            if (it != null) {
-                fromMigrationsModel.addAll(it.map { MigrationItem(it) })
-            }
-        }
+        fromMigrationView.bind(dataCtx.fromMigration,
+            mappings.migration.toItem,
+            mappings.migration.fromItem)
 
-        dataCtx.availableToMigrations.afterChange {
-            toMigrationsModel.removeAllElements()
-
-            if (it != null) {
-                toMigrationsModel.addAll(it.map { MigrationItem(it) })
-            }
-        }
-
-        fromMigration.bindNullable(dataCtx.fromMigration,
-            { fromMigrationsModel.firstOrNull { item -> item.data == it } },
-            { it?.data })
-
-        fromMigration.bindNullable(dataCtx.fromMigration,
-            { toMigrationsModel.firstOrNull { item -> item.data == it } },
-            { it?.data })
+        fromMigrationView.bind(dataCtx.fromMigration,
+            mappings.migration.toItem,
+            mappings.migration.fromItem)
     }
 
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
-        val fromMigration = dataCtx.fromMigration.notNullValue.trim()
+        val fromMigration = dataCtx.fromMigration.value!!.trim()
         val toMigration = dataCtx.toMigration.value?.trim()
-        val outputFile = dataCtx.outputFilePath.notNullValue
-        val idempotent = dataCtx.idempotent.notNullValue
-        val noTransactions = dataCtx.noTransactions.notNullValue
+        val outputFile = dataCtx.outputFilePath.value
+        val idempotent = dataCtx.idempotent.value
+        val noTransactions = dataCtx.noTransactions.value
 
         return migrationsCommandFactory.generateScript(
             efCoreVersion, commonOptions, fromMigration, toMigration, outputFile, idempotent, noTransactions)
@@ -113,7 +106,7 @@ class GenerateScriptDialogWrapper(
 
     private fun Panel.createMigrationRows() {
         row("From migration:") {
-            iconComboBox(fromMigrationsModel, fromMigration)
+            iconComboBox(fromMigrationView, fromMigrationsView)
                 .validationOnApply(validator.fromMigrationValidation())
                 .validationOnInput(validator.fromMigrationValidation())
                 .comment("'0' means before the first migration")
@@ -123,10 +116,24 @@ class GenerateScriptDialogWrapper(
         }
 
         row("To migration:") {
-            iconComboBox(toMigrationsModel, toMigration)
+            iconComboBox(toMigrationView, toMigrationsView)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .monospaced()
                 .focused()
+        }
+    }
+
+    companion object {
+        private object mappings {
+            object migration {
+                val toItem: (String?) -> MigrationItem?
+                    get() = {
+                        if (it == null) null else MigrationItem(it)
+                    }
+
+                val fromItem: (MigrationItem?) -> String?
+                    get() = { it?.data }
+            }
         }
     }
 }

@@ -1,25 +1,28 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.openapi.project.Project
 import me.seclerp.observables.ObservableCollection
-import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 
-class ScaffoldDbContextDataContext {
-    var connection = ObservableProperty("")
-    var provider = ObservableProperty("")
-    var outputFolder = ObservableProperty("Entities")
+class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext(intellijProject, false) {
+    val connection = observable("")
+    val provider = observable("")
+    val outputFolder = observable("Entities")
 
-    var useAttributes = ObservableProperty(false)
-    var useDatabaseNames = ObservableProperty(false)
-    var generateOnConfiguring = ObservableProperty(true)
-    var usePluralizer = ObservableProperty(true)
+    val useAttributes = observable(false)
+    val useDatabaseNames = observable(false)
+    val generateOnConfiguring = observable(true)
+    val usePluralizer = observable(true)
 
-    var dbContextName = ObservableProperty("MyDbContext")
-    var dbContextFolder = ObservableProperty("Context")
+    val dbContextName = observable("MyDbContext")
+    val dbContextFolder = observable("Context")
 
-    val tablesList = ObservableCollection<SimpleItem>()
-    val schemasList = ObservableCollection<SimpleItem>()
+    val tablesList = observableList<SimpleItem>()
+    val schemasList = observableList<SimpleItem>()
 
-    var scaffoldAllTables = ObservableProperty(true)
-    var scaffoldAllSchemas = ObservableProperty(true)
+    val scaffoldAllTables = observable(true)
+    val scaffoldAllSchemas = observable(true)
 }

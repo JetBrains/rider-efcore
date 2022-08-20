@@ -6,16 +6,21 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
-import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 
 class RemoveLastMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?,
-) : BaseDialogWrapper(toolsVersion, "Remove Last Migration", intellijProject, selectedDotnetProjectName, true) {
+    selectedProjectName: String?,
+) : CommonDialogWrapper<RemoveLastMigrationDataContext>(
+    RemoveLastMigrationDataContext(intellijProject),
+    toolsVersion,
+    "Remove Last Migration",
+    intellijProject,
+    selectedProjectName,
+    true
+) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
-
-    val dataCtx = RemoveLastMigrationDataContext(intellijProject, commonCtx, beModel)
 
     //
     // Constructor
@@ -35,6 +40,6 @@ class RemoveLastMigrationDialogWrapper(
         }
 
         val folderService = intellijProject.service<RemoveLastMigrationFolderService>()
-        folderService.deleteMigrationsFolderIfEmpty(dataCtx.availableMigrations.notNullValue.first())
+        folderService.deleteMigrationsFolderIfEmpty(dataCtx.availableMigrations.value.firstOrNull())
     }
 }

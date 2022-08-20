@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 package me.seclerp.rider.plugins.efcore.ui
 
 import com.intellij.openapi.editor.colors.EditorColorsManager
@@ -19,6 +17,8 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.PropertyBinding
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.rdclient.util.idea.toIOFile
+import me.seclerp.observables.Observable
+import me.seclerp.observables.ObservableCollection
 import me.seclerp.observables.ObservableProperty
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
@@ -50,23 +50,40 @@ fun <T : IconItem<*>> Row.iconComboBox(
         }
 
 fun <T : IconItem<*>> Row.iconComboBox(
-    model: DefaultComboBoxModel<T>,
-    property: ObservableProperty<T>
-): Cell<ComboBox<T>> =
-    iconComboBox(model, property.getter, property.setter)
-        .applyToComponent { property.afterChange { this.selectedItem = it } }
+    selectedItemProperty: Observable<T?>,
+    availableItemsProperty: Observable<List<T?>>
+): Cell<ComboBox<T>> {
+    val model = DefaultComboBoxModel<T>()
+        .apply {
+            selectedItemProperty.afterChange {
+                // We are going to introduce a little hack here. In some cases, selected item comes BEFORE new
+                // available items are set to the model. In such case, we will add selected item to the model. After
+                // actual data for available items will be presented, old item will be removed.
+                if (getIndexOf(it) == -1) {
+                    addElement(it)
+                }
 
+                if (selectedItem != it)
+                    selectedItem = it
+            }
+            availableItemsProperty.afterChange {
+                val selectedItem = this.selectedItem
+                removeAllElements()
+                addAll(it)
+                this.selectedItem = selectedItem
+            }
+        }
+
+    return iconComboBox(model, selectedItemProperty.getter, selectedItemProperty.setter)
+}
+
+@Deprecated("Use ObservableProperty-based overload instead.", level = DeprecationLevel.WARNING)
 fun <T : IconItem<*>> Row.iconComboBox(
     model: DefaultComboBoxModel<T>,
     property: KMutableProperty0<T?>
 ): Cell<ComboBox<T>> = iconComboBox(model, property.getter, property.setter)
 
-fun <T : IconItem<*>> Row.iconComboBox(
-    items: Array<T>,
-    getter: () -> T?,
-    setter: (T?) -> Unit
-): Cell<ComboBox<T>> = iconComboBox(DefaultComboBoxModel(items), getter, setter)
-
+@Deprecated("Use ObservableProperty-based overload instead.", level = DeprecationLevel.WARNING)
 fun <T : IconItem<*>> Row.iconComboBox(
     items: Array<T>,
     property: KMutableProperty0<T?>
@@ -100,10 +117,11 @@ fun Row.textFieldWithCompletion(
     project: Project? = null,
     icon: Icon? = null
 ): Cell<TextFieldWithCompletion> {
-    return textFieldWithCompletion({ property.notNullValue }, property.setter, completions, project, icon)
-        .applyToComponent { property.afterChange { this.text = it!! } }
+    return textFieldWithCompletion(property.getter, property.setter, completions, project, icon)
+        .applyToComponent { property.afterChange { this.text = it } }
 }
 
+@Deprecated("Use ObservableProperty-based overload instead.", level = DeprecationLevel.WARNING)
 fun Row.textFieldWithCompletion(
     binding: PropertyBinding<String>,
     completions: MutableList<String>,
@@ -111,15 +129,6 @@ fun Row.textFieldWithCompletion(
     icon: Icon? = null
 ): Cell<TextFieldWithCompletion> {
     return textFieldWithCompletion(binding.get, binding.set, completions, project, icon)
-}
-
-fun Row.textFieldWithCompletion(
-    property: KMutableProperty0<String>,
-    completions: MutableList<String>,
-    project: Project? = null,
-    icon: Icon? = null
-): Cell<TextFieldWithCompletion> {
-    return textFieldWithCompletion(PropertyBinding(property.getter, property.setter), completions, project, icon)
 }
 
 fun Row.textFieldForRelativeFolder(
@@ -149,7 +158,7 @@ fun Row.simpleExpandableTextField(
     property: ObservableProperty<String>,
 ): Cell<ExpandableTextField> {
     return simpleExpandableTextFieldBase()
-        .bindText({ property.notNullValue }, property.setter)
+        .bindText(property.getter, property.setter)
         .applyToComponent { property.afterChange { this.text = it } }
 }
 
@@ -159,13 +168,6 @@ fun Row.simpleExpandableTextField(
 ): Cell<ExpandableTextField> {
     return simpleExpandableTextFieldBase()
         .bindText(getter, setter)
-}
-
-fun Row.simpleExpandableTextField(
-    property: KMutableProperty0<String>,
-): Cell<ExpandableTextField> {
-    return simpleExpandableTextFieldBase()
-        .bindText(property)
 }
 
 private fun Row.simpleExpandableTextFieldBase(): Cell<ExpandableTextField> =
@@ -179,16 +181,16 @@ fun Cell<JBCheckBox>.bindSelected(
     property: ObservableProperty<Boolean>,
 ): Cell<JBCheckBox> {
     return this
-        .bindSelected({ property.notNullValue }, property.setter)
-        .applyToComponent { property.afterChange { this.isSelected = it!! } }
+        .bindSelected(property.getter, property.setter)
+        .applyToComponent { property.afterChange { this.isSelected = it } }
 }
 
 fun Cell<JBTextField>.bindText(
     property: ObservableProperty<String>,
 ): Cell<JBTextField> {
     return this
-        .bindText({ property.notNullValue }, property.setter)
-        .applyToComponent { property.afterChange { this.text = it!! } }
+        .bindText(property.getter, property.setter)
+        .applyToComponent { property.afterChange { this.text = it } }
 }
 
 @JvmName("bindTextTextFieldWithBrowseButton")
@@ -196,8 +198,8 @@ fun Cell<TextFieldWithBrowseButton>.bindText(
     property: ObservableProperty<String>,
 ): Cell<TextFieldWithBrowseButton> {
     return this
-        .bindText({ property.notNullValue }, property.setter)
-        .applyToComponent { property.afterChange { this.text = it!! } }
+        .bindText(property.getter, property.setter)
+        .applyToComponent { property.afterChange { this.text = it } }
 }
 
 

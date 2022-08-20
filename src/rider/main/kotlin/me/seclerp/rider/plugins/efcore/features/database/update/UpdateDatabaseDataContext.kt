@@ -1,45 +1,28 @@
 package me.seclerp.rider.plugins.efcore.features.database.update
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.util.idea.runUnderProgress
-import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
+import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
-class UpdateDatabaseDataContext(
-    intellijProject: Project,
-    commonCtx: CommonDataContext,
-    beModel: RiderEfCoreModel
-) {
-    var availableMigrations = ObservableProperty(listOf<MigrationInfo>())
+class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(intellijProject, true) {
+    val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
 
-    var targetMigration = ObservableProperty("")
-    var useDefaultConnection = ObservableProperty(true)
-    var connection = ObservableProperty("")
+    var targetMigration = observable("")
+    var useDefaultConnection = observable(true)
+    var connection = observable("")
 
-    init {
-        commonCtx.dbContext.afterChange {
-            val migrationProjectName = commonCtx.migrationsProject.notNullValue.name
-            val dbContextName = it!!.fullName
-            val migrations = beModel.getAvailableMigrations.runUnderProgress(
-                MigrationsIdentity(migrationProjectName, dbContextName), intellijProject, "Loading available migrations...",
-                isCancelable = true,
-                throwFault = true
-            )
+    override fun initBindings() {
+        super.initBindings()
 
-            if (migrations != null) {
-                availableMigrations.value = migrations
-            }
-        }
+        availableMigrations.initBinding()
 
-        availableMigrations.afterChange {
-            if (it!!.isEmpty()) {
-                targetMigration.value = ""
-            } else {
-                targetMigration.value = it.first().migrationLongName
-            }
+        targetMigration.bind(availableMigrations) {
+            if (it.isNotEmpty())
+                it.first().migrationLongName
+            else
+                ""
         }
     }
 }
