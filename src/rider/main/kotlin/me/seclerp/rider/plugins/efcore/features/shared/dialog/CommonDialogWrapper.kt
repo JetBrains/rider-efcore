@@ -272,6 +272,11 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(startupProjectView, availableStartupProjectsView)
                 .validationOnInput(validator.startupProjectValidation())
                 .validationOnApply(validator.startupProjectValidation())
+                .comment(
+                    "Your project is not listed? " +
+                    "<a href='https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui/f-a-q#why-i-cant-see-my-project-in-a-startup-projects-field'>" +
+                        "Help" +
+                    "</a>")
         }
     }
 
