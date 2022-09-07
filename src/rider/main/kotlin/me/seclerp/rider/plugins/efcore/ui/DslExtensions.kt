@@ -1,0 +1,69 @@
+package me.seclerp.rider.plugins.efcore.ui
+
+import com.intellij.openapi.editor.colors.EditorColorsManager
+import com.intellij.openapi.editor.colors.EditorFontType
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.ui.components.fields.ExpandableTextField
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindText
+import com.jetbrains.rdclient.util.idea.toIOFile
+import me.seclerp.observables.ObservableProperty
+import java.io.File
+import javax.swing.JComponent
+
+fun <T : JComponent> Cell<T>.monospaced(): Cell<T> = applyToComponent {
+    monospaced()
+}
+
+fun JComponent.monospaced(): JComponent = apply {
+    font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN)
+}
+
+fun Row.textFieldForRelativeFolder(
+    basePathGetter: () -> String,
+    project: Project? = null,
+    browseDialogTitle: String? = null,
+): Cell<TextFieldWithBrowseButton> {
+
+    val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+    val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
+        val pathRelativeToAsFile = File(basePathGetter()).path
+        it.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
+    }
+
+    return textFieldWithBrowseButtonCell
+}
+
+fun Row.readonlyExpandableTextField(
+    getter: () -> String
+): Cell<ExpandableTextField> =
+    simpleExpandableTextField(getter, {})
+        .applyToComponent {
+            isEditable = false
+        }
+
+fun Row.simpleExpandableTextField(
+    property: ObservableProperty<String>,
+): Cell<ExpandableTextField> {
+    return simpleExpandableTextFieldBase()
+        .bindText(property.getter, property.setter)
+        .applyToComponent { property.afterChange { this.text = it } }
+}
+
+fun Row.simpleExpandableTextField(
+    getter: () -> String,
+    setter: (String) -> Unit
+): Cell<ExpandableTextField> {
+    return simpleExpandableTextFieldBase()
+        .bindText(getter, setter)
+}
+
+private fun Row.simpleExpandableTextFieldBase(): Cell<ExpandableTextField> =
+    expandableTextField({ mutableListOf(it) }, { it[0] } )
+        .applyToComponent {
+            caretPosition = 0
+        }
+        .monospaced()
