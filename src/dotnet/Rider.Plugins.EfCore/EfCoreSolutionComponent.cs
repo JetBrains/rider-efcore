@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Core;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.Impl;
 using JetBrains.ProjectModel;
@@ -78,10 +77,13 @@ namespace Rider.Plugins.EfCore
     {
       InvalidateProjects();
 
-      var efToolsDefinitionValue = _efCoreModel.EfToolsDefinition.Value;
-      if (efToolsDefinitionValue != null)
+      if (_efCoreModel.EfToolsDefinition.Maybe.HasValue)
       {
-        CheckToolsInstalled(efToolsDefinitionValue);
+        var efToolsDefinitionValue = _efCoreModel.EfToolsDefinition.Value;
+        if (efToolsDefinitionValue != null)
+        {
+          CheckToolsInstalled(efToolsDefinitionValue);
+        }
       }
 
       _efCoreModel.EfToolsDefinition.Advise(_lifetime, CheckToolsInstalled);

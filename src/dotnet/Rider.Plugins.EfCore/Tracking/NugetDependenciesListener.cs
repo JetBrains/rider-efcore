@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;

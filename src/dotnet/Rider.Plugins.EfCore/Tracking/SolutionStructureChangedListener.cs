@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.ProjectsHost.Impl;
 using JetBrains.ProjectModel.ProjectsHost.SolutionHost;

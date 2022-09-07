@@ -3,8 +3,8 @@ using System.Linq;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.RiderTutorials.Utils;
+using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Migrations;
 using Rider.Plugins.EfCore.Rd;
 
@@ -20,15 +20,27 @@ namespace Rider.Plugins.EfCore.DbContext
         var foundDbContexts = project
           .GetPsiModules()
           .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
-          .Where(dbContextClass => !dbContextClass.IsAbstract)
           .Distinct(dbContextClass =>
             dbContextClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
-          .Select(dbContextClass =>
-            new DbContextInfo(dbContextClass.ShortName, dbContextClass.GetFullClrName()))
+          .TrySelect<IClass, DbContextInfo>(TryGetDbContextInfo)
           .ToList();
 
         return foundDbContexts;
       }
+    }
+
+    private static bool TryGetDbContextInfo(IClass @class, out DbContextInfo dbContextInfo)
+    {
+      dbContextInfo = null;
+
+      if (@class.IsAbstract)
+      {
+        return false;
+      }
+
+      dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetFullClrName());
+
+      return true;
     }
   }
 }
