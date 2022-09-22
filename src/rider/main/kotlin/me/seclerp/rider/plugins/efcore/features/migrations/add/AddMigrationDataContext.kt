@@ -9,8 +9,8 @@ class AddMigrationDataContext(
     intellijProject: Project
 ): CommonDataContext(intellijProject, true) {
     val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
-    val migrationName = observable("").withLogger("migrationName")
-    val migrationsOutputFolder = observable("Migrations").withLogger("migrationsOutputFolder")
+    val migrationName = observable("")
+    val migrationsOutputFolder = observable("Migrations")
 
     override fun initBindings() {
         super.initBindings()

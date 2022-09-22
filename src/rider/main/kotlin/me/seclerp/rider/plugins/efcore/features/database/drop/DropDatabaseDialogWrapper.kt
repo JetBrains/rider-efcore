@@ -21,7 +21,7 @@ class DropDatabaseDialogWrapper(
     selectedProjectName,
     false
 ) {
-    val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
+    private val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
 
     //
     // Constructor
