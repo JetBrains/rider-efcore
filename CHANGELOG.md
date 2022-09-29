@@ -1,3 +1,13 @@
+<h2>222.2.0</h2>
+<p>
+  <ul>
+    <li>Fix: abstract DbContexts are visible in DbContext dorpdown (#109 by @vova-lantsov-dev)</li>
+    <li>Fix: connection string is escaped improperly (#110 by @vova-lantsov-dev)</li>
+    <li>Add F.A.Q. hyperlink near Startup project dropdown (#115 by @TheBottleCyber)</li>
+    <li>Fix: startup exception when dotnet tools cache is not yet initialized</li>
+    <li>Fix: NullRef on invalid migration classes instead of ignoring</li>
+  </ul>
+</p>
 <h2>222.1.1</h2>
 <p>
   <ul>
