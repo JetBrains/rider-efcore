@@ -60,7 +60,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2022.2+**
+- JetBrains Rider **2022.3+**
 
 - EF Core **5.0+** with projects under such target frameworks:
   - `net7.0` (preview)
@@ -76,7 +76,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Development
 
-> **Note**: You should have JDK 11 and .NET SDK 5.0+ installed and configured.
+> **Note**: You should have JDK 17 and .NET SDK 5.0+ installed and configured.
 
 #### Preparing
 
@@ -91,7 +91,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 - for EAP version of Rider:
 
-  `./gradlew buildPlugin -PRiderSdkVersion=2022.2.0-eap04 -PProductVersion=2022.2-EAP4-SNAPSHOT`
+  `./gradlew buildPlugin -PRiderSdkVersion=2022.3.0-eap01 -PProductVersion=2022.3-EAP1-SNAPSHOT`
 
 It will build both frontend and backend parts.
 
