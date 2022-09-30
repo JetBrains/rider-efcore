@@ -110,7 +110,6 @@ changelog {
     version = "${PluginVersion}"
     path = "${project.projectDir}/CHANGELOG.md"
     header = "[${-> version.get()}] - ${new SimpleDateFormat("yyyy-MM-dd").format(new Date())}"
-    headerParserRegex = ~/(\d+\.\d+)/
     itemPrefix = "-"
     keepUnreleasedSection = true
     unreleasedTerm = "[Unreleased]"
