@@ -24,10 +24,13 @@ jobs:
 
       - name: 🏗 Get current changelog
         id: changelog_step
-        run: >-
-          echo "::set-output name=CHANGELOG::$(
-            ./gradlew getChangelog --console=plain -q
-          )"
+        run: |
+          CHANGELOG=$(./gradlew getChangelog --console=plain -q)
+          echo $CHANGELOG
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo "::set-output name=CHANGELOG_ALL::$CHANGELOG"
 
       - name: 🚀 Create Release
         uses: ncipollo/release-action@v1
@@ -36,7 +39,7 @@ jobs:
           commit: ${{ github.sha }} # Commit SHA
           tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
           draft: true
-          body: ${{ steps.changelog_step.outputs.CHANGELOG }}
+          body: ${{ steps.changelog_step.outputs.CHANGELOG_ALL }}
           artifacts: "output/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
