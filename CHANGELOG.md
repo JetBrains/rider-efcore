@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [222.3.0] - 2022-09-30
+### Added
+- Enable support for Rider 2022.3 EAP
+
 ## [222.2.0] - 2022-09-30
 ### Added
 - F.A.Q. hyperlink near Startup project dropdown (#115 by @TheBottleCyber)
