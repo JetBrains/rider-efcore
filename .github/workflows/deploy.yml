@@ -25,7 +25,7 @@ jobs:
       - name: 🏗 Get current changelog
         id: changelog_step
         run: |
-          CHANGELOG=$(./gradlew getChangelog --console=plain -q)
+          CHANGELOG=$(./gradlew getChangelog --console=plain -q --no-header)
           echo $CHANGELOG
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
