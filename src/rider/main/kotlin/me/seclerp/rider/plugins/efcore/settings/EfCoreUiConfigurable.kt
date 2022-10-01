@@ -16,5 +16,12 @@ class EfCoreUiConfigurable : BoundConfigurable("EF Core UI") {
                     .comment("<b>Experimental</b>: If enabled, next opened dialog instance will reuse data from a previous one")
             }
         }
+        group("Execution") {
+            row {
+                checkBox("Execute commands in terminal")
+                    .bindSelected(settingsStateService::useTerminalExecution)
+                    .comment("If enabled, command will be executed in the terminal with full output available")
+            }
+        }
     }
 }

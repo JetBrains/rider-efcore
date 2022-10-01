@@ -14,6 +14,10 @@ class EfCoreUiSettingsStateService : PersistentStateComponent<EfCoreUiSettingsSt
         get() = myState.usePreviouslySelectedOptionsInDialogs
         set(value) { myState.usePreviouslySelectedOptionsInDialogs = value }
 
+    var useTerminalExecution : Boolean
+        get() = myState.useTerminalExecution
+        set(value) { myState.useTerminalExecution = value }
+
     override fun getState(): EfCoreUiSettingsState = myState
 
     override fun loadState(state: EfCoreUiSettingsState) {

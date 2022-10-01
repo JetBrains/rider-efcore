@@ -1,11 +1,11 @@
 package me.seclerp.rider.plugins.efcore.features.database.drop
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 
@@ -39,7 +39,7 @@ class DropDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): GeneralCommandLine {
         val options = getCommonOptions()
         return databaseCommandFactory.drop(options)
     }

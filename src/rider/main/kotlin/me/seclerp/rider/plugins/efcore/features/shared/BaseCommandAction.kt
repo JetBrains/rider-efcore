@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -15,13 +16,13 @@ import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.cli.execution.NotificationCommandResultProcessor
+import me.seclerp.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
-import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.ToolKind
 
 abstract class BaseCommandAction(
-    private val actionPerformingText: String,
     private val actionPerformedText: String
 ) : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
@@ -61,11 +62,17 @@ abstract class BaseCommandAction(
         val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
 
         if (dialog.showAndGet()) {
-            executeCommandUnderProgress(actionEvent.project!!, actionPerformingText, actionPerformedText) {
-                val result = dialog.generateCommand().execute()
-                dialog.postCommandExecute(result)
-                result
+            val executor = intellijProject.service<PreferredCommandExecutorProvider>().getExecutor()
+            val command = dialog.generateCommand()
+            val processor = NotificationCommandResultProcessor(
+                intellijProject,
+                actionPerformedText,
+                false
+            ).withPostExecuted {
+                dialog.postCommandExecute(it)
             }
+
+            executor.execute(command, processor)
         }
     }
 

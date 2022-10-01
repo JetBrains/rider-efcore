@@ -5,7 +5,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.BaseCommandAction
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
-class ScaffoldDbContextAction : BaseCommandAction("Scaffolding DbContext...", "DbContext has been scaffolded") {
+class ScaffoldDbContextAction : BaseCommandAction("DbContext has been scaffolded") {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,
