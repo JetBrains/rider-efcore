@@ -113,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v222.2.0...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...HEAD
+[223.0.0]: https://github.com/seclerp/rider-efcore/compare/v222.2.0...v223.0.0
 [222.2.0]: https://github.com/seclerp/rider-efcore/compare/v222.1.1...v222.2.0
 [222.1.1]: https://github.com/seclerp/rider-efcore/compare/v222.1.0...v222.1.1
 [222.1.0]: https://github.com/seclerp/rider-efcore/compare/v222.0.0...v222.1.0

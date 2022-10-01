@@ -1,6 +1,15 @@
 name: Deploy
+
 on:
   workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        description: Release channel
+        options:
+          - default
+          - eap
+        required: true
 
 jobs:
   deploy:
@@ -46,4 +55,4 @@ jobs:
       - name: 🚀 Publish Plugin
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }}
+          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PPublishChannel=${{ github.event.inputs.channel }}

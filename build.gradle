@@ -184,6 +184,6 @@ prepareSandbox {
 
 publishPlugin {
     dependsOn buildPlugin
-    channels = ['eap']
     token = "${PublishToken}"
+    channels = [ "${PublishChannel}" ]
 }
