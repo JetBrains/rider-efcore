@@ -7,16 +7,15 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
 import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import javax.swing.DefaultComboBoxModel
 
 class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,

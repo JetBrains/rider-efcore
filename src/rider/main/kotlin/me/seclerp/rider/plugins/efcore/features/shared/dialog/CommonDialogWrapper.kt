@@ -22,8 +22,8 @@ import me.seclerp.rider.plugins.efcore.features.shared.services.PreferredProject
 import me.seclerp.rider.plugins.efcore.rd.*
 import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
-import me.seclerp.rider.plugins.efcore.ui.bindSelected
-import me.seclerp.rider.plugins.efcore.ui.iconComboBox
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
 import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
 import java.awt.event.ActionEvent

@@ -7,6 +7,9 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.observables.ui.dsl.textFieldWithCompletion
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand

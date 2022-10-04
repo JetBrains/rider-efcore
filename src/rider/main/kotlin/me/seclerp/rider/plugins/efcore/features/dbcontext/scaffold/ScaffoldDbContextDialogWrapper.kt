@@ -22,8 +22,8 @@ import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import me.seclerp.rider.plugins.efcore.ui.bindSelected
-import me.seclerp.rider.plugins.efcore.ui.bindText
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import javax.swing.JComponent

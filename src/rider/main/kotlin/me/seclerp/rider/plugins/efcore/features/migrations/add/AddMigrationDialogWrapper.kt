@@ -2,6 +2,7 @@ package me.seclerp.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import me.seclerp.observables.bind
@@ -11,7 +12,8 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import me.seclerp.rider.plugins.efcore.ui.bindText
+import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.rider.plugins.efcore.ui.AnyInputDocumentListener
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 
@@ -31,6 +33,8 @@ class AddMigrationDialogWrapper(
     //
     // Internal data
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
+    private val userInputReceived = observable(false).withLogger("userInputReceived")
+    private val migrationNameChangedListener = AnyInputDocumentListener(userInputReceived)
 
     //
     // Validation
@@ -71,6 +75,9 @@ class AddMigrationDialogWrapper(
                 .validationOnInput(validator.migrationNameValidation())
                 .validationOnApply(validator.migrationNameValidation())
                 .focused()
+                .applyToComponent {
+                    setupInitialMigrationNameListener(this)
+                }
         }
     }
 
@@ -85,6 +92,20 @@ class AddMigrationDialogWrapper(
                     .applyToComponent {
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }
+            }
+        }
+    }
+
+    private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
+        dataCtx.availableMigrations.afterChange {
+            if (!userInputReceived.value) {
+                val migrationName = if (it.isNotEmpty()) "" else "Initial"
+
+                if (migrationNameField.text != migrationName) {
+                    migrationNameField.document.removeDocumentListener(migrationNameChangedListener)
+                    migrationNameField.text = migrationName
+                    migrationNameField.document.addDocumentListener(migrationNameChangedListener)
+                }
             }
         }
     }

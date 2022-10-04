@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.ui
+package me.seclerp.observables.ui.dsl
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
@@ -13,6 +13,7 @@ import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import me.seclerp.observables.Observable
 import me.seclerp.observables.ObservableProperty
+import me.seclerp.rider.plugins.efcore.ui.IconComboBoxRendererAdapter
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
 import javax.swing.DefaultComboBoxModel
