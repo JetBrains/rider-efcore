@@ -128,8 +128,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     }
 
     private fun initBuildConfigurationBindings() {
-        availableStartupProjectsView.bind(dataCtx.availableStartupProjects) {
-            it.map(mappings.startupProject.toItem)
+        availableBuildConfigurationView.bind(dataCtx.availableBuildConfigurations) {
+            it.map(mappings.buildConfiguration.toItem)
         }
 
         buildConfigurationView.bind(dataCtx.buildConfiguration,

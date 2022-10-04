@@ -1,6 +1,5 @@
 package me.seclerp.rider.plugins.efcore.ui.items
 
-import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
 import javax.swing.Icon
 
 open class IconItem<T>(

@@ -55,7 +55,7 @@ class CommonDialogValidator(
     }
 
     fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
-        if (it.isEnabled && (it.item == null || dataCtx.availableBuildConfigurations.isEmpty()))
+        if (it.isEnabled && (it.item == null || dataCtx.availableBuildConfigurations.value.isEmpty()))
             error("Solution doesn't have any build configurations")
         else
             null
