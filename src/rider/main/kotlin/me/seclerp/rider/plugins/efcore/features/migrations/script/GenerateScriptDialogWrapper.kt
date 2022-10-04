@@ -14,7 +14,6 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 
 class GenerateScriptDialogWrapper(
@@ -52,6 +51,14 @@ class GenerateScriptDialogWrapper(
     override fun initBindings() {
         super.initBindings()
 
+        fromMigrationsView.bind(dataCtx.availableFromMigrationNames) {
+            it.map(mappings.migration.toItem)
+        }
+
+        toMigrationsView.bind(dataCtx.availableToMigrationNames) {
+            it.map(mappings.migration.toItem)
+        }
+
         fromMigrationView.bind(fromMigrationsView) { it.lastOrNull() }
         toMigrationView.bind(toMigrationsView) { it.firstOrNull() }
 
@@ -59,7 +66,7 @@ class GenerateScriptDialogWrapper(
             mappings.migration.toItem,
             mappings.migration.fromItem)
 
-        fromMigrationView.bind(dataCtx.fromMigration,
+        toMigrationView.bind(dataCtx.toMigration,
             mappings.migration.toItem,
             mappings.migration.fromItem)
     }
@@ -110,14 +117,12 @@ class GenerateScriptDialogWrapper(
                 .validationOnInput(validator.fromMigrationValidation())
                 .comment("'0' means before the first migration")
                 .horizontalAlign(HorizontalAlign.FILL)
-                .monospaced()
                 .focused()
         }
 
         row("To migration:") {
             iconComboBox(toMigrationView, toMigrationsView)
                 .horizontalAlign(HorizontalAlign.FILL)
-                .monospaced()
                 .focused()
         }
     }

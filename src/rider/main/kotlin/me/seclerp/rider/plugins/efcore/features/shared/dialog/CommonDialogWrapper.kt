@@ -296,7 +296,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
         groupRowsRange("Build Options") {
             var noBuildCheck: JBCheckBox? = null
             row {
-                noBuildCheck = checkBox("Skip project build process (<code>--no-build</code>)")
+                noBuildCheck = checkBox("Skip project build process (--no-build)")
                     .bindSelected(dataCtx.noBuild)
                     .component
             }

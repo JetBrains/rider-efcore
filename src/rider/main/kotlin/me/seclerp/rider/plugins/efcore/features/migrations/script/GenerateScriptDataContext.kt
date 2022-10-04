@@ -8,9 +8,8 @@ import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 class GenerateScriptDataContext(
     intellijProject: Project
 ): CommonDataContext(intellijProject, true) {
-    val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
-    val availableFromMigrations = observableList<String>()
-    val availableToMigrations = observableList<String>()
+    val availableFromMigrationNames = observableList<String>()
+    val availableToMigrationNames = observableList<String>()
 
     val fromMigration = observable<String?>(null)
     val toMigration = observable<String?>(null)
@@ -18,21 +17,30 @@ class GenerateScriptDataContext(
     val idempotent = observable(false)
     val noTransactions = observable(false)
 
+    private val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
+    private val availableMigrationNames = observableList<String>()
+        .apply {
+            bind(observableMigrations) { migrations -> migrations
+                .map { it.migrationLongName }
+                .sortedByDescending { it }
+            }
+        }
+
     override fun initBindings() {
         super.initBindings()
 
-        availableMigrations.initBinding()
+        observableMigrations.initBinding()
 
-        availableFromMigrations.bind(availableMigrations) {
+        availableFromMigrationNames.bind(availableMigrationNames) {
             buildList {
-                addAll(it.map { it.migrationLongName })
+                addAll(it)
                 add("0")
             }
         }
 
-        availableToMigrations.bind(availableMigrations) {
+        availableToMigrationNames.bind(availableMigrationNames) {
             buildList {
-                addAll(it.map { it.migrationLongName })
+                addAll(it)
             }
         }
     }

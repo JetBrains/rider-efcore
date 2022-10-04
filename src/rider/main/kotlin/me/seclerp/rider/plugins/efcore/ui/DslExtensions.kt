@@ -14,13 +14,15 @@ import me.seclerp.observables.ObservableProperty
 import java.io.File
 import javax.swing.JComponent
 
-fun <T : JComponent> Cell<T>.monospaced(): Cell<T> = applyToComponent {
-    monospaced()
-}
+fun <T : JComponent> Cell<T>.monospaced(): Cell<T> =
+    applyToComponent {
+        monospaced()
+    }
 
-fun JComponent.monospaced(): JComponent = apply {
-    font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN)
-}
+fun JComponent.monospaced(): JComponent =
+    apply {
+        font = EditorColorsManager.getInstance().globalScheme.getFont(EditorFontType.PLAIN)
+    }
 
 fun Row.textFieldForRelativeFolder(
     basePathGetter: () -> String,

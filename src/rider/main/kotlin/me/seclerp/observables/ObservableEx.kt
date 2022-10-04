@@ -29,14 +29,3 @@ inline fun <reified TValue, reified TObservable : Observable<TValue>> TObservabl
 
     return this
 }
-
-fun <T, T2> Observable<T>.compose(with: Observable<T2>): Observable<Pair<T, T2>> =
-    observable(Pair(value, with.value))
-        .apply {
-            bind(this@compose) {
-                Pair(it, value.second)
-            }
-            bind(with) {
-                Pair(value.first, it)
-            }
-        }
