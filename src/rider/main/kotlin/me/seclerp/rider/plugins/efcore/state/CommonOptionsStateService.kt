@@ -1,7 +1,6 @@
 package me.seclerp.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
-import com.intellij.openapi.project.Project
 import java.util.*
 
 @Service
@@ -53,8 +52,6 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
     }
 
     companion object {
-        fun getInstance(project: Project) = project.service<CommonOptionsStateService>()
-
         private const val MIGRATIONS_PROJECT_KEY = "migrationsProject"
         private const val STARTUP_PROJECT_KEY = "startupProject"
     }

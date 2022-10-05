@@ -4,57 +4,63 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
+import me.seclerp.observables.withLogger
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.rider.plugins.efcore.ui.AnyInputDocumentListener
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
-import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import java.io.File
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 
 class AddMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?,
-) : BaseDialogWrapper(toolsVersion, "Add Migration", intellijProject, selectedDotnetProjectName, false) {
+    selectedProjectName: String?,
+) : CommonDialogWrapper<AddMigrationDataContext>(
+    AddMigrationDataContext(intellijProject),
+    toolsVersion,
+    "Add Migration",
+    intellijProject,
+    selectedProjectName
+) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //
-    // Data binding
-    val model = AddMigrationModel("", "Migrations")
-
-    //
     // Internal data
-    private var availableMigrationsList = listOf<MigrationInfo>()
-    private var currentDbContextMigrationsList = listOf<String>()
-    private var userInputReceived: Boolean = false
-    private lateinit var migrationNameTextField: JBTextField
+    private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
+    private val userInputReceived = observable(false).withLogger("userInputReceived")
+    private val migrationNameChangedListener = AnyInputDocumentListener(userInputReceived)
 
     //
     // Validation
-    private val validator = AddMigrationValidator()
+    private val validator = AddMigrationValidator(dataCtx)
 
     //
     // Constructor
     init {
-        addMigrationsProjectChangedListener(::onMigrationsProjectChanged)
-        addDbContextChangedListener(::onDbContextChanged)
+        initUi()
+    }
 
-        init()
+    override fun initBindings() {
+        super.initBindings()
+
+        migrationProjectFolder.bind(dataCtx.migrationsProject) {
+            if (it != null)
+                File(it.fullPath).parentFile.path
+            else
+                ""
+        }
     }
 
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
-        val migrationName = model.migrationName.trim()
-        val migrationsOutputFolder = model.migrationsOutputFolder
+        val migrationName = dataCtx.migrationName.value.trim()
+        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value
 
         return migrationsCommandFactory.add(commonOptions, migrationName, migrationsOutputFolder)
     }
@@ -62,20 +68,15 @@ class AddMigrationDialogWrapper(
     //
     // UI
     override fun Panel.createPrimaryOptions() {
-        createMigrationNameRow()
-    }
-
-    private fun Panel.createMigrationNameRow() {
         row("Migration name:") {
             textField()
-                .bindText(model::migrationName)
+                .bindText(dataCtx.migrationName)
                 .horizontalAlign(HorizontalAlign.FILL)
-                .validationOnInput { validator.migrationNameValidation(currentDbContextMigrationsList)(it) }
-                .validationOnApply { validator.migrationNameValidation(currentDbContextMigrationsList)(it) }
+                .validationOnInput(validator.migrationNameValidation())
+                .validationOnApply(validator.migrationNameValidation())
                 .focused()
                 .applyToComponent {
-                    document.addDocumentListener(migrationNameChangedListener)
-                    migrationNameTextField = this
+                    setupInitialMigrationNameListener(this)
                 }
         }
     }
@@ -83,92 +84,29 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange("Additional Options"){
             row("Migrations folder:") {
-                textFieldForRelativeFolder(
-                    ::currentMigrationsProjectFolderGetter,
-                    intellijProject,
-                    "Select Migrations Folder")
-                    .bindText(model::migrationsOutputFolder)
+                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, "Select Migrations Folder")
+                    .bindText(dataCtx.migrationsOutputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
-                    .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
+                    .applyToComponent {
+                        dataCtx.migrationsProject.afterChange { isEnabled = it != null }
+                    }
             }
         }
     }
 
-    //
-    // Event listeners
-    private val migrationNameChangedListener = object : DocumentListener {
-        override fun changedUpdate(e: DocumentEvent?) {
-            userInputReceived = true
+    private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
+        dataCtx.availableMigrations.afterChange {
+            if (!userInputReceived.value) {
+                val migrationName = if (it.isNotEmpty()) "" else "Initial"
+
+                if (migrationNameField.text != migrationName) {
+                    migrationNameField.document.removeDocumentListener(migrationNameChangedListener)
+                    migrationNameField.text = migrationName
+                    migrationNameField.document.addDocumentListener(migrationNameChangedListener)
+                }
+            }
         }
-
-        override fun insertUpdate(e: DocumentEvent?) {
-            userInputReceived = true
-        }
-
-        override fun removeUpdate(e: DocumentEvent?) {
-            userInputReceived = true
-        }
-    }
-
-    private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        refreshAvailableMigrations(migrationsProjectItem.displayName)
-        refreshCurrentDbContextMigrations(commonOptions.dbContext)
-    }
-
-    private fun onDbContextChanged(dbContext: DbContextItem?) {
-        refreshCurrentDbContextMigrations(dbContext)
-    }
-
-    //
-    // Methods
-    private fun refreshAvailableMigrations(migrationsProjectName: String) {
-        if (commonOptions.dbContext == null) {
-            availableMigrationsList = listOf()
-            return
-        }
-
-        val migrationsIdentity = MigrationsIdentity(
-            migrationsProjectName,
-            commonOptions.dbContext!!.data)
-
-        availableMigrationsList = beModel.getAvailableMigrations.runUnderProgress(
-            migrationsIdentity,
-            intellijProject,
-            "Loading migrations...",
-            isCancelable = true,
-            throwFault = true
-        )!!
-    }
-
-    private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
-        currentDbContextMigrationsList =
-            if (dbContext == null)
-                listOf()
-            else
-                availableMigrationsList
-                    .filter { it.dbContextClassFullName == dbContext.data }
-                    .map { it.migrationShortName }
-                    .toList()
-
-        setInitialMigrationNameIfNeeded()
-    }
-
-    private fun setInitialMigrationNameIfNeeded() {
-        if (userInputReceived) return
-
-        val migrationsExist = currentDbContextMigrationsList.isNotEmpty()
-        val migrationName = if (migrationsExist) "" else "Initial"
-
-        migrationNameTextField.document.removeDocumentListener(migrationNameChangedListener)
-        migrationNameTextField.text = migrationName
-        migrationNameTextField.document.addDocumentListener(migrationNameChangedListener)
-    }
-
-    private fun currentMigrationsProjectFolderGetter(): String {
-        val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
-
-        return File(currentMigrationsProject).parentFile.path
     }
 }

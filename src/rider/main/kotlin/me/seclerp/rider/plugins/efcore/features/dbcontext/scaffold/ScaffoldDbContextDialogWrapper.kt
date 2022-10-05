@@ -13,44 +13,35 @@ import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
+import me.seclerp.observables.ObservableProperty
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
 import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import javax.swing.JComponent
-import kotlin.reflect.KMutableProperty0
 
 @Suppress("UnstableApiUsage")
 class ScaffoldDbContextDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?,
-) : BaseDialogWrapper(toolsVersion, "Scaffold DbContext", intellijProject, selectedDotnetProjectName,
-    requireMigrationsInProject = false, requireDbContext = false
+    selectedProjectName: String?,
+) : CommonDialogWrapper<ScaffoldDbContextDataContext>(
+    ScaffoldDbContextDataContext(intellijProject),
+    toolsVersion,
+    "Scaffold DbContext",
+    intellijProject,
+    selectedProjectName,
+    requireMigrationsInProject = false
 ) {
     val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
-
-    //
-    // Data binding
-    val model = ScaffoldDbContextModel(
-        connection = "",
-        provider = "",
-        outputFolder = "Entities",
-        useAttributes = false,
-        useDatabaseNames = false,
-        generateOnConfiguring = true,
-        usePluralizer = true,
-        dbContextName = "MyDbContext",
-        dbContextFolder = "Context",
-        tablesList = mutableListOf(),
-        schemasList = mutableListOf(),
-        scaffoldAllTables = true,
-        scaffoldAllSchemas = true,
-    )
 
     //
     // Internal data
@@ -59,8 +50,10 @@ class ScaffoldDbContextDialogWrapper(
     private lateinit var tablesTab: DialogPanel
     private lateinit var schemaTab: DialogPanel
 
-    private val tablesModel = SimpleListTableModel(model.tablesList)
-    private val schemasModel = SimpleListTableModel(model.schemasList)
+    private val tablesModel = SimpleListTableModel(dataCtx.tablesList)
+    private val schemasModel = SimpleListTableModel(dataCtx.schemasList)
+
+    private val migrationProjectFolder = observable("")
 
     //
     // Validation
@@ -69,7 +62,18 @@ class ScaffoldDbContextDialogWrapper(
     //
     // Constructor
     init {
-        init()
+        initUi()
+    }
+
+    override fun initBindings() {
+        super.initBindings()
+
+        migrationProjectFolder.bind(dataCtx.migrationsProject) {
+            if (it != null)
+                File(it.fullPath).parentFile.path
+            else
+                ""
+        }
     }
 
     override fun generateCommand(): CliCommand {
@@ -77,19 +81,19 @@ class ScaffoldDbContextDialogWrapper(
 
         return dbContextCommandFactory.scaffold(
             efCoreVersion, commonOptions,
-            model.connection,
-            model.provider,
-            model.outputFolder,
-            model.useAttributes,
-            model.useDatabaseNames,
-            model.generateOnConfiguring,
-            model.usePluralizer,
-            model.dbContextName,
-            model.dbContextFolder,
-            model.scaffoldAllTables,
-            model.tablesList.map { it.data },
-            model.scaffoldAllSchemas,
-            model.schemasList.map { it.data })
+            dataCtx.connection.value,
+            dataCtx.provider.value,
+            dataCtx.outputFolder.value,
+            dataCtx.useAttributes.value,
+            dataCtx.useDatabaseNames.value,
+            dataCtx.generateOnConfiguring.value,
+            dataCtx.usePluralizer.value,
+            dataCtx.dbContextName.value,
+            dataCtx.dbContextFolder.value,
+            dataCtx.scaffoldAllTables.value,
+            dataCtx.tablesList.map { it.data },
+            dataCtx.scaffoldAllSchemas.value,
+            dataCtx.schemasList.map { it.data })
     }
 
     //
@@ -126,14 +130,16 @@ class ScaffoldDbContextDialogWrapper(
 
     override fun Panel.createPrimaryOptions() {
         row("Connection:") {
-            textField().bindText(model::connection)
+            textField()
+                .bindText(dataCtx.connection)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.connectionValidation())
                 .validationOnApply(validator.connectionValidation())
         }
 
         row("Provider:") {
-            textField().bindText(model::provider)
+            textField()
+                .bindText(dataCtx.provider)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.providerValidation())
                 .validationOnApply(validator.providerValidation())
@@ -144,35 +150,35 @@ class ScaffoldDbContextDialogWrapper(
         groupRowsRange("Additional Options") {
             row("Output folder:") {
                 textFieldForRelativeFolder(
-                    ::currentMigrationsProjectFolderGetter,
+                    migrationProjectFolder.getter,
                     intellijProject,
                     "Select Output Folder")
-                    .bindText(model::outputFolder)
+                    .bindText(dataCtx.outputFolder)
                     .horizontalAlign(HorizontalAlign.FILL)
                     .validationOnInput(validator.outputFolderValidation())
                     .validationOnApply(validator.outputFolderValidation())
-                    .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
+                    .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
             }
 
             row {
                 checkBox("Use attributes to generate the model")
-                    .bindSelected(model::useAttributes)
+                    .bindSelected(dataCtx.useAttributes)
             }
 
             row {
                 checkBox("Use database names")
-                    .bindSelected(model::useDatabaseNames)
+                    .bindSelected(dataCtx.useDatabaseNames)
             }
 
             if (efCoreVersion.major >= 5) {
                 row {
                     checkBox("Generate OnConfiguring method")
-                        .bindSelected(model::generateOnConfiguring)
+                        .bindSelected(dataCtx.generateOnConfiguring)
                 }
 
                 row {
                     checkBox("Use the pluralizer")
-                        .bindSelected(model::usePluralizer)
+                        .bindSelected(dataCtx.usePluralizer)
                 }
             }
         }
@@ -180,7 +186,8 @@ class ScaffoldDbContextDialogWrapper(
 
     private fun createDbContextTab(): DialogPanel = panel {
         row("Generated DbContext name:") {
-            textField().bindText(model::dbContextName)
+            textField()
+                .bindText(dataCtx.dbContextName)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
                 .validationOnInput(validator.dbContextNameValidation())
@@ -188,27 +195,28 @@ class ScaffoldDbContextDialogWrapper(
 
         row("Generated DbContext folder:") {
             textFieldForRelativeFolder(
-                ::currentMigrationsProjectFolderGetter,
+                migrationProjectFolder.getter,
                 intellijProject,
                 "Select Generated DbContext Folder")
-                .bindText(model::dbContextFolder)
+                .bindText(dataCtx.dbContextFolder)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
-                .applyToComponent { isEnabled = commonOptions.migrationsProject != null }
+                .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
         }
     }
 
-    private fun createTablesTab(): DialogPanel {
-        return createToggleableTablePanel(tablesModel, "Scaffold all tables", model::scaffoldAllTables)
-    }
+    private fun createTablesTab(): DialogPanel =
+        createToggleableTablePanel(tablesModel, "Scaffold all tables", dataCtx.scaffoldAllTables)
 
-    private fun createSchemasTab(): DialogPanel {
-        return createToggleableTablePanel(schemasModel, "Scaffold all schemas", model::scaffoldAllSchemas)
-    }
+    private fun createSchemasTab(): DialogPanel =
+        createToggleableTablePanel(schemasModel, "Scaffold all schemas", dataCtx.scaffoldAllSchemas)
 
-    private fun createToggleableTablePanel(tableModel: SimpleListTableModel, checkboxText: String,
-                                           checkboxProperty: KMutableProperty0<Boolean>): DialogPanel {
+    private fun createToggleableTablePanel(
+        tableModel: SimpleListTableModel,
+        checkboxText: String,
+        checkboxProperty: ObservableProperty<Boolean>
+    ): DialogPanel {
         val table = JBTable(tableModel)
             .apply {
                 tableHeader.isVisible = false
@@ -246,13 +254,5 @@ class ScaffoldDbContextDialogWrapper(
                     .enabledIf(enabledCheckbox!!.selected.not())
             }.resizableRow()
         }
-    }
-
-    //
-    // Methods
-    private fun currentMigrationsProjectFolderGetter(): String {
-        val currentMigrationsProject = commonOptions.migrationsProject!!.data.fullPath
-
-        return File(currentMigrationsProject).parentFile.path
     }
 }

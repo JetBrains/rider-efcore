@@ -6,27 +6,35 @@ import com.intellij.openapi.ui.showYesNoDialog
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 
 class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?,
-) : BaseDialogWrapper(toolsVersion, "Drop Database", intellijProject, selectedDotnetProjectName, false) {
-
-    val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
+    selectedProjectName: String?,
+) : CommonDialogWrapper<CommonDataContext>(
+    CommonDataContext(intellijProject, false),
+    toolsVersion,
+    "Drop Database",
+    intellijProject,
+    selectedProjectName,
+    false
+) {
+    private val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
 
     //
     // Constructor
     init {
-        init()
+        initUi()
     }
 
     override fun doOKAction() {
         if (showYesNoDialog(
-                "Confirmation",
-             "Are you sure that you want to drop database, used by ${commonOptions.dbContext!!.displayName}? This action can't be undone.",
-                     intellijProject)) {
+            "Confirmation",
+            "Are you sure that you want to drop database, used by ${dataCtx.dbContext.value!!.name}? This action can't be undone.",
+            intellijProject)
+        ) {
             super.doOKAction()
         }
     }

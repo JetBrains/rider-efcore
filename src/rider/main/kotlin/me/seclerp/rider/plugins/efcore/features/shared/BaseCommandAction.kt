@@ -2,6 +2,7 @@ package me.seclerp.rider.plugins.efcore.features.shared
 
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
@@ -16,6 +17,7 @@ import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import me.seclerp.rider.plugins.efcore.cli.execution.executeCommandUnderProgress
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.ToolKind
 
 abstract class BaseCommandAction(
@@ -43,6 +45,8 @@ abstract class BaseCommandAction(
             }
         })
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
     abstract fun createDialog(
         intellijProject: Project,

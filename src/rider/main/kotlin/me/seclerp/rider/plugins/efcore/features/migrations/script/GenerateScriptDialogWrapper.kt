@@ -4,35 +4,39 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.jetbrains.rider.util.idea.runUnderProgress
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
+import me.seclerp.observables.ui.dsl.bindSelected
+import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
-import me.seclerp.rider.plugins.efcore.features.shared.BaseDialogWrapper
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
-import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
-import me.seclerp.rider.plugins.efcore.ui.*
-import me.seclerp.rider.plugins.efcore.ui.items.DbContextItem
+import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import javax.swing.DefaultComboBoxModel
 
 class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedDotnetProjectName: String?
-) : BaseDialogWrapper(toolsVersion, "Generate SQL Script", intellijProject, selectedDotnetProjectName, true) {
-
+    selectedProjectName: String?
+) : CommonDialogWrapper<GenerateScriptDataContext>(
+    GenerateScriptDataContext(intellijProject),
+    toolsVersion,
+    "Generate SQL Script",
+    intellijProject,
+    selectedProjectName,
+    requireMigrationsInProject = true
+) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //
-    // Data binding
-    private val model = GenerateScriptModel(null, null, "script.sql", false, false)
-
-    //
     // Internal data
-    private var fromMigrationsModel: DefaultComboBoxModel<MigrationItem> = DefaultComboBoxModel()
-    private var toMigrationsModel: DefaultComboBoxModel<MigrationItem> = DefaultComboBoxModel()
+    private val fromMigrationsView = observableList<MigrationItem?>()
+    private val toMigrationsView = observableList<MigrationItem?>()
+
+    private val fromMigrationView = observable<MigrationItem?>(null)
+    private val toMigrationView = observable<MigrationItem?>(null)
 
     //
     // Validation
@@ -41,19 +45,39 @@ class GenerateScriptDialogWrapper(
     //
     // Constructor
     init {
-        addMigrationsProjectChangedListener(::onMigrationsProjectChanged)
-        addDbContextChangedListener(::onDbContextChanged)
+        initUi()
+    }
 
-        init()
+    override fun initBindings() {
+        super.initBindings()
+
+        fromMigrationsView.bind(dataCtx.availableFromMigrationNames) {
+            it.map(mappings.migration.toItem)
+        }
+
+        toMigrationsView.bind(dataCtx.availableToMigrationNames) {
+            it.map(mappings.migration.toItem)
+        }
+
+        fromMigrationView.bind(fromMigrationsView) { it.lastOrNull() }
+        toMigrationView.bind(toMigrationsView) { it.firstOrNull() }
+
+        fromMigrationView.bind(dataCtx.fromMigration,
+            mappings.migration.toItem,
+            mappings.migration.fromItem)
+
+        toMigrationView.bind(dataCtx.toMigration,
+            mappings.migration.toItem,
+            mappings.migration.fromItem)
     }
 
     override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
-        val fromMigration = model.fromMigration!!.data.trim()
-        val toMigration = model.toMigration?.data?.trim()
-        val outputFile = model.outputFilePath
-        val idempotent = model.idempotent
-        val noTransactions = model.noTransactions
+        val fromMigration = dataCtx.fromMigration.value!!.trim()
+        val toMigration = dataCtx.toMigration.value?.trim()
+        val outputFile = dataCtx.outputFilePath.value
+        val idempotent = dataCtx.idempotent.value
+        val noTransactions = dataCtx.noTransactions.value
 
         return migrationsCommandFactory.generateScript(
             efCoreVersion, commonOptions, fromMigration, toMigration, outputFile, idempotent, noTransactions)
@@ -69,18 +93,18 @@ class GenerateScriptDialogWrapper(
         groupRowsRange("Additional Options") {
             row("Output file") {
                 textField()
-                    .bindText(model::outputFilePath)
+                    .bindText(dataCtx.outputFilePath)
                     .validationOnApply(validator.outputFileValidation())
                     .validationOnInput(validator.outputFileValidation())
             }
             row {
                 checkBox("Make script idempotent")
-                    .bindSelected(model::idempotent)
+                    .bindSelected(dataCtx.idempotent)
             }
             if (efCoreVersion.major >= 5) {
                 row {
                     checkBox("No transactions")
-                        .bindSelected(model::noTransactions)
+                        .bindSelected(dataCtx.noTransactions)
                 }
             }
         }
@@ -88,7 +112,7 @@ class GenerateScriptDialogWrapper(
 
     private fun Panel.createMigrationRows() {
         row("From migration:") {
-            iconComboBox(fromMigrationsModel, model::fromMigration)
+            iconComboBox(fromMigrationView, fromMigrationsView)
                 .validationOnApply(validator.fromMigrationValidation())
                 .validationOnInput(validator.fromMigrationValidation())
                 .comment("'0' means before the first migration")
@@ -97,58 +121,23 @@ class GenerateScriptDialogWrapper(
         }
 
         row("To migration:") {
-            iconComboBox(toMigrationsModel, model::toMigration)
+            iconComboBox(toMigrationView, toMigrationsView)
                 .horizontalAlign(HorizontalAlign.FILL)
                 .focused()
         }
     }
 
-    //
-    // Event listeners
-    private fun onMigrationsProjectChanged(migrationsProjectItem: MigrationsProjectItem) {
-        refreshCurrentDbContextMigrations(commonOptions.dbContext)
-    }
+    companion object {
+        private object mappings {
+            object migration {
+                val toItem: (String?) -> MigrationItem?
+                    get() = {
+                        if (it == null) null else MigrationItem(it)
+                    }
 
-    private fun onDbContextChanged(dbContext: DbContextItem?) {
-        refreshCurrentDbContextMigrations(dbContext)
-    }
-
-    private fun refreshCurrentDbContextMigrations(dbContext: DbContextItem?) {
-        fromMigrationsModel.removeAllElements()
-        toMigrationsModel.removeAllElements()
-
-        if (dbContext == null) {
-            return
+                val fromItem: (MigrationItem?) -> String?
+                    get() = { it?.data }
+            }
         }
-
-        val migrationProjectName = commonOptions.migrationsProject!!.displayName
-        val dbContextFullName = commonOptions.dbContext!!.data
-        val migrationsIdentity = MigrationsIdentity(migrationProjectName, dbContextFullName)
-
-        val availableDbContextMigrations = loadMigrationsByContextName(migrationsIdentity)
-            .map { MigrationItem(it.migrationLongName) }
-
-        fromMigrationsModel.addAll(0, availableDbContextMigrations)
-        fromMigrationsModel.addElement(MigrationItem("0"))
-        toMigrationsModel.addAll(0, availableDbContextMigrations)
-
-        fromMigrationsModel.selectedItem = null
-        if (availableDbContextMigrations.size > 0) {
-            fromMigrationsModel.selectedItem = fromMigrationsModel.getElementAt(fromMigrationsModel.size - 1)
-        }
-        toMigrationsModel.selectedItem = toMigrationsModel.getElementAt(0)
-    }
-
-    private fun loadMigrationsByContextName(migrationsIdentity: MigrationsIdentity): List<MigrationInfo> {
-        if (migrationsIdentity.dbContextClassFullName.isEmpty()) {
-            return listOf()
-        }
-
-        return beModel.getAvailableMigrations
-            .runUnderProgress(
-                migrationsIdentity, intellijProject, "Loading migrations...",
-                isCancelable = true,
-                throwFault = true
-            )?.sortedByDescending { it.migrationLongName } ?: listOf()
     }
 }
