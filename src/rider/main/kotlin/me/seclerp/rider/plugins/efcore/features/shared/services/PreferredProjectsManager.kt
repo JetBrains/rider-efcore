@@ -1,20 +1,23 @@
 package me.seclerp.rider.plugins.efcore.features.shared.services
 
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import me.seclerp.rider.plugins.efcore.rd.MigrationsProjectInfo
+import me.seclerp.rider.plugins.efcore.rd.StartupProjectInfo
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationsProjectItem
-import me.seclerp.rider.plugins.efcore.ui.items.StartupProjectItem
 import java.util.*
 
+@Service
 class PreferredProjectsManager(
     intellijProject: Project
 ) {
-    private val commonOptionsStateService = CommonOptionsStateService.getInstance(intellijProject)
+    private val commonOptionsStateService = intellijProject.service<CommonOptionsStateService>()
     private var prevPreferredMigrationsProjectId: UUID? = null
     private var prevPreferredStartupProjectId: UUID? = null
 
-    fun getProjectPair(preferredProjectId: UUID?, migrationsProjects: Array<MigrationsProjectItem>,
-                       startupProjects: Array<StartupProjectItem>): Pair<MigrationsProjectItem?, StartupProjectItem?> {
+    fun getProjectPair(preferredProjectId: UUID?, migrationsProjects: Collection<MigrationsProjectInfo>,
+                       startupProjects: Collection<StartupProjectInfo>): Pair<MigrationsProjectInfo?, StartupProjectInfo?> {
 
         if (preferredProjectId == null) {
             return getDefaultProjects(null, migrationsProjects, startupProjects)
@@ -29,10 +32,10 @@ class PreferredProjectsManager(
             prevPreferredStartupProjectId = startupProjectId
 
             val migrationsProject =
-                migrationsProjects.find { it.data.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
+                migrationsProjects.find { it.id == migrationsProjectId } ?: migrationsProjects.firstOrNull()
 
             val startupProject =
-                startupProjects.find { it.data.id == startupProjectId } ?: startupProjects.firstOrNull()
+                startupProjects.find { it.id == startupProjectId } ?: startupProjects.firstOrNull()
 
             return Pair(migrationsProject, startupProject)
         }
@@ -40,44 +43,44 @@ class PreferredProjectsManager(
         return getDefaultProjects(preferredProjectId, migrationsProjects, startupProjects)
     }
 
-    fun setProjectPair(migrationsProjectItem: MigrationsProjectItem, startupProjectItem: StartupProjectItem) {
+    fun setProjectPair(migrationsProjectInfo: MigrationsProjectInfo, startupProjectInfo: StartupProjectInfo) {
         if (prevPreferredMigrationsProjectId != null && prevPreferredStartupProjectId != null)
             commonOptionsStateService.clearPreferredProjectsPair(
                 prevPreferredMigrationsProjectId!!,
                 prevPreferredStartupProjectId!!
             )
 
-        commonOptionsStateService.setPreferredProjectsPair(migrationsProjectItem.data.id, startupProjectItem.data.id)
+        commonOptionsStateService.setPreferredProjectsPair(migrationsProjectInfo.id, startupProjectInfo.id)
     }
 
-    fun getGlobalProjectPair(migrationsProjects: Array<MigrationsProjectItem>,
-                             startupProjects: Array<StartupProjectItem>
-    ): Pair<MigrationsProjectItem?, StartupProjectItem?> {
+    fun getGlobalProjectPair(migrationsProjects: Collection<MigrationsProjectInfo>,
+                             startupProjects: Collection<StartupProjectInfo>
+    ): Pair<MigrationsProjectInfo?, StartupProjectInfo?> {
         val ids = commonOptionsStateService.getGlobalProjectIdsPair()
 
         return if (ids == null) {
             migrationsProjects.firstOrNull() to startupProjects.firstOrNull()
         } else {
-            val migrationProject = migrationsProjects.find { it.data.id == ids.first }
+            val migrationProject = migrationsProjects.find { it.id == ids.first }
                 ?: migrationsProjects.firstOrNull()
-            val startupProject = startupProjects.find { it.data.id == ids.second }
+            val startupProject = startupProjects.find { it.id == ids.second }
                 ?: startupProjects.firstOrNull()
             migrationProject to startupProject
         }
     }
 
-    fun setGlobalProjectPair(migrationsProjectItem: MigrationsProjectItem, startupProjectItem: StartupProjectItem) {
-        commonOptionsStateService.setGlobalProjectIdsPair(migrationsProjectItem.data.id, startupProjectItem.data.id)
+    fun setGlobalProjectPair(migrationsProjectInfo: MigrationsProjectInfo, startupProjectInfo: StartupProjectInfo) {
+        commonOptionsStateService.setGlobalProjectIdsPair(migrationsProjectInfo.id, startupProjectInfo.id)
     }
 
-    private fun getDefaultProjects(preferredProjectId: UUID?, migrationsProjects: Array<MigrationsProjectItem>,
-                                   startupProjects: Array<StartupProjectItem>): Pair<MigrationsProjectItem?, StartupProjectItem?> {
+    private fun getDefaultProjects(preferredProjectId: UUID?, migrationsProjects: Collection<MigrationsProjectInfo>,
+                                   startupProjects: Collection<StartupProjectInfo>): Pair<MigrationsProjectInfo?, StartupProjectInfo?> {
         val migrationsProject =
-            migrationsProjects.find { it.data.id == preferredProjectId }
+            migrationsProjects.find { it.id == preferredProjectId }
                 ?: migrationsProjects.firstOrNull()
 
         val startupProject =
-            startupProjects.find { it.data.id == preferredProjectId }
+            startupProjects.find { it.id == preferredProjectId }
                 ?: startupProjects.firstOrNull()
 
         return Pair(migrationsProject, startupProject)

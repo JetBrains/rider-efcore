@@ -33,6 +33,9 @@
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="EF Core Notifications Group" displayType="BALLOON"/>
     <postStartupActivity implementation="me.seclerp.rider.plugins.efcore.startup.EfCoreStartupActivity" />
+    <applicationConfigurable
+      parentId="tools"
+      instance="me.seclerp.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
   </extensions>
 
   <actions>
@@ -43,42 +46,35 @@
       <action id="EfCore.Features.Migrations.AddMigrationAction"
               class="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction"
               text="Add Migration"
-              description="Add new code-first migration">
-      </action>
+              description="Add new code-first migration"/>
       <action id="EfCore.Features.Migrations.RemoveLastMigrationAction"
               class="me.seclerp.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction"
               text="Remove Last Migration"
-              description="Removes last created migration">
-      </action>
+              description="Removes last created migration"/>
       <action id="EfCore.Features.Migrations.GenerateScriptAction"
               class="me.seclerp.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"
               text="Generate SQL Script"
-              description="Generates file with SQL script generated from a set of migrations">
-      </action>
+              description="Generates file with SQL script generated from a set of migrations"/>
       <separator />
       <action id="EfCore.Features.Database.UpdateDatabaseAction"
               class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"
               text="Update Database"
-              description="Update database using a selected migration as a target">
-      </action>
+              description="Update database using a selected migration as a target"/>
       <action id="EfCore.Features.Database.DropDatabaseAction"
               class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"
               text="Drop Database"
-              description="Drop database used by a DbContext">
-      </action>
+              description="Drop database used by a DbContext"/>
       <separator />
       <action id="EfCore.Features.DbContext.ScaffoldDbContextAction"
               class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"
               text="Scaffold DbContext"
-              description="Generates code for a DbContext and entity types for a database">
-      </action>
+              description="Generates code for a DbContext and entity types for a database"/>
     </group>
 
     <action id="EfCore.Shared.OpenQuickEfCoreActionsAction"
             class="me.seclerp.rider.plugins.efcore.features.shared.OpenQuickEfCoreActionsAction"
             text="Entity Framework Core Quick Actions"
-            description="Opens available EF Core quick actions">
-    </action>
+            description="Opens available EF Core quick actions"/>
   </actions>
 
 </idea-plugin>

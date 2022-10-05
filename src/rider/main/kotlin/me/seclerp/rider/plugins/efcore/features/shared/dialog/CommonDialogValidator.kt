@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.shared
+package me.seclerp.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
@@ -8,27 +8,23 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.rider.plugins.efcore.rd.MigrationsIdentity
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.ui.items.*
-import javax.swing.DefaultComboBoxModel
 
-class EfCoreDialogValidator(
-    private val commonOptions: CommonOptionsModel,
+class CommonDialogValidator(
+    private val dataCtx: CommonDataContext,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val shouldHaveMigrationsInProject: Boolean,
-    private val dbContextModel: DefaultComboBoxModel<DbContextItem>,
-    private val availableBuildConfigurations: Array<BuildConfigurationItem>,
-    private val targetFrameworkModel: DefaultComboBoxModel<BaseTargetFrameworkItem>
+    private val shouldHaveMigrationsInProject: Boolean
 ) {
     fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {
-        if (commonOptions.migrationsProject == null)
+        if (it.item == null)
             error("You should selected valid migrations project")
         else if (shouldHaveMigrationsInProject) {
-            if (commonOptions.dbContext == null)
+            if (dataCtx.dbContext.value == null)
                 null
             else {
                 val migrationsIdentity = MigrationsIdentity(
-                    commonOptions.migrationsProject!!.displayName,
-                    commonOptions.dbContext!!.data)
+                    it.item.displayName,
+                    dataCtx.dbContext.value!!.fullName)
 
                 val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(
                     migrationsIdentity, intellijProject, "Checking migrations...",
@@ -45,28 +41,28 @@ class EfCoreDialogValidator(
     }
 
     fun startupProjectValidation(): ValidationInfoBuilder.(ComboBox<StartupProjectItem>) -> ValidationInfo? = {
-        if (commonOptions.startupProject == null)
+        if (it.item == null)
             error("You should selected valid startup project")
         else
             null
     }
 
     fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
-        if (commonOptions.dbContext == null || dbContextModel.size == 0)
+        if (it.item == null || dataCtx.availableDbContexts.value.isEmpty())
             error("Migrations project should have at least 1 DbContext")
         else
             null
     }
 
     fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
-        if (it.isEnabled && (commonOptions.buildConfiguration == null || availableBuildConfigurations.isEmpty()))
+        if (it.isEnabled && (it.item == null || dataCtx.availableBuildConfigurations.value.isEmpty()))
             error("Solution doesn't have any build configurations")
         else
             null
     }
 
     fun targetFrameworkValidation(): ValidationInfoBuilder.(ComboBox<BaseTargetFrameworkItem>) -> ValidationInfo? = {
-        if (it.isEnabled && (commonOptions.targetFramework == null || targetFrameworkModel.size == 0))
+        if (it.isEnabled && (it.item == null || dataCtx.availableTargetFrameworks.value.isEmpty()))
             error("Startup project should have at least 1 supported target framework")
         else
             null
