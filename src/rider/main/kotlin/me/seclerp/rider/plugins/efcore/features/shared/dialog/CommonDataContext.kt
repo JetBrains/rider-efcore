@@ -92,7 +92,7 @@ open class CommonDataContext(
         targetFramework.value = availableTargetFrameworks.firstOrNull()
     }
 
-    fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
+    open fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
         val migrationsProjectId = migrationsProject.value?.id
         val startupProjectId = startupProject.value?.id
 
@@ -127,7 +127,7 @@ open class CommonDataContext(
         this.additionalArguments.value = additionalArguments
     }
 
-    fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
+    open fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
         if (requireDbContext && dbContext.value != null) {
             commonDialogState.set(KnownStateKeys.DB_CONTEXT, dbContext.value!!.fullName)
         }
