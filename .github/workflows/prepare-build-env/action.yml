@@ -25,3 +25,9 @@ runs:
       with:
         cache-disabled: true
         arguments: rdgen
+
+    - name: 🏗 Prepare dependencies
+      uses: gradle/gradle-build-action@v2
+      with:
+        cache-disabled: true
+        arguments: setupDependencies

@@ -62,6 +62,8 @@ task setBuildTool {
 
 task compileDotNet {
     dependsOn setBuildTool
+    dependsOn setupDependencies
+
     doLast {
         def arguments = setBuildTool.args.clone()
         arguments << "/t:Restore;Rebuild"
