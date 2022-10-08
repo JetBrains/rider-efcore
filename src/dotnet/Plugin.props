@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <SdkVersion Condition=" '$(SdkVersion)' == '' ">2022.3.0-eap01</SdkVersion>
+    <RiderVersion Condition=" '$(RiderVersion)' == '' ">2022.3-EAP1-SNAPSHOT</RiderVersion>
 
     <Title>Entity Framework Core</Title>
     <Description>JetBrains Rider plugin for Entity Framework Core</Description>

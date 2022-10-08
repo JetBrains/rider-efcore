@@ -33,16 +33,13 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("migrationShortName", string)
         field("migrationLongName", string)
         field("migrationFolderAbsolutePath", string)
-        field("language", enum {
-            +"Unknown"
-            +"CSharp"
-            +"FSharp"
-        })
+        field("language", language)
     }
 
     private val DbContextInfo = structdef {
         field("name", string)
         field("fullName", string)
+        field("language", language)
     }
 
     private val EfToolDefinition = structdef {
@@ -52,6 +49,12 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
             +"Local"
             +"Global"
         })
+    }
+
+    private val language = enum {
+        +"Unknown"
+        +"CSharp"
+        +"FSharp"
     }
 
     init {

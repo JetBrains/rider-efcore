@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [223.1.0] - 2022-10-20
+### Added
+- Support for F# migrations projects
+
 ## [223.0.0] - 2022-09-30
 ### Added
 - Enable support for Rider 2022.3 EAP

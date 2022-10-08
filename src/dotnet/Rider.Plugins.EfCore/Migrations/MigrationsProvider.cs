@@ -1,7 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FSharp.Compiler.Symbols;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.RiderTutorials.Utils;
 using Rider.Plugins.EfCore.Extensions;
@@ -48,8 +54,8 @@ namespace Rider.Plugins.EfCore.Migrations
       migrationInfo = null;
 
       var migrationShortName = @class.ShortName;
-      var migrationAttribute = @class.GetAttributeInstance("MigrationAttribute");
-      var dbContextAttribute = @class.GetAttributeInstance("DbContextAttribute");
+      var migrationAttribute = @class.GetAttributeInstance(KnownAttributes.MigrationAttribute);
+      var dbContextAttribute = @class.GetAttributeInstance(KnownAttributes.DbContextAttribute);
 
       if (dbContextAttribute is null || migrationAttribute is null)
       {
@@ -61,11 +67,7 @@ namespace Rider.Plugins.EfCore.Migrations
         .ConstantValue
         .StringValue;
 
-      var dbContextClass = dbContextAttribute
-        .PositionParameter(0)
-        .TypeValue
-        ?.GetScalarType()
-        ?.GetClrName();
+      var dbContextClass = ExtractDbContextClrName(dbContextAttribute);
 
       if (migrationLongName is null || dbContextClass is null)
       {
@@ -76,13 +78,39 @@ namespace Rider.Plugins.EfCore.Migrations
         .FirstOrDefault()
         .GetLocation().Directory.FileAccessPath;
 
+      var language = @class.PresentationLanguage switch
+      {
+        CSharpLanguage _ => Language.CSharp,
+        FSharpLanguage _ => Language.FSharp,
+        _ => Language.Unknown
+      };
+
       migrationInfo = new MigrationInfo(
         dbContextClass.FullName,
         migrationShortName,
         migrationLongName,
-        migrationFolderAbsolutePath);
+        migrationFolderAbsolutePath,
+        language);
 
       return true;
     }
+
+    private static IClrTypeName ExtractDbContextClrName(IAttributeInstance attributeInstance) =>
+      attributeInstance switch
+      {
+        FSharpAttributeInstance fsharpAttribute =>
+          (fsharpAttribute
+            .AttrConstructorArgs
+            .First()
+            .Item2 as FSharpType)?
+          .TypeDefinition
+          .GetClrName(),
+
+        _ => attributeInstance
+          .PositionParameter(0)
+          .TypeValue
+          ?.GetScalarType()
+          ?.GetClrName()
+      };
   }
 }

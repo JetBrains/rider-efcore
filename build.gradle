@@ -56,6 +56,7 @@ task setBuildTool {
         ext.args << "/p:Configuration=${BuildConfiguration}"
         ext.args << "/p:HostFullIdentifier="
         ext.args << "/p:SdkVersion=${RiderSdkVersion}"
+        ext.args << "/p:RiderVersion=${ProductVersion}"
     }
 }
 
@@ -99,13 +100,7 @@ intellij {
     downloadSources = false
     instrumentCode = false
     // TODO: add plugins
-    // HACK: -- Load F# plugin from custom repository (our local disk)
-    plugins = ["com.jetbrains.rider.fsharp"]
-    pluginsRepositories {
-        marketplace()
-        custom(new File("${buildDir}/dependencies").toURI().toURL().toString())
-    }
-    // /--
+    plugins = ["rider-fsharp"]
 
     patchPluginXml {
         changeNotes = changelog.get(PluginVersion).toHTML()

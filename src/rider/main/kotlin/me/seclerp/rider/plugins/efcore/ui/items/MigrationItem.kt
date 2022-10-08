@@ -4,5 +4,5 @@ import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
 
-class MigrationItem(name: String)
-    : IconItem<String>(name, DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS), name)
+class MigrationItem(displayName: String, data: MigrationInfo)
+    : IconItem<MigrationInfo>(displayName, DotnetIconResolver.resolveForLanguage(data.language), data)

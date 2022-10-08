@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.RiderTutorials.Utils;
 using Rider.Plugins.EfCore.Extensions;
@@ -38,7 +40,14 @@ namespace Rider.Plugins.EfCore.DbContext
         return false;
       }
 
-      dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetFullClrName());
+      var language = @class.PresentationLanguage switch
+      {
+        CSharpLanguage _ => Language.CSharp,
+        FSharpLanguage _ => Language.FSharp,
+        _ => Language.Unknown
+      };
+
+      dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetFullClrName(), language);
 
       return true;
     }
