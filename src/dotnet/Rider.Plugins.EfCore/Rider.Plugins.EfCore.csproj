@@ -21,19 +21,19 @@
   
   <ItemGroup>
     <Reference Include="FSharp.Compiler.Service, Version=2022.3.0-dev, Culture=neutral, PublicKeyToken=3099b8d9d20e74bf">
-      <HintPath>..\..\..\build\riderRD-$(RiderVersion)\plugins\rider-fsharp\dotnet\FSharp.Compiler.Service.dll</HintPath>
+      <HintPath>../../../build/riderRD-$(RiderVersion)/plugins/rider-fsharp/dotnet/FSharp.Compiler.Service.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Plugins.FSharp.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
-      <HintPath>..\..\..\build\riderRD-$(RiderVersion)\plugins\rider-fsharp\dotnet\JetBrains.ReSharper.Plugins.FSharp.Common.dll</HintPath>
+      <HintPath>../../../build/riderRD-$(RiderVersion)/plugins/rider-fsharp/dotnet/JetBrains.ReSharper.Plugins.FSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
-      <HintPath>..\..\..\build\riderRD-$(RiderVersion)\plugins\rider-fsharp\dotnet\JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll</HintPath>
+      <HintPath>../../../build/riderRD-$(RiderVersion)/plugins/rider-fsharp/dotnet/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Plugins.FSharp.Psi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
-      <HintPath>..\..\..\build\riderRD-$(RiderVersion)\plugins\rider-fsharp\dotnet\JetBrains.ReSharper.Plugins.FSharp.Psi.dll</HintPath>
+      <HintPath>../../../build/riderRD-$(RiderVersion)/plugins/rider-fsharp/dotnet/JetBrains.ReSharper.Plugins.FSharp.Psi.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Plugins.FSharp.Psi.Features, Version=1.0.0.0, Culture=neutral, PublicKeyToken=333a98252ac829ae">
-      <HintPath>..\..\..\build\riderRD-$(RiderVersion)\plugins\rider-fsharp\dotnet\JetBrains.ReSharper.Plugins.FSharp.Psi.Features.dll</HintPath>
+      <HintPath>../../../build/riderRD-$(RiderVersion)/plugins/rider-fsharp/dotnet/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.dll</HintPath>
     </Reference>
   </ItemGroup>
 
