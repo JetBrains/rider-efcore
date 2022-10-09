@@ -27,9 +27,8 @@ jobs:
           echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=PluginVersion: ).*')" >> $GITHUB_ENV
 
       - name: 🏗 Build Plugin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: buildPlugin
+        shell: bash
+        run: ./gradlew :buildPlugin
 
       - name: 🏗 Get current changelog
         id: changelog_step
@@ -53,6 +52,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🚀 Publish Plugin
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PPublishChannel=${{ github.event.inputs.channel }}
+        shell: bash
+        run: ./gradlew :publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PPublishChannel=${{ github.event.inputs.channel }}

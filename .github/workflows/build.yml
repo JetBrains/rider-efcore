@@ -6,6 +6,8 @@ on:
     branches: [ release/* ]
   workflow_dispatch:
 
+permissions: read-all
+
 jobs:
   build-ubuntu:
     runs-on: ubuntu-latest
@@ -16,7 +18,16 @@ jobs:
       - name: 🛠 Prepare Build Environment
         uses: ./.github/workflows/prepare-build-env
 
+      - name: 🔍 List files (debug)
+        id: list-files
+        run: |
+          FILES=$(cat ./build/.rdgen)
+          echo $FILES
+          FILES="${FILES//'%'/'%25'}"
+          FILES="${FILES//$'\n'/'%0A'}"
+          FILES="${FILES//$'\r'/'%0D'}"
+          echo "::set-output name=FILES_ALL::$FILES"
+
       - name: 🏗 Build Plugin (Stable)
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: buildPlugin
+        shell: bash
+        run: ./gradlew :buildPlugin
