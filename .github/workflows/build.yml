@@ -21,11 +21,8 @@ jobs:
       - name: 🔍 List files (debug)
         id: list-files
         run: |
-          FILES=$(cat ./build/.rdgen)
+          FILES=$(./gradlew :properties)
           echo $FILES
-          FILES="${FILES//'%'/'%25'}"
-          FILES="${FILES//$'\n'/'%0A'}"
-          FILES="${FILES//$'\r'/'%0D'}"
           echo "::set-output name=FILES_ALL::$FILES"
 
       - name: 🏗 Build Plugin (Stable)
