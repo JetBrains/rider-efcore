@@ -5,7 +5,7 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.BaseCommandAction
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 
-class RemoveLastMigrationAction : BaseCommandAction("Removing migration...", "Last migration has been removed") {
+class RemoveLastMigrationAction : BaseCommandAction("Last migration has been removed") {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

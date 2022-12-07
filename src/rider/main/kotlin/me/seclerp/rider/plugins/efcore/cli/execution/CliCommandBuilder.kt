@@ -14,6 +14,8 @@ class CliCommandBuilder(private val solutionDirectory: String, baseCommand: Stri
             .withParameters(baseCommand.split(" "))
             .withCharset(Charset.forName("UTF-8"))
             .withWorkDirectory(solutionDirectory)
+            .withEnvironment("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "true")
+            .withEnvironment("DOTNET_NOLOGO", "true")
 
     init {
         addNamed("--project", makeRelativeProjectPath(commonOptions.migrationsProject))
@@ -57,12 +59,13 @@ class CliCommandBuilder(private val solutionDirectory: String, baseCommand: Stri
         return this
     }
 
-    fun build(): CliCommand {
+    fun build(): GeneralCommandLine {
         if (commonOptions.additionalArguments.isNotEmpty()) {
             add("--")
             generalCommandLine = generalCommandLine.withRawParameters(commonOptions.additionalArguments)
         }
-        return CliCommand(generalCommandLine)
+
+        return generalCommandLine
     }
 
     private fun makeRelativeProjectPath(projectDirectory: String): String {

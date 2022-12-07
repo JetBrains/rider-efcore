@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
@@ -20,7 +21,6 @@ import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import me.seclerp.rider.plugins.efcore.cli.execution.CliCommand
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
@@ -76,7 +76,7 @@ class ScaffoldDbContextDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): GeneralCommandLine {
         val commonOptions = getCommonOptions()
 
         return dbContextCommandFactory.scaffold(
