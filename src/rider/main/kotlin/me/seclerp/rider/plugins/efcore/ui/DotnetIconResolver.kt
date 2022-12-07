@@ -3,6 +3,7 @@ package me.seclerp.rider.plugins.efcore.ui
 import com.intellij.icons.AllIcons
 import com.intellij.ide.plugins.cl.PluginClassLoader
 import com.intellij.openapi.util.IconLoader
+import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import icons.ReSharperIcons
 import icons.RiderIcons
 import me.seclerp.rider.plugins.efcore.rd.Language
@@ -25,14 +26,14 @@ object DotnetIconResolver {
             DotnetIconType.TARGET_FRAMEWORK -> RiderIcons.RunConfigurations.Application
             DotnetIconType.CSHARP_CLASS -> ReSharperIcons.PsiCSharp.Csharp
             // Fallback to plain text if F# file icon was not found
-            DotnetIconType.FSHARP_CLASS -> IconLoader.findIcon("/icons/Fsharp.png", javaClass) ?: AllIcons.FileTypes.Text
+            DotnetIconType.FSHARP_CLASS -> FSharpIcons.FSharp
         }
 
     fun resolveForLanguage(language: Language) =
         when (language) {
             Language.CSharp -> ReSharperIcons.PsiCSharp.Csharp
             // Fallback to plain text if F# file icon was not found
-            Language.FSharp -> IconLoader.findIcon("/icons/Fsharp.png", javaClass) ?: AllIcons.FileTypes.Text
+            Language.FSharp -> FSharpIcons.FSharp
             Language.Unknown -> AllIcons.FileTypes.Text
         }
 }
