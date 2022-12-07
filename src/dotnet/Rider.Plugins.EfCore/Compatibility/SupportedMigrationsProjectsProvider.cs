@@ -18,13 +18,17 @@ namespace Rider.Plugins.EfCore.Compatibility
     public IEnumerable<IProject> GetSupportedMigrationProjects()
     {
       var supportedMigrationProjects = _solution.GetAllProjects()
-        .Where(project => project.TargetFrameworkIds.Any(IsSupportedInMigrationsProject))
-        .Where(project => project.ProjectFileLocation.ExtensionNoDot == "csproj");
+        .Where(project => project.TargetFrameworkIds.Any(IsSupportedTargetFramework))
+        .Where(project => IsSupportedProjectExtension(project.ProjectFileLocation.ExtensionNoDot));
 
       return supportedMigrationProjects;
     }
 
-    private static bool IsSupportedInMigrationsProject(TargetFrameworkId targetFrameworkId) =>
+    private static bool IsSupportedProjectExtension(string extensionNoDot) =>
+      extensionNoDot == "csproj"
+      || extensionNoDot == "fsproj";
+
+    private static bool IsSupportedTargetFramework(TargetFrameworkId targetFrameworkId) =>
       targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net5)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net6)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net7)

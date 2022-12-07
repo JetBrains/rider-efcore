@@ -14,6 +14,7 @@ import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 
 class GenerateScriptDialogWrapper(
@@ -51,11 +52,11 @@ class GenerateScriptDialogWrapper(
     override fun initBindings() {
         super.initBindings()
 
-        fromMigrationsView.bind(dataCtx.availableFromMigrationNames) {
+        fromMigrationsView.bind(dataCtx.availableFromMigrations) {
             it.map(mappings.migration.toItem)
         }
 
-        toMigrationsView.bind(dataCtx.availableToMigrationNames) {
+        toMigrationsView.bind(dataCtx.availableToMigrations) {
             it.map(mappings.migration.toItem)
         }
 
@@ -73,8 +74,8 @@ class GenerateScriptDialogWrapper(
 
     override fun generateCommand(): GeneralCommandLine {
         val commonOptions = getCommonOptions()
-        val fromMigration = dataCtx.fromMigration.value!!.trim()
-        val toMigration = dataCtx.toMigration.value?.trim()
+        val fromMigration = dataCtx.fromMigration.value!!.migrationLongName.trim()
+        val toMigration = dataCtx.toMigration.value?.migrationLongName?.trim()
         val outputFile = dataCtx.outputFilePath.value
         val idempotent = dataCtx.idempotent.value
         val noTransactions = dataCtx.noTransactions.value
@@ -130,12 +131,12 @@ class GenerateScriptDialogWrapper(
     companion object {
         private object mappings {
             object migration {
-                val toItem: (String?) -> MigrationItem?
+                val toItem: (MigrationInfo?) -> MigrationItem?
                     get() = {
-                        if (it == null) null else MigrationItem(it)
+                        if (it == null) null else MigrationItem(it.migrationLongName, it)
                     }
 
-                val fromItem: (MigrationItem?) -> String?
+                val fromItem: (MigrationItem?) -> MigrationInfo?
                     get() = { it?.data }
             }
         }

@@ -21,7 +21,5 @@ runs:
         dotnet-version: '6.0.301'
 
     - name: 🏗 Generate RD protocol data
-      uses: gradle/gradle-build-action@v2
-      with:
-        cache-disabled: true
-        arguments: rdgen
+      shell: bash
+      run: ./gradlew :rdgen

@@ -5,4 +5,4 @@ import me.seclerp.rider.plugins.efcore.ui.DotnetIconResolver
 import me.seclerp.rider.plugins.efcore.ui.DotnetIconType
 
 class DbContextItem(displayName: String, data: DbContextInfo)
-    : IconItem<DbContextInfo>(displayName, DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS), data)
+    : IconItem<DbContextInfo>(displayName, DotnetIconResolver.resolveForLanguage(data.language), data)

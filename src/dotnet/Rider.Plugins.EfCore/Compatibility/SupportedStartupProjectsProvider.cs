@@ -37,15 +37,15 @@ namespace Rider.Plugins.EfCore.Compatibility
 
       var result = projectsWithNugetPacks
         .Concat(referencingProjects)
-        .Where(project => project.TargetFrameworkIds.Any(IsSupportedInStartupProject))
+        .Where(project => project.TargetFrameworkIds.Any(IsSupportedTargetFramework))
         .Distinct();
 
       return result;
     }
 
     private bool StartupProjectPackagesInstalled(IProject project) =>
-      _nugetTracker.HasPackage(project, EfCoreRequiredPackages.EfCoreToolsNugetId)
-      || _nugetTracker.HasPackage(project, EfCoreRequiredPackages.EfCoreDesignNugetId);
+      _nugetTracker.HasPackage(project, KnownNuGetPackages.EfCoreToolsNugetId)
+      || _nugetTracker.HasPackage(project, KnownNuGetPackages.EfCoreDesignNugetId);
 
     private IEnumerable<IProject> GetReferencingProjects(IProject project) =>
       project.TargetFrameworkIds
@@ -53,7 +53,7 @@ namespace Rider.Plugins.EfCore.Compatibility
         .Select(x => x.Value)
         .ToList();
 
-    private static bool IsSupportedInStartupProject(TargetFrameworkId targetFrameworkId) =>
+    private static bool IsSupportedTargetFramework(TargetFrameworkId targetFrameworkId) =>
       targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net5)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net6)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net7)

@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Application.Progress;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Navigation.Requests;
 using JetBrains.ReSharper.Feature.Services.Occurrences;
@@ -12,10 +13,10 @@ namespace Rider.Plugins.EfCore.Extensions
 {
   public static class PsiExtensions
   {
-    public static IAttributeInstance GetAttributeInstance(this IAttributesSet @class, string attributeShortName) =>
+    public static IAttributeInstance GetAttributeInstance(this IAttributesSet @class, string attributeLongName) =>
       @class
-        .GetAttributeInstances(AttributesSource.All)
-        .SingleOrDefault(attribute => attribute.GetAttributeShortName() == attributeShortName);
+        .GetAttributeInstances(new ClrTypeName(attributeLongName), AttributesSource.All)
+        .SingleOrDefault();
 
     public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project,
       IClrTypeName clrTypeName)

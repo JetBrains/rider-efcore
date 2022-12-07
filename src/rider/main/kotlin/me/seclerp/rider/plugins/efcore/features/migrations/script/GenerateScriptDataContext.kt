@@ -4,25 +4,27 @@ import com.intellij.openapi.project.Project
 import me.seclerp.observables.*
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import me.seclerp.rider.plugins.efcore.rd.Language
+import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
 
 class GenerateScriptDataContext(
     intellijProject: Project
 ): CommonDataContext(intellijProject, true) {
-    val availableFromMigrationNames = observableList<String>()
-    val availableToMigrationNames = observableList<String>()
+    val availableFromMigrations = observableList<MigrationInfo>()
+    val availableToMigrations = observableList<MigrationInfo>()
 
-    val fromMigration = observable<String?>(null)
-    val toMigration = observable<String?>(null)
+    val fromMigration = observable<MigrationInfo?>(null)
+    val toMigration = observable<MigrationInfo?>(null)
     val outputFilePath = observable("script.sql")
     val idempotent = observable(false)
     val noTransactions = observable(false)
 
     private val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
-    private val availableMigrationNames = observableList<String>()
+    private val availableMigrations = observableList<MigrationInfo>()
         .apply {
             bind(observableMigrations) { migrations -> migrations
-                .map { it.migrationLongName }
-                .sortedByDescending { it }
+                .map { it }
+                .sortedByDescending { it.migrationLongName }
             }
         }
 
@@ -31,14 +33,14 @@ class GenerateScriptDataContext(
 
         observableMigrations.initBinding()
 
-        availableFromMigrationNames.bind(availableMigrationNames) {
+        availableFromMigrations.bind(availableMigrations) {
             buildList {
                 addAll(it)
-                add("0")
+                add(MigrationInfo("", "0", "0", "", it.lastOrNull()?.language ?: Language.Unknown))
             }
         }
 
-        availableToMigrationNames.bind(availableMigrationNames) {
+        availableToMigrations.bind(availableMigrations) {
             buildList {
                 addAll(it)
             }
