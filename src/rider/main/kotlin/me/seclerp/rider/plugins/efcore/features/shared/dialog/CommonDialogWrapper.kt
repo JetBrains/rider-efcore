@@ -68,7 +68,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     //
     // Preferences
     private val preferredProjectsManager = intellijProject.service<PreferredProjectsManager>()
-    private val settingsStateService = service<EfCoreUiSettingsStateService>()
+    private val settingsStateService = EfCoreUiSettingsStateService.getInstance()
     private val dialogsStateService = intellijProject.service<DialogsStateService>()
 
     //

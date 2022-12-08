@@ -1,18 +1,23 @@
 package me.seclerp.rider.plugins.efcore.settings
 
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.*
 
 @Service
 @State(name = "EfCoreUiSettings", storages = [Storage("efCoreUiSettings.xml")])
 class EfCoreUiSettingsStateService : PersistentStateComponent<EfCoreUiSettingsState> {
+    companion object {
+        fun getInstance(): EfCoreUiSettingsStateService = service()
+    }
+
     private var myState = EfCoreUiSettingsState()
 
     var usePreviouslySelectedOptionsInDialogs : Boolean
         get() = myState.usePreviouslySelectedOptionsInDialogs
         set(value) { myState.usePreviouslySelectedOptionsInDialogs = value }
+
+    var storeSensitiveData : Boolean
+        get() = myState.storeSensitiveData
+        set(value) { myState.storeSensitiveData = value }
 
     var useTerminalExecution : Boolean
         get() = myState.useTerminalExecution

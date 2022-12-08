@@ -6,6 +6,7 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.observables.*
 import me.seclerp.rider.plugins.efcore.rd.*
+import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 
 open class CommonDataContext(
@@ -13,6 +14,7 @@ open class CommonDataContext(
     val requireDbContext: Boolean
 ) : DataContext() {
     protected val beModel = intellijProject.solution.riderEfCoreModel
+    protected val pluginSettings by lazy { EfCoreUiSettingsStateService.getInstance() }
 
     val availableStartupProjects = observableList<StartupProjectInfo>().withLogger("availableStartupProjects")
     val availableMigrationsProjects = observableList<MigrationsProjectInfo>().withLogger("availableMigrationsProjects")
@@ -102,29 +104,30 @@ open class CommonDataContext(
 
         if (requireDbContext) {
             val dbContextName = commonDialogState.get("${migrationsProjectId}:${KnownStateKeys.DB_CONTEXT}")
-            val dbContext = availableDbContexts.value.firstOrNull { it.fullName == dbContextName }
-            if (dbContext != null) {
-                this.dbContext.value = dbContext
+            availableDbContexts.value.firstOrNull { it.fullName == dbContextName }?.apply {
+                dbContext.value = this
             }
         }
 
         val buildConfigurationName = commonDialogState.get(KnownStateKeys.BUILD_CONFIGURATION)
-        val buildConfiguration = availableBuildConfigurations.firstOrNull { it == buildConfigurationName }
-        if (buildConfiguration != null) {
-            this.buildConfiguration.value = buildConfiguration
+        availableBuildConfigurations.firstOrNull { it == buildConfigurationName }?.apply {
+            buildConfiguration.value = this
         }
 
         val targetFrameworkName = commonDialogState.get("${startupProjectId}:${KnownStateKeys.TARGET_FRAMEWORK}")
-        val targetFramework = availableTargetFrameworks.value.firstOrNull { it == targetFrameworkName }
-        if (targetFramework != null) {
-            this.targetFramework.value = targetFramework
+        availableTargetFrameworks.value.firstOrNull { it == targetFrameworkName }?.apply {
+            targetFramework.value = this
         }
 
-        val noBuild = commonDialogState.getBool(KnownStateKeys.NO_BUILD) ?: false
-        this.noBuild.value = noBuild
+        commonDialogState.getBool(KnownStateKeys.NO_BUILD)?.apply {
+            noBuild.value = this
+        }
 
-        val additionalArguments = commonDialogState.get(KnownStateKeys.ADDITIONAL_ARGUMENTS) ?: ""
-        this.additionalArguments.value = additionalArguments
+        if (pluginSettings.storeSensitiveData) {
+            commonDialogState.getSensitive(KnownStateKeys.ADDITIONAL_ARGUMENTS)?.apply {
+                additionalArguments.value = this
+            }
+        }
     }
 
     open fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
@@ -140,15 +143,18 @@ open class CommonDataContext(
             commonDialogState.set(KnownStateKeys.TARGET_FRAMEWORK, targetFramework.value!!)
         }
 
-        commonDialogState.set(KnownStateKeys.NO_BUILD, noBuild.value.toString())
-        commonDialogState.set(KnownStateKeys.ADDITIONAL_ARGUMENTS, additionalArguments.value)
+        commonDialogState.set(KnownStateKeys.NO_BUILD, noBuild.value)
+
+        if (pluginSettings.storeSensitiveData) {
+            commonDialogState.setSensitive(KnownStateKeys.ADDITIONAL_ARGUMENTS, additionalArguments.value)
+        }
     }
 
     private object KnownStateKeys {
-        val DB_CONTEXT = "dbContext"
-        val BUILD_CONFIGURATION = "buildConfiguration"
-        val TARGET_FRAMEWORK = "targetFramework"
-        val NO_BUILD = "noBuild"
-        val ADDITIONAL_ARGUMENTS = "additionalArguments"
+        const val DB_CONTEXT = "dbContext"
+        const val BUILD_CONFIGURATION = "buildConfiguration"
+        const val TARGET_FRAMEWORK = "targetFramework"
+        const val NO_BUILD = "noBuild"
+        const val ADDITIONAL_ARGUMENTS = "additionalArguments"
     }
 }

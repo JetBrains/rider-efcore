@@ -3,7 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [223.1.0] - 2022-12-07
+### Added
+- Most common values in dialogs are saved between instances 
+- Ability to run commands in terminal-like tool window
+- Support for a stable Rider 2022.3
+
+### Fixed
+- DbContext class not showing up (#105)
 
 ## [223.0.0] - 2022-09-30
 ### Added
@@ -114,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleting used database
 
 [Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...HEAD
+[223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...HEAD
 [223.0.0]: https://github.com/seclerp/rider-efcore/compare/v222.2.0...v223.0.0
 [222.2.0]: https://github.com/seclerp/rider-efcore/compare/v222.1.1...v222.2.0
 [222.1.1]: https://github.com/seclerp/rider-efcore/compare/v222.1.0...v222.1.1

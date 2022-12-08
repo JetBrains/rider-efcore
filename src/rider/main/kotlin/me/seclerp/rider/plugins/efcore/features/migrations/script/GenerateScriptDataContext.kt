@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project
 import me.seclerp.observables.*
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 
 class GenerateScriptDataContext(
     intellijProject: Project
@@ -43,5 +44,35 @@ class GenerateScriptDataContext(
                 addAll(it)
             }
         }
+    }
+
+    override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
+        super.loadState(commonDialogState)
+
+        commonDialogState.get(KnownStateKeys.OUTPUT_FILE)?.apply {
+            outputFilePath.value = this
+        }
+
+        commonDialogState.getBool(KnownStateKeys.IDEMPOTENT)?.apply {
+            idempotent.value = this
+        }
+
+        commonDialogState.getBool(KnownStateKeys.NO_TRANSACTIONS)?.apply {
+            noTransactions.value = this
+        }
+    }
+
+    override fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
+        super.saveState(commonDialogState)
+
+        commonDialogState.set(KnownStateKeys.OUTPUT_FILE, outputFilePath.value)
+        commonDialogState.set(KnownStateKeys.IDEMPOTENT, idempotent.value)
+        commonDialogState.set(KnownStateKeys.NO_TRANSACTIONS, noTransactions.value)
+    }
+
+    object KnownStateKeys {
+        const val OUTPUT_FILE = "outputFilePath"
+        const val IDEMPOTENT = "idempotent"
+        const val NO_TRANSACTIONS = "noTransactions"
     }
 }
