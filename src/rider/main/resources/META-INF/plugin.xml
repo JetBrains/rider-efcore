@@ -3,7 +3,7 @@
   <name>Entity Framework Core UI</name>
   <version>_PLACEHOLDER_</version>
   <vendor url="https://github.com/seclerp">Andrii Rublov</vendor>
-  <idea-version since-build="223" until-build="223.*" />
+  <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
 
   <description>
