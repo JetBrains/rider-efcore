@@ -8,13 +8,17 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
+import me.seclerp.observables.bind
+import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
-import me.seclerp.observables.ui.dsl.textFieldWithCompletion
+import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.*
+import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
 
 class UpdateDatabaseDialogWrapper(
@@ -34,11 +38,13 @@ class UpdateDatabaseDialogWrapper(
 
     //
     // Internal data
-    private val currentDbContextMigrationsList = mutableListOf<String>()
+    private val targetMigrationsView = observableList<MigrationItem?>()
+
+    private val targetMigrationView = observable<MigrationItem?>(null)
 
     //
     // Validation
-    private val validator = UpdateDatabaseValidator(currentDbContextMigrationsList)
+    private val validator = UpdateDatabaseValidator(targetMigrationsView)
 
     //
     // Constructor
@@ -49,16 +55,20 @@ class UpdateDatabaseDialogWrapper(
     override fun initBindings() {
         super.initBindings()
 
-        dataCtx.availableMigrations.afterChange {
-            currentDbContextMigrationsList.clear()
-            currentDbContextMigrationsList.addAll(it.map { it.migrationLongName })
-            currentDbContextMigrationsList.add("0")
+        targetMigrationsView.bind(dataCtx.availableMigrationNames) {
+            it.map(mappings.migration.toItem)
         }
+
+        targetMigrationView.bind(targetMigrationsView){ it.lastOrNull() }
+
+        targetMigrationView.bind(dataCtx.targetMigration,
+            mappings.migration.toItem,
+            mappings.migration.fromItem)
     }
 
     override fun generateCommand(): GeneralCommandLine {
         val commonOptions = getCommonOptions()
-        val targetMigration = dataCtx.targetMigration.value.trim()
+        val targetMigration = dataCtx.targetMigration.value!!.trim()
         val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
 
         return databaseCommandFactory.update(efCoreVersion, commonOptions, targetMigration, connection)
@@ -68,13 +78,12 @@ class UpdateDatabaseDialogWrapper(
     // UI
     override fun Panel.createPrimaryOptions() {
         row("Target migration:") {
-            textFieldWithCompletion(dataCtx.targetMigration, currentDbContextMigrationsList, intellijProject, completionItemsIcon)
-                .horizontalAlign(HorizontalAlign.FILL)
-                .comment("Use <code>0</code> as a target migration to undo all applied migrations")
-                .focused()
-                .validationOnInput(validator.targetMigrationValidation())
+            iconComboBox(targetMigrationView, targetMigrationsView)
                 .validationOnApply(validator.targetMigrationValidation())
-                .monospaced()
+                .validationOnInput(validator.targetMigrationValidation())
+                .comment("Use <code>0</code> as a target migration to undo all applied migrations")
+                .horizontalAlign(HorizontalAlign.FILL)
+                .focused()
         }
     }
 
@@ -101,5 +110,17 @@ class UpdateDatabaseDialogWrapper(
 
     companion object {
         val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
+
+        private object mappings {
+            object migration {
+                val toItem: (String?) -> MigrationItem?
+                    get() = {
+                        if (it == null) null else MigrationItem(it)
+                    }
+
+                val fromItem: (MigrationItem?) -> String?
+                    get() = { it?.data }
+            }
+        }
     }
 }

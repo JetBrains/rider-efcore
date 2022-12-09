@@ -3,28 +3,31 @@ package me.seclerp.rider.plugins.efcore.features.database.update
 import com.intellij.openapi.project.Project
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 
 class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(intellijProject, true) {
-    val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
+    val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
 
-    var targetMigration = observable("")
+    val availableMigrationNames = observableList<String>()
+        .apply {
+            bind(observableMigrations) { migrations -> migrations
+                .map { it.migrationLongName }
+                .sortedByDescending { it }
+            }
+            add("0")
+        }
+
+    var targetMigration = observable<String?>(null)
     var useDefaultConnection = observable(true)
     var connection = observable("")
 
     override fun initBindings() {
         super.initBindings()
 
-        availableMigrations.initBinding()
-
-        targetMigration.bind(availableMigrations) {
-            if (it.isNotEmpty())
-                it.first().migrationLongName
-            else
-                ""
-        }
+        observableMigrations.initBinding()
     }
 
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
