@@ -15,17 +15,18 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
+import java.util.*
 
 class GenerateScriptDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?
+    selectedProjectId: UUID?
 ) : CommonDialogWrapper<GenerateScriptDataContext>(
     GenerateScriptDataContext(intellijProject),
     toolsVersion,
     "Generate SQL Script",
     intellijProject,
-    selectedProjectName,
+    selectedProjectId,
     requireMigrationsInProject = true
 ) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()

@@ -24,7 +24,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     }
 
     private val MigrationsIdentity = structdef {
-        field("projectName", string)
+        field("projectId", guid)
         field("dbContextClassFullName", string)
     }
 
@@ -59,7 +59,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
 
         call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
-        call("getAvailableDbContexts", string, immutableList(DbContextInfo))
+        call("getAvailableDbContexts", guid, immutableList(DbContextInfo))
 
         callback("onMissingEfCoreToolsDetected", void, void)
     }

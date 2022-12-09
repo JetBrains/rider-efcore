@@ -16,17 +16,18 @@ import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.rider.plugins.efcore.ui.AnyInputDocumentListener
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
+import java.util.UUID
 
 class AddMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?,
+    selectedProjectId: UUID?,
 ) : CommonDialogWrapper<AddMigrationDataContext>(
     AddMigrationDataContext(intellijProject),
     toolsVersion,
     "Add Migration",
     intellijProject,
-    selectedProjectName
+    selectedProjectId
 ) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 

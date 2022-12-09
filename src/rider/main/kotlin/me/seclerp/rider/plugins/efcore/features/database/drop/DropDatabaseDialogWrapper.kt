@@ -8,17 +8,18 @@ import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import java.util.*
 
 class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?,
+    selectedProjectId: UUID?,
 ) : CommonDialogWrapper<CommonDataContext>(
     CommonDataContext(intellijProject, false),
     toolsVersion,
     "Drop Database",
     intellijProject,
-    selectedProjectName,
+    selectedProjectId,
     false
 ) {
     private val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()

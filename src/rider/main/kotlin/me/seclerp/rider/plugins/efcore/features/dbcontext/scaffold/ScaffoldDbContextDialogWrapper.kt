@@ -26,19 +26,20 @@ import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
+import java.util.*
 import javax.swing.JComponent
 
 @Suppress("UnstableApiUsage")
 class ScaffoldDbContextDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?,
+    selectedProjectId: UUID?,
 ) : CommonDialogWrapper<ScaffoldDbContextDataContext>(
     ScaffoldDbContextDataContext(intellijProject),
     toolsVersion,
     "Scaffold DbContext",
     intellijProject,
-    selectedProjectName,
+    selectedProjectId,
     requireMigrationsInProject = false
 ) {
     val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()

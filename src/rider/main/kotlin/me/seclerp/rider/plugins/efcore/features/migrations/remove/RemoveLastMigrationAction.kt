@@ -4,12 +4,13 @@ import com.intellij.openapi.project.Project
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.BaseCommandAction
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
+import java.util.*
 
 class RemoveLastMigrationAction : BaseCommandAction("Last migration has been removed") {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
-        currentDotnetProjectName: String?
-    ) = RemoveLastMigrationDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectName)
+        currentDotnetProjectId: UUID?
+    ) = RemoveLastMigrationDialogWrapper(toolsVersion, intellijProject, currentDotnetProjectId)
 }

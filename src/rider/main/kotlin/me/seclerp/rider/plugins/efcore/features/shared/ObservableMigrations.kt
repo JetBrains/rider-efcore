@@ -16,10 +16,10 @@ class ObservableMigrations(
     fun initBinding() {
         this.bind(dbContext) {
             if (it != null) {
-                val migrationsProjectName = migrationsProject.value!!.name
+                val migrationsProjectId = migrationsProject.value!!.id
                 val dbContextName = it.fullName
                 val migrations = intellijProject.solution.riderEfCoreModel.getAvailableMigrations.runUnderProgress(
-                    MigrationsIdentity(migrationsProjectName, dbContextName), intellijProject, "Loading available migrations...",
+                    MigrationsIdentity(migrationsProjectId, dbContextName), intellijProject, "Loading available migrations...",
                     isCancelable = true,
                     throwFault = true
                 )

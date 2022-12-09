@@ -15,17 +15,18 @@ import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.rider.plugins.efcore.ui.*
+import java.util.*
 
 class UpdateDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?
+    selectedProjectId: UUID?
 ) : CommonDialogWrapper<UpdateDatabaseDataContext>(
     UpdateDatabaseDataContext(intellijProject),
     toolsVersion,
     "Update Database",
     intellijProject,
-    selectedProjectName,
+    selectedProjectId,
     true
 ) {
 

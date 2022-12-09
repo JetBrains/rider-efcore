@@ -10,6 +10,7 @@ import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.model.RdUnloadProjectDescriptor
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
+import java.util.*
 
 fun AnActionEvent.isEfCoreActionContext(): Boolean {
     if (project == null) return false
@@ -29,10 +30,12 @@ fun AnActionEvent.isEfCoreActionContext(): Boolean {
     return true
 }
 
-fun AnActionEvent.getDotnetProjectName(): String? {
-    val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return ""
+fun AnActionEvent.getDotnetProjectId(): UUID? {
+    val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return null
 
-    return getFileProject(project!!, actionFile)?.descriptor?.name
+    return getFileProject(project!!, actionFile)?.descriptor?.let {
+        (it as RdProjectDescriptor).originalGuid
+    }
 }
 
 @Suppress("UnstableApiUsage")

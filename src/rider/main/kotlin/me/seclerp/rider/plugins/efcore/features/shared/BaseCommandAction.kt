@@ -21,6 +21,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.PreferredCommandExecutorPro
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import me.seclerp.rider.plugins.efcore.rd.ToolKind
+import java.util.UUID
 
 abstract class BaseCommandAction(
     private val actionPerformedText: String
@@ -53,12 +54,12 @@ abstract class BaseCommandAction(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
-        currentDotnetProjectName: String?): BaseDialogWrapper
+        currentDotnetProjectId: UUID?): BaseDialogWrapper
 
     private fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
         val intellijProject = actionEvent.project!!
         val model = getEfCoreRiderModel(actionEvent)
-        val currentDotnetProjectName = actionEvent.getDotnetProjectName()
+        val currentDotnetProjectName = actionEvent.getDotnetProjectId()
         val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
 
         if (dialog.showAndGet()) {

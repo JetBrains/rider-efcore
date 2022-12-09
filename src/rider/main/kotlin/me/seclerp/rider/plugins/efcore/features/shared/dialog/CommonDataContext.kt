@@ -34,7 +34,7 @@ open class CommonDataContext(
         if (requireDbContext) {
             availableDbContexts.bind(migrationsProject) {
                 beModel.getAvailableDbContexts.runUnderProgress(
-                    it!!.name, intellijProject, "Loading DbContext classes...",
+                    it!!.id, intellijProject, "Loading DbContext classes...",
                     isCancelable = true,
                     throwFault = true
                 )?.toMutableList() ?: mutableListOf()

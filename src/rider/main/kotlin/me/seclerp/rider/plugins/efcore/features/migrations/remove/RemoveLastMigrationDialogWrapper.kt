@@ -7,17 +7,18 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import java.util.*
 
 class RemoveLastMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
-    selectedProjectName: String?,
+    selectedProjectId: UUID?,
 ) : CommonDialogWrapper<RemoveLastMigrationDataContext>(
     RemoveLastMigrationDataContext(intellijProject),
     toolsVersion,
     "Remove Last Migration",
     intellijProject,
-    selectedProjectName,
+    selectedProjectId,
     true
 ) {
     val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()

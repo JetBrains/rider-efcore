@@ -4,7 +4,7 @@ namespace Rider.Plugins.EfCore.Exceptions
 {
   public class ProjectNotFoundException : Exception
   {
-    public ProjectNotFoundException(string projectName) : base($"Project with name {projectName} not found")
+    public ProjectNotFoundException(Guid projectId) : base($"Project with ID {projectId} not found")
     {
     }
   }

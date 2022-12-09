@@ -23,7 +23,7 @@ class CommonDialogValidator(
                 null
             else {
                 val migrationsIdentity = MigrationsIdentity(
-                    it.item.displayName,
+                    it.item.data.id,
                     dataCtx.dbContext.value!!.fullName)
 
                 val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(

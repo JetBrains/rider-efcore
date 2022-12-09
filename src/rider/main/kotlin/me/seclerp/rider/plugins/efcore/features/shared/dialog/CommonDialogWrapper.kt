@@ -27,6 +27,7 @@ import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.ui.items.*
 import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
 import java.awt.event.ActionEvent
+import java.util.*
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
@@ -37,7 +38,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected val efCoreVersion: DotnetEfVersion,
     dialogTitle: String,
     protected val intellijProject: Project,
-    private val selectedProjectName: String?,
+    private val selectedProjectId: UUID?,
     requireMigrationsInProject: Boolean = false
 ) : BaseDialogWrapper() {
 
@@ -59,7 +60,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     private val targetFrameworksView = observable<BaseTargetFrameworkItem?>(null).withLogger("targetFrameworksView")
     private val buildConfigurationView = observable<BuildConfigurationItem?>(null).withLogger("buildConfigurationView")
 
-    private val isSolutionLevelMode = selectedProjectName == null
+    private val isSolutionLevelMode = selectedProjectId == null
 
     //
     // Validation
@@ -180,7 +181,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
         val startupProjects = dataCtx.availableStartupProjects
 
         val selectedDotnetProject =
-            migrationsProjects.find { it.name == selectedProjectName }
+            migrationsProjects.find { it.id == selectedProjectId }
 
         val (preferredMigrationsProject, preferredStartupProject) =
             preferredProjectsManager.getProjectPair(selectedDotnetProject?.id, migrationsProjects, startupProjects)

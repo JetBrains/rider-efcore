@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Collections.Viewable;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.Impl;
@@ -185,10 +185,10 @@ namespace Rider.Plugins.EfCore
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByName(identity.ProjectName);
+        var project = _solution.GetProjectByGuid(identity.ProjectId);
         if (project is null)
         {
-          return RdTask<bool>.Faulted(new ProjectNotFoundException(identity.ProjectName));
+          return RdTask<bool>.Faulted(new ProjectNotFoundException(identity.ProjectId));
         }
 
         var hasMigrations = _migrationsProvider.HasMigrations(project, identity.DbContextClassFullName);
@@ -201,11 +201,11 @@ namespace Rider.Plugins.EfCore
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByName(identity.ProjectName);
+        var project = _solution.GetProjectByGuid(identity.ProjectId);
 
         if (project is null)
         {
-          return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(identity.ProjectName));
+          return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(identity.ProjectId));
         }
 
         var foundDbContexts = _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
@@ -214,15 +214,15 @@ namespace Rider.Plugins.EfCore
       }
     }
 
-    private RdTask<List<DbContextInfo>> GetAvailableDbContexts(Lifetime lifetime, string projectName)
+    private RdTask<List<DbContextInfo>> GetAvailableDbContexts(Lifetime lifetime, Guid projectId)
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByName(projectName);
+        var project = _solution.GetProjectByGuid(projectId);
 
         if (project is null)
         {
-          return RdTask<List<DbContextInfo>>.Faulted(new ProjectNotFoundException(projectName));
+          return RdTask<List<DbContextInfo>>.Faulted(new ProjectNotFoundException(projectId));
         }
 
         var foundDbContexts = _dbContextProvider.GetDbContexts(project).ToList();
