@@ -10,16 +10,16 @@ import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 
 class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(intellijProject, true) {
     val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
-
     val availableMigrationNames = observableList<String>()
+
+    val migrationNames = observableList<String>()
         .apply {
             bind(observableMigrations) { migrations -> migrations
                 .map { it.migrationLongName }
                 .sortedByDescending { it }
-                .apply { add("0") }
             }
-
         }
+
 
     var targetMigration = observable<String?>(null)
     var useDefaultConnection = observable(true)
@@ -29,6 +29,13 @@ class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(int
         super.initBindings()
 
         observableMigrations.initBinding()
+
+        availableMigrationNames.bind(migrationNames) {
+            buildList {
+                addAll(it)
+                add("0")
+            }
+        }
     }
 
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
