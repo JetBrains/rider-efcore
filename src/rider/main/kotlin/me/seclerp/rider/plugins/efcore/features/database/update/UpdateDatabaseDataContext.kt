@@ -16,8 +16,9 @@ class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(int
             bind(observableMigrations) { migrations -> migrations
                 .map { it.migrationLongName }
                 .sortedByDescending { it }
+                .apply { add("0") }
             }
-            add("0")
+
         }
 
     var targetMigration = observable<String?>(null)
