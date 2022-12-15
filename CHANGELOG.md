@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [223.2.0] - 2022-12-15
+### Changed
+- Target migration in Update database dialog is now represented as a drop-down list instead of text input field (#130 by @unopcpavilion)
+
+### Fixed
+- Target migration field selected oldest migration instead of newest as preselected value 
+
 ## [223.1.0] - 2022-12-07
 ### Added
 - Most common values in dialogs are saved between instances 
@@ -121,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleting used database
 
 [Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...HEAD
-[223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...HEAD
+[223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
+[223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...v223.1.0
 [223.0.0]: https://github.com/seclerp/rider-efcore/compare/v222.2.0...v223.0.0
 [222.2.0]: https://github.com/seclerp/rider-efcore/compare/v222.1.1...v222.2.0
 [222.1.1]: https://github.com/seclerp/rider-efcore/compare/v222.1.0...v222.1.1

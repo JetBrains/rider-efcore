@@ -59,7 +59,7 @@ class UpdateDatabaseDialogWrapper(
             it.map(mappings.migration.toItem)
         }
 
-        targetMigrationView.bind(targetMigrationsView){ it.lastOrNull() }
+        targetMigrationView.bind(targetMigrationsView){ it.firstOrNull() }
 
         targetMigrationView.bind(dataCtx.targetMigration,
             mappings.migration.toItem,
@@ -109,8 +109,6 @@ class UpdateDatabaseDialogWrapper(
     }
 
     companion object {
-        val completionItemsIcon = DotnetIconResolver.resolveForType(DotnetIconType.CSHARP_CLASS)
-
         private object mappings {
             object migration {
                 val toItem: (String?) -> MigrationItem?
