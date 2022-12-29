@@ -63,7 +63,7 @@ More about features and available dialogs you could read in [**the blog post**](
 - JetBrains Rider **2022.3+**
 
 - EF Core **5.0+** with projects under such target frameworks:
-  - `net7.0` (preview)
+  - `net7.0`
   - `net6.0`
   - `net5.0`
   - `netcoreapp3.1`
