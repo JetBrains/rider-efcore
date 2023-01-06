@@ -32,7 +32,7 @@ namespace Rider.Plugins.EfCore.Tracking
     {
       _nuGetPackageReferenceTracker.InitialProcessingIsCompleted.Change.Advise(_lifetime, args =>
       {
-        if (args.New && !args.Old)
+        if (args.HasNew && args.New && (!args.HasOld || !args.Old))
         {
           _logger.LogFlow($"{nameof(NugetDependenciesListener)}.InitialProcessingIsCompleted.Change",
             $"Calling {nameof(ProjectsUpdated)}");

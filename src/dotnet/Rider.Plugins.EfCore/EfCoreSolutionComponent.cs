@@ -208,9 +208,9 @@ namespace Rider.Plugins.EfCore
           return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(identity.ProjectId));
         }
 
-        var foundDbContexts = _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
+        var foundMigrations = _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
 
-        return RdTask<List<MigrationInfo>>.Successful(foundDbContexts);
+        return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
       }
     }
 

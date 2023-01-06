@@ -2,7 +2,6 @@
 using System.Linq;
 using JetBrains.Application.Progress;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Navigation.Requests;
 using JetBrains.ReSharper.Feature.Services.Occurrences;
 using JetBrains.ReSharper.Psi;
@@ -17,21 +16,14 @@ namespace Rider.Plugins.EfCore.Extensions
         .GetAttributeInstances(AttributesSource.All)
         .SingleOrDefault(attribute => attribute.GetAttributeShortName() == attributeShortName);
 
-    public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IProject project,
-      IClrTypeName clrTypeName)
+    public static IEnumerable<IClass> FindInheritorsOf(this IPsiModule module, IClrTypeName clrTypeName, bool transitive = true)
     {
       var psiServices = module.GetPsiServices();
-
-      var symbolScope =
-        psiServices.Symbols.GetSymbolScope(module, true,
-          true); // caseSensitive should probably come the project language service
-
+      var symbolScope = psiServices.Symbols.GetSymbolScope(module, transitive, true);
       var typeElement = symbolScope.GetTypeElementByCLRName(clrTypeName);
 
       if (typeElement == null)
-      {
         return Enumerable.Empty<IClass>();
-      }
 
       var consumer = new SearchResultsConsumer();
       var pi = NullProgressIndicator.Create();
@@ -43,7 +35,6 @@ namespace Rider.Plugins.EfCore.Extensions
         .OfType<DeclaredElementOccurrence>()
         .Select(occurence => occurence.GetDeclaredElement())
         .Where(element => element != null)
-        .Where(element => element.GetSourceFiles().All(file => Equals(file.GetProject(), project)))
         .Cast<IClass>();
     }
   }

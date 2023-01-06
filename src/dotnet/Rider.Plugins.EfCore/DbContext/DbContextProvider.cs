@@ -19,9 +19,9 @@ namespace Rider.Plugins.EfCore.DbContext
       {
         var foundDbContexts = project
           .GetPsiModules()
-          .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.DbContextBaseClass))
-          .Distinct(dbContextClass =>
-            dbContextClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
+          .SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.DbContextBaseClass))
+          // To get around of multiple modules (multiple target frameworks)
+          .Distinct(dbContextClass => dbContextClass.GetFullClrName())
           .TrySelect<IClass, DbContextInfo>(TryGetDbContextInfo)
           .ToList();
 
@@ -34,9 +34,7 @@ namespace Rider.Plugins.EfCore.DbContext
       dbContextInfo = null;
 
       if (@class.IsAbstract)
-      {
         return false;
-      }
 
       dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetFullClrName());
 

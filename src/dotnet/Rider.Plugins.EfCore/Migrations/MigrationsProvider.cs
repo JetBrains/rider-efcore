@@ -17,7 +17,7 @@ namespace Rider.Plugins.EfCore.Migrations
       using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
       {
         var projectHasMigrations = project.GetPsiModules()
-          ?.SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
+          ?.SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.MigrationBaseClass))
           .TrySelect<IClass, MigrationInfo>(TryGetMigrationInfo)
           .Any(migrationInfo =>
             migrationInfo != null && migrationInfo.DbContextClassFullName == dbContextFullName);
@@ -32,9 +32,9 @@ namespace Rider.Plugins.EfCore.Migrations
       {
         var foundMigrations = project
           .GetPsiModules()
-          .SelectMany(module => module.FindInheritorsOf(project, EfCoreKnownTypeNames.MigrationBaseClass))
-          .Distinct(migrationClass =>
-            migrationClass.GetFullClrName()) // To get around of multiple modules (multiple target frameworks)
+          .SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.MigrationBaseClass))
+          // To get around of multiple modules (multiple target frameworks)
+          .Distinct(migrationClass => migrationClass.GetFullClrName())
           .TrySelect<IClass, MigrationInfo>(TryGetMigrationInfo)
           .Where(m => m.DbContextClassFullName == dbContextFullName)
           .ToList();
@@ -52,9 +52,7 @@ namespace Rider.Plugins.EfCore.Migrations
       var dbContextAttribute = @class.GetAttributeInstance("DbContextAttribute");
 
       if (dbContextAttribute is null || migrationAttribute is null)
-      {
         return false;
-      }
 
       var migrationLongName = migrationAttribute
         .PositionParameter(0)
@@ -68,9 +66,7 @@ namespace Rider.Plugins.EfCore.Migrations
         ?.GetClrName();
 
       if (migrationLongName is null || dbContextClass is null)
-      {
         return false;
-      }
 
       var migrationFolderAbsolutePath = @class.GetSourceFiles()
         .FirstOrDefault()
