@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.jetbrains.rider.model.dotNetActiveRuntimeModel
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
@@ -35,9 +36,12 @@ abstract class BaseCommandAction(
         ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, "Getting dotnet ef version...", false) {
             override fun run(progress: ProgressIndicator) {
                 val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
+                val dotnetCliPath = intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull?.dotNetCliExePath
 
-                if (efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None) {
-                    notifyDotnetEfIsNotInstalled(intellijProject)
+                if (dotnetCliPath == null) {
+                    notifyDotnetIsNotInstalled(intellijProject)
+                } else if (efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None) {
+                    notifyEfIsNotInstalled(intellijProject)
                 } else {
                     val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version)!!
                     ApplicationManager.getApplication().invokeLater {
@@ -83,10 +87,16 @@ abstract class BaseCommandAction(
         return actionEvent.project?.solution?.riderEfCoreModel!!
     }
 
-    private fun notifyDotnetEfIsNotInstalled(intellijProject: Project) {
+    private fun notifyEfIsNotInstalled(intellijProject: Project) {
         NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
-            .createNotification("EF Core are required to execute this action", NotificationType.ERROR)
+            .createNotification("EF Core tools are required to execute this action", NotificationType.ERROR)
             .addAction(InstallDotnetEfAction())
+            .notify(intellijProject)
+    }
+
+    private fun notifyDotnetIsNotInstalled(intellijProject: Project) {
+        NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
+            .createNotification(".NET / .NET Core is required to execute this action", NotificationType.ERROR)
             .notify(intellijProject)
     }
 }
