@@ -3,28 +3,28 @@ package me.seclerp.rider.plugins.efcore.cli.api
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.projectView.solutionDirectoryPath
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
+import me.seclerp.rider.plugins.efcore.cli.execution.EfCommandBuilder
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 
 @Service
-class MigrationsCommandFactory(intellijProject: Project) : BaseToolsCommandFactory(intellijProject.solutionDirectoryPath.toString()) {
+class MigrationsCommandFactory(private val intellijProject: Project) {
     fun add(options: CommonOptions, migrationName: String, outputDirectory: String? = null, namespace: String? = null): GeneralCommandLine =
-        createCommand(KnownEfCommands.Migrations.add, options) {
+        EfCommandBuilder(intellijProject, KnownEfCommands.Migrations.add, options).apply {
             add(migrationName)
             addNamedNullable("--output-dir", outputDirectory)
             addNamedNullable("--namespace", namespace)
-        }
+        }.build()
 
     fun removeLast(options: CommonOptions): GeneralCommandLine =
-        createCommand(KnownEfCommands.Migrations.remove, options) {
+        EfCommandBuilder(intellijProject, KnownEfCommands.Migrations.remove, options).apply {
             add("--force")
-        }
+        }.build()
 
     fun generateScript(efCoreVersion: DotnetEfVersion, options: CommonOptions, fromMigration: String, toMigration: String?,
                        outputFile: String, idempotent: Boolean, noTransactions: Boolean): GeneralCommandLine =
-        createCommand(KnownEfCommands.Migrations.script, options) {
+        EfCommandBuilder(intellijProject, KnownEfCommands.Migrations.script, options).apply {
             add(fromMigration)
             addNullable(toMigration)
             addNamed("--output", outputFile)
@@ -32,5 +32,5 @@ class MigrationsCommandFactory(intellijProject: Project) : BaseToolsCommandFacto
             if (efCoreVersion.major >= 5) {
                 addIf("--no-transactions", noTransactions)
             }
-        }
+        }.build()
 }
