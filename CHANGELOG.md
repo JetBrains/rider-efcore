@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [223.3.0] - 2023-01-10
+### Changed
+- Use .NET CLI from Rider's settings instead of global "dotnet" one
+
+### Fixed
+- Exception thrown when dotnet not installed or accessible bug
+- Transitively available DbContexts in Migrations project are not visible in the dropdown 
+
 ## [223.2.0] - 2022-12-15
 ### Changed
 - Target migration in Update database dialog is now represented as a drop-down list instead of text input field (#130 by @unopcpavilion)
@@ -127,7 +135,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.3.0...HEAD
+[223.3.0]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v223.3.0
 [223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
 [223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...v223.1.0
 [223.0.0]: https://github.com/seclerp/rider-efcore/compare/v222.2.0...v223.0.0
