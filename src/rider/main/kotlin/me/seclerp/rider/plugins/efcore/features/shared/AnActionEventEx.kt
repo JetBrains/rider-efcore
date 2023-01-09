@@ -17,7 +17,7 @@ fun AnActionEvent.isEfCoreActionContext(): Boolean {
 
     // Case when we are presenting action from Tools application menu entry (always visible)
     val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE)
-    if (!ActionPlaces.isPopupPlace(place) || actionFile == null) {
+    if (ActionPlaces.MAIN_MENU == place || !ActionPlaces.isPopupPlace(place) || actionFile == null) {
         return true
     }
 
