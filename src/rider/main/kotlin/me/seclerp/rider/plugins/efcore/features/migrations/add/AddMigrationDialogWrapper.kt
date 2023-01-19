@@ -4,8 +4,8 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.withLogger
@@ -72,7 +72,7 @@ class AddMigrationDialogWrapper(
         row("Migration name:") {
             textField()
                 .bindText(dataCtx.migrationName)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .validationOnInput(validator.migrationNameValidation())
                 .validationOnApply(validator.migrationNameValidation())
                 .focused()
@@ -87,7 +87,7 @@ class AddMigrationDialogWrapper(
             row("Migrations folder:") {
                 textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, "Select Migrations Folder")
                     .bindText(dataCtx.migrationsOutputFolder)
-                    .horizontalAlign(HorizontalAlign.FILL)
+                    .align(AlignX.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
                     .applyToComponent {

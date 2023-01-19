@@ -5,7 +5,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import me.seclerp.observables.bind
@@ -17,7 +16,6 @@ import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import me.seclerp.rider.plugins.efcore.ui.*
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
 
@@ -82,7 +80,7 @@ class UpdateDatabaseDialogWrapper(
                 .validationOnApply(validator.targetMigrationValidation())
                 .validationOnInput(validator.targetMigrationValidation())
                 .comment("Use <code>0</code> as a target migration to undo all applied migrations")
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .focused()
         }
     }

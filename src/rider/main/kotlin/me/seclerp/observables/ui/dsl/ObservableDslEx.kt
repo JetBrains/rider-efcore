@@ -9,7 +9,6 @@ import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import me.seclerp.observables.Observable
 import me.seclerp.observables.ObservableProperty
@@ -39,7 +38,7 @@ fun <T : IconItem<*>> Row.iconComboBox(
 
     return comboBox(model, IconComboBoxRendererAdapter())
         .bindItem(selectedItemProperty.getter, selectedItemProperty.setter)
-        .horizontalAlign(HorizontalAlign.FILL)
+        .align(AlignX.FILL)
         .applyToComponent {
             // Setter provided above called only on submit, so we need additional change detection
             addItemListener {

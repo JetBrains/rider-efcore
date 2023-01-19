@@ -4,7 +4,6 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
@@ -117,13 +116,13 @@ class GenerateScriptDialogWrapper(
                 .validationOnApply(validator.fromMigrationValidation())
                 .validationOnInput(validator.fromMigrationValidation())
                 .comment("'0' means before the first migration")
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .focused()
         }
 
         row("To migration:") {
             iconComboBox(toMigrationView, toMigrationsView)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .focused()
         }
     }

@@ -4,9 +4,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.jetbrains.rd.util.reactive.hasValue
@@ -330,7 +330,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             if (efCoreVersion.major >= 5) {
                 row("Additional arguments:") {
                     simpleExpandableTextField(dataCtx.additionalArguments)
-                        .horizontalAlign(HorizontalAlign.FILL)
+                        .align(AlignX.FILL)
                 }
             }
             row("EF Core tools:") {

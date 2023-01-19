@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [231.0.0-eap01] - 2023-01-19
+### Added
+- Enable support for Rider 2023.1 EAP 1
+
 ## [223.3.0] - 2023-01-10
 ### Changed
 - Use .NET CLI from Rider's settings instead of global "dotnet" one
@@ -135,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.3.0...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...HEAD
+[231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v231.0.0-eap01
 [223.3.0]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v223.3.0
 [223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
 [223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...v223.1.0

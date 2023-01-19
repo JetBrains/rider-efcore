@@ -25,8 +25,6 @@ There are a couple of UI stuff for:
 
 #### Using marketplace:
 
-> **For EAP users**: you should add `https://plugins.jetbrains.com/plugins/eap/list` to your plugin repositories list before installing
-
 1. Go to `Settings` / `Plugins` / `Marketplace`
 1. Search for "Entity Framework Core UI"
 1. Click `Install`, then `Save`
@@ -70,7 +68,7 @@ More about features and available dialogs you could read in [**the blog post**](
   - `netstandard2.1` (only for Migrations projects)
   - `netstandard2.0` (only for Migrations projects)
 
-- EF Core global tools (`dotnet ef`) **5.0+** installed
+- EF Core tools (`dotnet ef`) **5.0+** installed
 
 > **Note**: Projects with older versions of EF Core might work, but with issues
 
@@ -84,14 +82,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 #### Building plugin parts
 
-- for stable version of Rider:
-
   `./gradlew buildPlugin`
-
-
-- for EAP version of Rider:
-
-  `./gradlew buildPlugin -PRiderSdkVersion=2022.3.0-eap01 -PProductVersion=2022.3-EAP1-SNAPSHOT`
 
 It will build both frontend and backend parts.
 

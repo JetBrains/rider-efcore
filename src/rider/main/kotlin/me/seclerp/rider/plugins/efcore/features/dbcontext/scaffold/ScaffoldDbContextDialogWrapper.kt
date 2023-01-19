@@ -9,8 +9,6 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTabbedPane
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
@@ -115,8 +113,7 @@ class ScaffoldDbContextDialogWrapper(
         return panel {
             row {
                 cell(tabbedPane)
-                    .horizontalAlign(HorizontalAlign.FILL)
-                    .verticalAlign(VerticalAlign.FILL)
+                    .align(Align.FILL)
             }.resizableRow()
         }.apply {
             registerIntegratedPanel(mainTab)
@@ -133,7 +130,7 @@ class ScaffoldDbContextDialogWrapper(
         row("Connection:") {
             textField()
                 .bindText(dataCtx.connection)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .validationOnInput(validator.connectionValidation())
                 .validationOnApply(validator.connectionValidation())
         }
@@ -141,7 +138,7 @@ class ScaffoldDbContextDialogWrapper(
         row("Provider:") {
             textField()
                 .bindText(dataCtx.provider)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .validationOnInput(validator.providerValidation())
                 .validationOnApply(validator.providerValidation())
         }
@@ -155,7 +152,7 @@ class ScaffoldDbContextDialogWrapper(
                     intellijProject,
                     "Select Output Folder")
                     .bindText(dataCtx.outputFolder)
-                    .horizontalAlign(HorizontalAlign.FILL)
+                    .align(AlignX.FILL)
                     .validationOnInput(validator.outputFolderValidation())
                     .validationOnApply(validator.outputFolderValidation())
                     .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
@@ -189,7 +186,7 @@ class ScaffoldDbContextDialogWrapper(
         row("Generated DbContext name:") {
             textField()
                 .bindText(dataCtx.dbContextName)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
                 .validationOnInput(validator.dbContextNameValidation())
         }
@@ -200,7 +197,7 @@ class ScaffoldDbContextDialogWrapper(
                 intellijProject,
                 "Select Generated DbContext Folder")
                 .bindText(dataCtx.dbContextFolder)
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
                 .validationOnInput(validator.dbContextFolderValidation())
                 .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
@@ -250,8 +247,7 @@ class ScaffoldDbContextDialogWrapper(
 
             row {
                 cell(tablePanel)
-                    .horizontalAlign(HorizontalAlign.FILL)
-                    .verticalAlign(VerticalAlign.FILL)
+                    .align(Align.FILL)
                     .enabledIf(enabledCheckbox!!.selected.not())
             }.resizableRow()
         }

@@ -2,8 +2,8 @@ package me.seclerp.rider.plugins.efcore.features.preview
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import me.seclerp.rider.plugins.efcore.ui.readonlyExpandableTextField
 import java.awt.Dimension
 import javax.swing.Action
@@ -22,12 +22,12 @@ class CommandPreviewDialogWrapper(
     override fun createCenterPanel(): JComponent = panel {
         row("Working directory:") {
             readonlyExpandableTextField { cliCommand.workDirectory.path }
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
         }
 
         row("Command:") {
             readonlyExpandableTextField { cliCommand.commandLineString }
-                .horizontalAlign(HorizontalAlign.FILL)
+                .align(AlignX.FILL)
         }
     }
 

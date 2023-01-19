@@ -16,7 +16,7 @@ namespace Rider.Plugins.EfCore.Tracking
     private readonly NugetDependenciesListener _nugetListener;
     private readonly SolutionStructureChangedListener _solutionListener;
     private readonly ISolutionLoadTasksScheduler _solutionLoadScheduler;
-    private readonly NuGetDotnetToolsTracker _dotnetToolsTracker;
+    private readonly SolutionDotnetToolsTracker _dotnetToolsTracker;
     private readonly ILogger _logger;
 
     private readonly JetFastSemiReenterableRWLock _lock = new JetFastSemiReenterableRWLock();
@@ -31,7 +31,7 @@ namespace Rider.Plugins.EfCore.Tracking
       NugetDependenciesListener nugetListener,
       SolutionStructureChangedListener solutionListener,
       ISolutionLoadTasksScheduler solutionLoadScheduler,
-      NuGetDotnetToolsTracker dotnetToolsTracker,
+      SolutionDotnetToolsTracker dotnetToolsTracker,
       ILogger logger)
     {
       _lifetime = lifetime;
@@ -51,7 +51,7 @@ namespace Rider.Plugins.EfCore.Tracking
 
         var cache = args.New;
 
-        _logger.LogFlow($"{nameof(NuGetDotnetToolsTracker)}.DotNetToolCache.Change",
+        _logger.LogFlow($"{nameof(SolutionDotnetToolsTracker)}.DotNetToolCache.Change",
           $"Calling {nameof(OnAfterToolsCacheUpdate)}");
 
         OnAfterToolsCacheUpdate?.Invoke(cache);
