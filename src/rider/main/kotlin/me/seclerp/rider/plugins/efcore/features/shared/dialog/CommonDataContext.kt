@@ -131,8 +131,10 @@ open class CommonDataContext(
     }
 
     open fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
+        val migrationsProjectId = migrationsProject.value?.id
+
         if (requireDbContext && dbContext.value != null) {
-            commonDialogState.set(KnownStateKeys.DB_CONTEXT, dbContext.value!!.fullName)
+            commonDialogState.set("${migrationsProjectId}:${KnownStateKeys.DB_CONTEXT}", dbContext.value!!.fullName)
         }
 
         if (buildConfiguration.value != null) {
