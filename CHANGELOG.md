@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Enable support for Rider 2023.1 EAP 1
 
+## [223.3.1] - 2023-01-23
+### Fixed
+- DbContext is not persisted between dialogs
+- EF Core Quick Actions popup is empty
+- Exception when trying to call Drop Database dialog submit button
+- Project-specific saved values are not restored when project in dropdown changes
+
 ## [223.3.0] - 2023-01-10
 ### Changed
 - Use .NET CLI from Rider's settings instead of global "dotnet" one
@@ -140,7 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleting used database
 
 [Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...HEAD
-[231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v231.0.0-eap01
+[231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v231.0.0-eap01
+[223.3.1]: https://github.com/seclerp/rider-efcore/compare/v223.3.0...v223.3.1
 [223.3.0]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v223.3.0
 [223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
 [223.1.0]: https://github.com/seclerp/rider-efcore/compare/v223.0.0...v223.1.0
