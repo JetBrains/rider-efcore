@@ -110,10 +110,26 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             it.map(mappings.migrationsProject.toItem)
         }
 
+        if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
+            // Since some properties are persisted depending on the selected project, we should reload them once
+            // project changes
+            dataCtx.startupProject.afterChange {
+                dataCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
+            }
+        }
+
         // Migration projects bindings
         migrationsProjectView.bind(dataCtx.migrationsProject,
             mappings.migrationsProject.toItem,
             mappings.migrationsProject.fromItem)
+
+        if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
+            // Since some properties are persisted depending on the selected project, we should reload them once
+            // project changes
+            dataCtx.migrationsProject.afterChange {
+                dataCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
+            }
+        }
     }
 
     private fun initDbContextBindings() {
@@ -155,7 +171,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
         if (settingsStateService.usePreviouslySelectedOptionsInDialogs) {
             dataCtx.loadState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
-            loadDialogState(dialogsStateService.forDialog(dialogId))
         }
     }
 
@@ -210,7 +225,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
 
             dataCtx.saveState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
-            saveDialogState(dialogsStateService.forDialog(dialogId))
         }
     }
 
