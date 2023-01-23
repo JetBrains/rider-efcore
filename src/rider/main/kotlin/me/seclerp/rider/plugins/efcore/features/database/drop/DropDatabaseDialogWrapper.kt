@@ -33,7 +33,7 @@ class DropDatabaseDialogWrapper(
     override fun doOKAction() {
         if (showYesNoDialog(
             "Confirmation",
-            "Are you sure that you want to drop database, used by ${dataCtx.dbContext.value!!.name}? This action can't be undone.",
+            "Are you sure that you want to drop database, used by ${dataCtx.migrationsProject.value?.name ?: "selected project"}? This action can't be undone.",
             intellijProject)
         ) {
             super.doOKAction()
