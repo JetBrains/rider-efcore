@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [223.3.2] - 2023-02-17
+### Fixed
+- Issues with action presentation in different actions popup groups (#142 and #145)
+- At least 1 migration requirement is not rechecked after changing DbContext (#144)
+
 ## [223.3.1] - 2023-01-23
 ### Fixed
 - DbContext is not persisted between dialogs
@@ -142,7 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v223.3.2...HEAD
+[223.3.2]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v223.3.2
 [223.3.1]: https://github.com/seclerp/rider-efcore/compare/v223.3.0...v223.3.1
 [223.3.0]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v223.3.0
 [223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
