@@ -16,11 +16,14 @@ fun AnActionEvent.isEfCoreActionContext(): Boolean {
     // Solution not loaded, hide action
     if (project == null) return false
 
-    // Case when action group is inside application menu, under Tools section
+    // Tools section
     if (place == ActionPlaces.MAIN_MENU) return true
 
-    // Case when EF Core Quick Actions group is shown in popup, same as application menu
-    if (place == ActionPlaces.POPUP) return true
+    // Search
+    if (place == ActionPlaces.ACTION_SEARCH) return true
+
+    // Other potential popups, except project view popup (project context menu)
+    if (ActionPlaces.isPopupPlace(place) && place != ActionPlaces.PROJECT_VIEW_POPUP) return true
 
     // If we're trying to show action from context menu, but not under project context menu, hide
     val actionFile = getData(PlatformDataKeys.VIRTUAL_FILE) ?: return false
