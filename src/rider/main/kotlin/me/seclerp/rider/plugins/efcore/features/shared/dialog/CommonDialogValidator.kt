@@ -13,31 +13,12 @@ class CommonDialogValidator(
     private val dataCtx: CommonDataContext,
     private val beModel: RiderEfCoreModel,
     private val intellijProject: Project,
-    private val shouldHaveMigrationsInProject: Boolean
+    private val shouldHaveMigrationsForDbContext: Boolean
 ) {
     fun migrationsProjectValidation(): ValidationInfoBuilder.(ComboBox<MigrationsProjectItem>) -> ValidationInfo? = {
         if (it.item == null)
             error("You should selected valid migrations project")
-        else if (shouldHaveMigrationsInProject) {
-            if (dataCtx.dbContext.value == null)
-                null
-            else {
-                val migrationsIdentity = MigrationsIdentity(
-                    it.item.data.id,
-                    dataCtx.dbContext.value!!.fullName)
-
-                val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(
-                    migrationsIdentity, intellijProject, "Checking migrations...",
-                    isCancelable = true,
-                    throwFault = true
-                )
-
-                if (hasMigrations == null || !hasMigrations)
-                    error("Selected migrations project doesn't have migrations")
-                else
-                    null
-            }
-        } else null
+        else null
     }
 
     fun startupProjectValidation(): ValidationInfoBuilder.(ComboBox<StartupProjectItem>) -> ValidationInfo? = {
@@ -50,8 +31,25 @@ class CommonDialogValidator(
     fun dbContextValidation(): ValidationInfoBuilder.(ComboBox<DbContextItem>) -> ValidationInfo? = {
         if (it.item == null || dataCtx.availableDbContexts.value.isEmpty())
             error("Migrations project should have at least 1 DbContext")
-        else
-            null
+        else if (shouldHaveMigrationsForDbContext) {
+            if (dataCtx.dbContext.value == null || dataCtx.migrationsProject.value == null)
+                null
+            else {
+                val migrationsIdentity = MigrationsIdentity(
+                    dataCtx.migrationsProject.value!!.id,
+                    it.item.data.fullName)
+
+                val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(
+                    migrationsIdentity, intellijProject, "Checking migrations...",
+                    isCancelable = true,
+                    throwFault = true
+                )
+
+                if (hasMigrations == null || !hasMigrations)
+                    error("Selected DbContext doesn't have migrations")
+                else null
+            }
+        } else null
     }
 
     fun buildConfigurationValidation(): ValidationInfoBuilder.(ComboBox<BuildConfigurationItem>) -> ValidationInfo? = {
