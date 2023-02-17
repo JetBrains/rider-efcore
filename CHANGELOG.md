@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Enable support for Rider 2023.1 EAP 1
 
+## [223.3.2] - 2023-02-17
+### Fixed
+- Issues with action presentation in different actions popup groups (#142 and #145)
+- At least 1 migration requirement is not rechecked after changing DbContext (#144)
+
 ## [223.3.1] - 2023-01-23
 ### Fixed
 - DbContext is not persisted between dialogs
@@ -150,8 +155,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.1-eap01...HEAD
+[231.0.1-eap01]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...v231.0.1-eap01
 [231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v231.0.0-eap01
+[223.3.2]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v223.3.2
 [223.3.1]: https://github.com/seclerp/rider-efcore/compare/v223.3.0...v223.3.1
 [223.3.0]: https://github.com/seclerp/rider-efcore/compare/v223.2.0...v223.3.0
 [223.2.0]: https://github.com/seclerp/rider-efcore/compare/v223.1.0...v223.2.0
