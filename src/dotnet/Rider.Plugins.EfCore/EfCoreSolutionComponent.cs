@@ -59,9 +59,9 @@ namespace Rider.Plugins.EfCore
 
       _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
 
-      _efCoreModel.HasAvailableMigrations.Set(HasAvailableMigrations);
-      _efCoreModel.GetAvailableMigrations.Set(GetAvailableMigrations);
-      _efCoreModel.GetAvailableDbContexts.Set(GetAvailableDbContexts);
+      _efCoreModel.HasAvailableMigrations.SetSync(HasAvailableMigrations);
+      _efCoreModel.GetAvailableMigrations.SetSync(GetAvailableMigrations);
+      _efCoreModel.GetAvailableDbContexts.SetSync(GetAvailableDbContexts);
 
       solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
       solutionTracker.OnAfterToolsCacheUpdate += InvalidateEfToolsDefinition;
@@ -181,53 +181,45 @@ namespace Rider.Plugins.EfCore
     //
     // Calls implementations
 
-    private RdTask<bool> HasAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
+    private bool HasAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
     {
       using (ReadLockCookie.Create())
       {
         var project = _solution.GetProjectByGuid(identity.ProjectId);
         if (project is null)
         {
-          return RdTask<bool>.Faulted(new ProjectNotFoundException(identity.ProjectId));
+          throw new ProjectNotFoundException(identity.ProjectId);
         }
 
-        var hasMigrations = _migrationsProvider.HasMigrations(project, identity.DbContextClassFullName);
-
-        return RdTask<bool>.Successful(hasMigrations);
+        return _migrationsProvider.HasMigrations(project, identity.DbContextClassFullName);
       }
     }
 
-    private RdTask<List<MigrationInfo>> GetAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
+    private List<MigrationInfo> GetAvailableMigrations(Lifetime lifetime, MigrationsIdentity identity)
     {
       using (ReadLockCookie.Create())
       {
         var project = _solution.GetProjectByGuid(identity.ProjectId);
-
         if (project is null)
         {
-          return RdTask<List<MigrationInfo>>.Faulted(new ProjectNotFoundException(identity.ProjectId));
+          throw new ProjectNotFoundException(identity.ProjectId);
         }
 
-        var foundMigrations = _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
-
-        return RdTask<List<MigrationInfo>>.Successful(foundMigrations);
+        return _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
       }
     }
 
-    private RdTask<List<DbContextInfo>> GetAvailableDbContexts(Lifetime lifetime, Guid projectId)
+    private List<DbContextInfo> GetAvailableDbContexts(Lifetime lifetime, Guid projectId)
     {
       using (ReadLockCookie.Create())
       {
         var project = _solution.GetProjectByGuid(projectId);
-
         if (project is null)
         {
-          return RdTask<List<DbContextInfo>>.Faulted(new ProjectNotFoundException(projectId));
+          throw new ProjectNotFoundException(projectId);
         }
 
-        var foundDbContexts = _dbContextProvider.GetDbContexts(project).ToList();
-
-        return RdTask<List<DbContextInfo>>.Successful(foundDbContexts);
+        return _dbContextProvider.GetDbContexts(project).ToList();
       }
     }
   }
