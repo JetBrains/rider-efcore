@@ -5,7 +5,9 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.textCompletion.TextFieldWithCompletion
+import me.seclerp.rider.plugins.efcore.ui.items.DbConnectionItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
+import javax.swing.text.JTextComponent
 
 class UpdateDatabaseValidator(
     private val currentDbContextMigrationsList: MutableList<MigrationItem?>
@@ -17,8 +19,8 @@ class UpdateDatabaseValidator(
             null
     }
 
-    fun connectionValidation(): ValidationInfoBuilder.(JBTextField) -> ValidationInfo? = {
-        if (it.isEnabled && it.text.isEmpty())
+    fun connectionValidation(): ValidationInfoBuilder.(ComboBox<DbConnectionItem>) -> ValidationInfo? = {
+        if (it.isEnabled && (it.editor.editorComponent as JTextComponent).text.isEmpty())
             error("Connection could not be empty")
         else null
     }

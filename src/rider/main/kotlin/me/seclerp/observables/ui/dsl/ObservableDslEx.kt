@@ -2,6 +2,7 @@ package me.seclerp.observables.ui.dsl
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.observable.util.whenTextChanged
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -15,8 +16,11 @@ import me.seclerp.observables.ObservableProperty
 import me.seclerp.rider.plugins.efcore.ui.IconComboBoxRendererAdapter
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
+import javax.swing.ComboBoxEditor
 import javax.swing.DefaultComboBoxModel
 import javax.swing.Icon
+import javax.swing.JTextField
+import javax.swing.plaf.basic.BasicComboBoxEditor
 
 fun <T : IconItem<*>> Row.iconComboBox(
     selectedItemProperty: Observable<T?>,
@@ -47,6 +51,49 @@ fun <T : IconItem<*>> Row.iconComboBox(
                 }
             }
         }
+}
+
+fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
+    selectedTextProperty: Observable<String>,
+    availableItemsProperty: Observable<List<T>>,
+    itemMapper: (TValue) -> String
+): Cell<ComboBox<T>> {
+    val model = DefaultComboBoxModel<T>()
+        .apply {
+            availableItemsProperty.afterChange {
+                removeAllElements()
+                addAll(it)
+            }
+        }
+
+    return comboBox(model, IconComboBoxRendererAdapter())
+        .applyToComponent {
+            isEditable = true
+            editor = object : BasicComboBoxEditor() {
+                override fun setItem(anObject: Any?) {
+                    val item = anObject as? IconItem<TValue>
+                    if (item == null && anObject is String?)
+                        editor.text = anObject
+                    else if (item != null)
+                        editor.text = itemMapper(item.data)
+                }
+
+                override fun getItem(): Any {
+                    return editor.text
+                }
+            }
+
+            val editorComponent = editor.editorComponent as JTextField
+
+            editorComponent.whenTextChanged {
+                selectedTextProperty.value = editorComponent.text
+            }
+
+            selectedTextProperty.afterChange {
+                editorComponent.text = it
+            }
+        }
+        .align(AlignX.FILL)
 }
 
 fun Row.textFieldWithCompletion(

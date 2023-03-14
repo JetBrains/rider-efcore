@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
+import me.seclerp.rider.plugins.efcore.features.shared.ObservableConnections
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
@@ -11,6 +12,7 @@ import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(intellijProject, true) {
     val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
     val availableMigrationNames = observableList<String>()
+    val observableConnections = ObservableConnections(intellijProject, startupProject)
 
     val migrationNames = observableList<String>()
         .apply {
@@ -29,6 +31,7 @@ class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(int
         super.initBindings()
 
         observableMigrations.initBinding()
+        observableConnections.initBinding()
 
         availableMigrationNames.bind(migrationNames) {
             buildList {

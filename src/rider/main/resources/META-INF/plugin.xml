@@ -5,6 +5,7 @@
   <vendor url="https://github.com/seclerp">Andrii Rublov</vendor>
   <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
+  <depends>com.intellij.database</depends>
 
   <description>
 <![CDATA[

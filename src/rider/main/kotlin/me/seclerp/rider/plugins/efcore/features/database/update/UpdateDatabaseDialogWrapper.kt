@@ -11,11 +11,14 @@ import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
 import me.seclerp.observables.ui.dsl.bindSelected
-import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.observables.ui.dsl.editableComboBox
 import me.seclerp.observables.ui.dsl.iconComboBox
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import me.seclerp.rider.plugins.efcore.ui.DbConnectionItemRenderer
+import me.seclerp.rider.plugins.efcore.ui.items.DbConnectionItem
 import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
 
@@ -37,8 +40,8 @@ class UpdateDatabaseDialogWrapper(
     //
     // Internal data
     private val targetMigrationsView = observableList<MigrationItem?>()
-
     private val targetMigrationView = observable<MigrationItem?>(null)
+    private val availableDbConnectionsView = observableList<DbConnectionItem>()
 
     //
     // Validation
@@ -62,6 +65,10 @@ class UpdateDatabaseDialogWrapper(
         targetMigrationView.bind(dataCtx.targetMigration,
             mappings.migration.toItem,
             mappings.migration.fromItem)
+
+        availableDbConnectionsView.bind(dataCtx.observableConnections) {
+            it.map(mappings.dbConnection.toItem)
+        }
     }
 
     override fun generateCommand(): GeneralCommandLine {
@@ -96,8 +103,8 @@ class UpdateDatabaseDialogWrapper(
                             .component
                 }
                 row("Connection:") {
-                    textField()
-                        .bindText(dataCtx.connection)
+                    editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
+                        .applyToComponent { renderer = DbConnectionItemRenderer() }
                         .validationOnInput(validator.connectionValidation())
                         .validationOnApply(validator.connectionValidation())
                         .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
@@ -116,6 +123,16 @@ class UpdateDatabaseDialogWrapper(
 
                 val fromItem: (MigrationItem?) -> String?
                     get() = { it?.data }
+            }
+
+            object dbConnection {
+                val toItem: (DbConnectionInfo) -> DbConnectionItem
+                    get() = {
+                        DbConnectionItem(it)
+                    }
+
+                val fromItem: (DbConnectionItem) -> DbConnectionInfo
+                    get() = { it.data }
             }
         }
     }

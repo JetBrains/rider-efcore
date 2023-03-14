@@ -15,6 +15,7 @@ import com.intellij.ui.table.JBTable
 import me.seclerp.observables.ObservableProperty
 import me.seclerp.observables.bind
 import me.seclerp.observables.observable
+import me.seclerp.observables.observableList
 import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
@@ -22,6 +23,11 @@ import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.observables.ui.dsl.editableComboBox
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
+import me.seclerp.rider.plugins.efcore.ui.DbConnectionItemRenderer
+import me.seclerp.rider.plugins.efcore.ui.items.DbConnectionItem
+import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import java.util.*
@@ -53,6 +59,7 @@ class ScaffoldDbContextDialogWrapper(
     private val schemasModel = SimpleListTableModel(dataCtx.schemasList)
 
     private val migrationProjectFolder = observable("")
+    private val availableDbConnectionsView = observableList<DbConnectionItem>()
 
     //
     // Validation
@@ -72,6 +79,10 @@ class ScaffoldDbContextDialogWrapper(
                 File(it.fullPath).parentFile.path
             else
                 ""
+        }
+
+        availableDbConnectionsView.bind(dataCtx.observableConnections) {
+            it.map(mappings.dbConnection.toItem)
         }
     }
 
@@ -128,8 +139,8 @@ class ScaffoldDbContextDialogWrapper(
 
     override fun Panel.createPrimaryOptions() {
         row("Connection:") {
-            textField()
-                .bindText(dataCtx.connection)
+            editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
+                .applyToComponent { renderer = DbConnectionItemRenderer() }
                 .align(AlignX.FILL)
                 .validationOnInput(validator.connectionValidation())
                 .validationOnApply(validator.connectionValidation())
@@ -250,6 +261,20 @@ class ScaffoldDbContextDialogWrapper(
                     .align(Align.FILL)
                     .enabledIf(enabledCheckbox!!.selected.not())
             }.resizableRow()
+        }
+    }
+
+    companion object {
+        private object mappings {
+            object dbConnection {
+                val toItem: (DbConnectionInfo) -> DbConnectionItem
+                    get() = {
+                        DbConnectionItem(it)
+                    }
+
+                val fromItem: (DbConnectionItem) -> DbConnectionInfo
+                    get() = { it.data }
+            }
         }
     }
 }
