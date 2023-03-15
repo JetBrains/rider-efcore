@@ -1,5 +1,8 @@
 package me.seclerp.rider.plugins.efcore.cli.execution
 
+import org.jetbrains.annotations.NonNls
+
+@NonNls
 object KnownEfCommands {
     val dotnet       = "dotnet"
     val ef           = "ef"

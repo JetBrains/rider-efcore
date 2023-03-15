@@ -8,6 +8,7 @@ import me.seclerp.rider.plugins.efcore.features.shared.ObservableConnections
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
+import org.jetbrains.annotations.NonNls
 
 class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(intellijProject, true) {
     val observableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
@@ -66,7 +67,9 @@ class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(int
     }
 
     object KnownStateKeys {
+        @NonNls
         const val USE_DEFAULT_CONNECTION = "useDefaultConnection"
+        @NonNls
         const val CONNECTION = "connection"
     }
 }

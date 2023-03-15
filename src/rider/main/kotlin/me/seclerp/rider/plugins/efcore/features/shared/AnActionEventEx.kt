@@ -10,6 +10,7 @@ import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.model.RdUnloadProjectDescriptor
 import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
+import org.jetbrains.annotations.NonNls
 import java.util.*
 
 fun AnActionEvent.isEfCoreActionContext(): Boolean {
@@ -54,6 +55,7 @@ private fun getFileProject(intellijProject: Project, virtualFile: VirtualFile): 
             && it.descriptor !is RdUnloadProjectDescriptor
         }
 
+@NonNls
 private fun isSupportedProjectExtension(projectFileExtension: String) =
     projectFileExtension == "csproj"
     || projectFileExtension == "fsproj"

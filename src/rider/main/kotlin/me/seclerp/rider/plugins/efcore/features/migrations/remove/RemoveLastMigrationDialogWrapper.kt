@@ -3,6 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.migrations.remove
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.CliCommandResult
@@ -16,12 +17,12 @@ class RemoveLastMigrationDialogWrapper(
 ) : CommonDialogWrapper<RemoveLastMigrationDataContext>(
     RemoveLastMigrationDataContext(intellijProject),
     toolsVersion,
-    "Remove Last Migration",
+    EfCoreUiBundle.message("action.EfCore.Features.Migrations.RemoveLastMigrationAction.text"),
     intellijProject,
     selectedProjectId,
     true
 ) {
-    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
+    private val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //
     // Constructor

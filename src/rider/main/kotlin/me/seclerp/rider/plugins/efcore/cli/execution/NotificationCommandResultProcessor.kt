@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.features.shared.TryCommandAgainAction
 
@@ -23,19 +24,19 @@ public class NotificationCommandResultProcessor(
                 .notify(project)
         } else {
             val errorTextBuilder = StringBuilder()
-            errorTextBuilder.append("Command: ${result.command}")
+            errorTextBuilder.append("${EfCoreUiBundle.message("command")}: ${result.command}")
 
             if (result.output.trim().isNotEmpty())
-                errorTextBuilder.append("\n\nOutput:\n${result.output}")
+                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("output")}:\n${result.output}")
 
             if (result.error?.trim()?.isNotEmpty() == true)
-                errorTextBuilder.append("\n\nError:\n${result.error}")
+                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("error")}:\n${result.error}")
 
-            errorTextBuilder.append("\n\nExit code: ${result.exitCode}")
+            errorTextBuilder.append("\n\n${EfCoreUiBundle.message("exit.code")}: ${result.exitCode}")
 
             NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
                 .createNotification(
-                    "EF Core command failed",
+                    EfCoreUiBundle.message("notification.title.ef.core.command.failed"),
                     errorTextBuilder.toString(),
                     NotificationType.ERROR
                 )

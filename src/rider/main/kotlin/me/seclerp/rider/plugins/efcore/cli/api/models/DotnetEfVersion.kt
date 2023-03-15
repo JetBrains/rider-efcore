@@ -1,7 +1,10 @@
 package me.seclerp.rider.plugins.efcore.cli.api.models
 
+import org.jetbrains.annotations.NonNls
+
 data class DotnetEfVersion(val major: Int, val minor: Int, val patch: Int) {
     companion object {
+        @NonNls
         val SEMVER_REGEX =
             Regex("(\\d+)\\.(\\d+)\\.(\\d+)(?:-([\\dA-Za-z-]+(?:\\.[\\dA-Za-z-]+)*))?(?:\\+[\\dA-Za-z-]+)?")
 

@@ -24,8 +24,11 @@ import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.iconComboBox
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.ui.items.*
+import me.seclerp.rider.plugins.efcore.ui.localize
 import me.seclerp.rider.plugins.efcore.ui.simpleExpandableTextField
+import org.jetbrains.annotations.NonNls
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.AbstractAction
@@ -237,7 +240,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
 
     override fun createLeftSideActions(): Array<Action> {
-        val commandPreviewAction = object : AbstractAction("Preview") {
+        val commandPreviewAction = object : AbstractAction(EfCoreUiBundle.message("button.preview")) {
             override fun actionPerformed(e: ActionEvent?) {
                 applyFields()
                 if (panel.validateAll().isEmpty()) {
@@ -253,7 +256,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected fun createMainUI(): DialogPanel {
         return panel {
             panel {
-                groupRowsRange("Common") {
+                groupRowsRange(EfCoreUiBundle.message("section.common")) {
                     createPrimaryOptions()
                     createDefaultMainRows()
                 }
@@ -275,7 +278,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     }
 
     protected fun Panel.createMigrationsProjectRow() {
-        row("Migrations project:") {
+        row(EfCoreUiBundle.message("migrations.project")) {
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
                 .validationOnInput(validator.migrationsProjectValidation())
                 .validationOnApply(validator.migrationsProjectValidation())
@@ -283,20 +286,16 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     }
 
     protected fun Panel.createStartupProjectRow() {
-        row("Startup project:") {
+        row(EfCoreUiBundle.message("startup.project")) {
             iconComboBox(startupProjectView, availableStartupProjectsView)
                 .validationOnInput(validator.startupProjectValidation())
                 .validationOnApply(validator.startupProjectValidation())
-                .comment(
-                    "Your project is not listed? " +
-                    "<a href='https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui/f-a-q#why-i-cant-see-my-project-in-a-startup-projects-field'>" +
-                        "Help" +
-                    "</a>")
+                .comment(EfCoreUiBundle.message("startup.project.missing.comment"))
         }
     }
 
     protected fun Panel.createDbContextProjectRow() {
-        row("DbContext class:") {
+        row(EfCoreUiBundle.message("dbcontext.class")) {
             iconComboBox(dbContextView, availableDbContextsView)
                 .validationOnInput(validator.dbContextValidation())
                 .validationOnApply(validator.dbContextValidation())
@@ -308,21 +307,21 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected open fun Panel.createAdditionalGroup() {}
 
     protected fun Panel.createBuildOptions() {
-        groupRowsRange("Build Options") {
+        groupRowsRange(EfCoreUiBundle.message("section.build.options")) {
             var noBuildCheck: JBCheckBox? = null
             row {
-                noBuildCheck = checkBox("Skip project build process (--no-build)")
+                noBuildCheck = checkBox(EfCoreUiBundle.message("checkbox.no.build"))
                     .bindSelected(dataCtx.noBuild)
                     .component
             }
 
-            row("Build configuration:") {
+            row(EfCoreUiBundle.message("build.configuration")) {
                 iconComboBox(buildConfigurationView, availableBuildConfigurationView)
                     .validationOnInput(validator.buildConfigurationValidation())
                     .validationOnApply(validator.buildConfigurationValidation())
             }.enabledIf(noBuildCheck!!.selected.not())
 
-            row("Target framework:") {
+            row(EfCoreUiBundle.message("target.framework")) {
                 iconComboBox(targetFrameworksView, availableTargetFrameworksView)
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
@@ -335,19 +334,19 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             if (beModel.efToolsDefinition.hasValue) {
                 val efToolsDefinition = beModel.efToolsDefinition.valueOrNull!!
                 when (efToolsDefinition.toolKind) {
-                    ToolKind.None -> "None"
-                    else -> "${efToolsDefinition.toolKind.name}, ${efToolsDefinition.version}"
+                    ToolKind.None -> EfCoreUiBundle.message("tool.kind.none")
+                    else -> "${efToolsDefinition.toolKind.localize()}, ${efToolsDefinition.version}"
                 }
-            } else "None"
+            } else EfCoreUiBundle.message("label.none")
 
-        groupRowsRange("Execution") {
+        groupRowsRange(EfCoreUiBundle.message("section.execution")) {
             if (efCoreVersion.major >= 5) {
-                row("Additional arguments:") {
+                row(EfCoreUiBundle.message("additional.arguments")) {
                     simpleExpandableTextField(dataCtx.additionalArguments)
                         .align(AlignX.FILL)
                 }
             }
-            row("EF Core tools:") {
+            row(EfCoreUiBundle.message("ef.core.tools")) {
                 label(toolLabel)
             }
         }
@@ -366,6 +365,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     )
 
     companion object {
+        @NonNls
         val COMMON_DIALOG_ID = "Common"
 
         private object mappings {

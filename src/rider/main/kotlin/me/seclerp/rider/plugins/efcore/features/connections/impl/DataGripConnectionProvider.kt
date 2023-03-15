@@ -9,6 +9,8 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.RdProjectDescriptor
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
+import org.jetbrains.annotations.NonNls
 
 @Service
 class DataGripConnectionProvider(private val intellijProject: Project) : DbConnectionProvider {
@@ -19,10 +21,11 @@ class DataGripConnectionProvider(private val intellijProject: Project) : DbConne
         LocalDataSourceManager.getInstance(intellijProject).dataSources.forEach {
             val connString = generateConnectionString(it)
             if (connString != null)
-                add(DbConnectionInfo(it.name, connString, "Data sources", it.dbms))
+                add(DbConnectionInfo(it.name, connString, EfCoreUiBundle.message("source.data.sources"), it.dbms))
         }
     }
 
+    @NonNls
     private fun generateConnectionString(source: LocalDataSource) =
         when (source.dbms) {
             Dbms.SQLITE -> "Data Source=${source.url?.removePrefix("jdbc:sqlite:")}"

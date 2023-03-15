@@ -4,6 +4,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
@@ -17,7 +18,7 @@ class DropDatabaseDialogWrapper(
 ) : CommonDialogWrapper<CommonDataContext>(
     CommonDataContext(intellijProject, false),
     toolsVersion,
-    "Drop Database",
+    EfCoreUiBundle.message("action.EfCore.Features.Database.DropDatabaseAction.text"),
     intellijProject,
     selectedProjectId,
     false
@@ -32,8 +33,8 @@ class DropDatabaseDialogWrapper(
 
     override fun doOKAction() {
         if (showYesNoDialog(
-            "Confirmation",
-            "Are you sure that you want to drop database, used by ${dataCtx.migrationsProject.value?.name ?: "selected project"}? This action can't be undone.",
+            EfCoreUiBundle.message("dialog.title.confirmation"),
+            EfCoreUiBundle.message("drop.database.confirmation", dataCtx.migrationsProject.value?.name ?: EfCoreUiBundle.message("selected.project")),
             intellijProject)
         ) {
             super.doOKAction()

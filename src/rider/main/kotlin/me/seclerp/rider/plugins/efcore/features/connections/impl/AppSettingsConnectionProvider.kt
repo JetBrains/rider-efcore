@@ -12,6 +12,7 @@ import com.jetbrains.rider.model.RdCustomLocation
 import com.jetbrains.rider.model.RdProjectDescriptor
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
+import org.jetbrains.annotations.NonNls
 import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
@@ -29,6 +30,7 @@ class AppSettingsConnectionProvider : DbConnectionProvider {
     override fun getAvailableConnections(project: RdProjectDescriptor) =
         buildList {
             val directory = (project.location as RdCustomLocation?)?.customLocation?.let(::Path)?.parent ?: return@buildList
+            @NonNls
             val connectionStrings = directory.listDirectoryEntries("appsettings*.json")
                 .filter { it.isFile() }
                 .map { it.name to json.readTree(it.toFile()) }

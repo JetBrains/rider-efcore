@@ -3,7 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.migrations.add
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
-import me.seclerp.rider.plugins.efcore.rd.MigrationInfo
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import javax.swing.JTextField
 
 class AddMigrationValidator(
@@ -11,16 +11,16 @@ class AddMigrationValidator(
 ) {
     fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error("Migration name could not be empty")
+            error(EfCoreUiBundle.message("dialog.message.migration.name.could.not.be.empty"))
         else if (dataCtx.availableMigrations.value.any { migration -> migration.migrationLongName == it.text.trim() })
-            error("Migration with such name already exist")
+            error(EfCoreUiBundle.message("dialog.message.migration.with.such.name.already.exist"))
         else
             null
     }
 
     fun migrationsOutputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error("Migrations output folder could not be empty")
+            error(EfCoreUiBundle.message("dialog.message.migrations.output.folder.could.not.be.empty"))
         else
             null
     }

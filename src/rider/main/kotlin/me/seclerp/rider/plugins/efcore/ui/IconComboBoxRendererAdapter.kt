@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.ui
 
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.ui.items.IconItem
 import java.awt.Component
 import javax.swing.DefaultListCellRenderer
@@ -22,7 +23,7 @@ class IconComboBoxRendererAdapter<T : IconItem<*>>: ListCellRenderer<T?> {
             delegatingRenderer.text = value.displayName
             delegatingRenderer.icon = value.icon
         } else {
-            delegatingRenderer.text = "<none>"
+            delegatingRenderer.text = EfCoreUiBundle.message("none")
         }
 
         return delegatingRenderer
