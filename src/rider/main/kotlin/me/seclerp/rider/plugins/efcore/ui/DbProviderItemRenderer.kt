@@ -21,23 +21,14 @@ class DbProviderItemRenderer : ListCellRenderer<DbProviderItem> {
         add(packageIdComponent, GridBagConstraints(
             0, 0,
             1, 1,
-            0.0, 0.0,
+            1.0, 0.0,
             GridBagConstraints.BASELINE,
-            GridBagConstraints.NONE,
+            GridBagConstraints.HORIZONTAL,
             JBInsets.emptyInsets(),
             0, 0
         ))
-        add(JPanel(), GridBagConstraints(
-            1, 0,
-            GridBagConstraints.REMAINDER, 1,
-            0.0, 0.0,
-            GridBagConstraints.BASELINE,
-            GridBagConstraints.HORIZONTAL,
-            JBInsets.create(0, 10),
-            0, 0
-        ))
         add(packageVersionComponent, GridBagConstraints(
-            2, 0,
+            1, 0,
             1, 1,
             0.0, 0.0,
             GridBagConstraints.BASELINE,
