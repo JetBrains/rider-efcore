@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
 import me.seclerp.rider.plugins.efcore.ui.items.DbConnectionItem
+import me.seclerp.rider.plugins.efcore.ui.items.DbProviderItem
 import javax.swing.JTextField
 import javax.swing.text.JTextComponent
 
@@ -15,8 +16,8 @@ class ScaffoldDbContextValidator {
         else null
     }
 
-    fun providerValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
-        if (it.text.trim().isEmpty())
+    fun providerValidation(): ValidationInfoBuilder.(ComboBox<DbProviderItem>) -> ValidationInfo? = {
+        if (it.isEnabled && (it.editor.editorComponent as JTextComponent).text.isEmpty())
             error("Provider could not be empty")
         else
             null

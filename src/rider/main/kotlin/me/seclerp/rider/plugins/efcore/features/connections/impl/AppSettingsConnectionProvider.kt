@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.connections
+package me.seclerp.rider.plugins.efcore.features.connections.impl
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
@@ -9,6 +9,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.io.isFile
 import com.jetbrains.rider.model.RdCustomLocation
 import com.jetbrains.rider.model.RdProjectDescriptor
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
 import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name

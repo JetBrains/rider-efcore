@@ -17,17 +17,16 @@ import me.seclerp.observables.bind
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
 import me.seclerp.rider.plugins.efcore.cli.api.DbContextCommandFactory
-import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
-import me.seclerp.rider.plugins.efcore.ui.items.SimpleListTableModel
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.observables.ui.dsl.editableComboBox
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
+import me.seclerp.rider.plugins.efcore.rd.DbProviderInfo
 import me.seclerp.rider.plugins.efcore.ui.DbConnectionItemRenderer
-import me.seclerp.rider.plugins.efcore.ui.items.DbConnectionItem
-import me.seclerp.rider.plugins.efcore.ui.items.MigrationItem
+import me.seclerp.rider.plugins.efcore.ui.DbProviderItemRenderer
+import me.seclerp.rider.plugins.efcore.ui.items.*
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import java.util.*
@@ -60,6 +59,7 @@ class ScaffoldDbContextDialogWrapper(
 
     private val migrationProjectFolder = observable("")
     private val availableDbConnectionsView = observableList<DbConnectionItem>()
+    private val availableDbProvidersView = observableList<DbProviderItem>()
 
     //
     // Validation
@@ -83,6 +83,10 @@ class ScaffoldDbContextDialogWrapper(
 
         availableDbConnectionsView.bind(dataCtx.observableConnections) {
             it.map(mappings.dbConnection.toItem)
+        }
+
+        availableDbProvidersView.bind(dataCtx.observableDbProviders) {
+            it.map(mappings.dbProvider.toItem)
         }
     }
 
@@ -147,8 +151,8 @@ class ScaffoldDbContextDialogWrapper(
         }
 
         row("Provider:") {
-            textField()
-                .bindText(dataCtx.provider)
+            editableComboBox(dataCtx.provider, availableDbProvidersView) { it.id }
+                .applyToComponent { renderer = DbProviderItemRenderer() }
                 .align(AlignX.FILL)
                 .validationOnInput(validator.providerValidation())
                 .validationOnApply(validator.providerValidation())
@@ -273,6 +277,16 @@ class ScaffoldDbContextDialogWrapper(
                     }
 
                 val fromItem: (DbConnectionItem) -> DbConnectionInfo
+                    get() = { it.data }
+            }
+
+            object dbProvider {
+                val toItem: (DbProviderInfo) -> DbProviderItem
+                    get() = {
+                        DbProviderItem(it)
+                    }
+
+                val fromItem: (DbProviderItem) -> DbProviderInfo
                     get() = { it.data }
             }
         }
