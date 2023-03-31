@@ -1,6 +1,8 @@
 <Project>
 
   <PropertyGroup>
+    <LangVersion>Latest</LangVersion>
+    <NoWarn>MSB3277</NoWarn>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
@@ -8,6 +10,13 @@
     <BaseIntermediateOutputPath>obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
     <DefaultItemExcludes>$(DefaultItemExcludes);obj\**</DefaultItemExcludes>
     <OutputPath>bin\$(MSBuildProjectName)\$(Configuration)\</OutputPath>
+    <IsPackable>false</IsPackable>
+
+    <!-- Disable automagic references for F# DotNet SDK -->
+    <!-- This will not do anything for other project types -->
+    <!-- see https://github.com/fsharp/fslang-design/blob/master/tooling/FST-1002-fsharp-in-dotnet-sdk.md -->
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -16,15 +25,8 @@
 
   <Import Project="Plugin.props" />
 
-  <PropertyGroup>
-    <WaveVersionBase>$(SdkVersion.Substring(2,2))$(SdkVersion.Substring(5,1))</WaveVersionBase>
-    <WaveVersion>$(WaveVersionBase).0.0$(SdkVersion.Substring(8))</WaveVersion>
-    <UpperWaveVersion>$(WaveVersionBase).9999.0</UpperWaveVersion>
-  </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="*.DotSettings" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

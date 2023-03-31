@@ -1,12 +1,10 @@
 ﻿<Project>
 
   <PropertyGroup>
-    <SdkVersion Condition=" '$(SdkVersion)' == '' ">2023.1.0-eap08</SdkVersion>
-
     <Title>Entity Framework Core</Title>
     <Description>JetBrains Rider plugin for Entity Framework Core</Description>
 
-    <Authors>Andrew Rublyov</Authors>
+    <Authors>Andrii Rublov</Authors>
     <Copyright>Copyright $([System.DateTime]::Now.Year) Andrii Rublov</Copyright>
     <PackageTags>resharper plugin</PackageTags>
 
