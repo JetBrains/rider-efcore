@@ -11,6 +11,10 @@ ProjectSection(SolutionItems) = preProject
 	..\..\CHANGELOG.md = ..\..\CHANGELOG.md
 	..\rider\main\resources\META-INF\plugin.xml = ..\rider\main\resources\META-INF\plugin.xml
 	..\..\gradle.properties = ..\..\gradle.properties
+	Directory.Build.props = Directory.Build.props
+	Directory.Packages.props = Directory.Packages.props
+	RiderSdk.PackageVersions.Generated.props = RiderSdk.PackageVersions.Generated.props
+	nuget.config = nuget.config
 EndProjectSection
 EndProject
 Global

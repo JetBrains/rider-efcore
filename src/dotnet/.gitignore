@@ -351,3 +351,6 @@ MigrationBackup/
 
 # User specific
 **/.idea/
+
+*.Generated.props
+nuget.config

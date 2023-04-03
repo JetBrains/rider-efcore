@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
-    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
@@ -16,7 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(SdkVersion)" />
+    <PackageReference Include="JetBrains.Platform.Core.Ide" />
+    <PackageReference Include="JetBrains.Psi.Features.Core" />
+    <PackageReference Include="JetBrains.Rider.RdBackend.Common" />
+    <PackageReference Include="JetBrains.Rider.RiderTutorials" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
