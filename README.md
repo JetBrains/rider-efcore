@@ -42,17 +42,19 @@ There are a couple of UI stuff for:
 1. Open solution that contains EF Core related projects (migrations and startup projects)
 2. Navigate to <kbd>Tools</kbd>/<kbd>Entity Framework Core</kbd> under project context menu:
 
-   ![Logo](img/how-to-use-1.png)
+   ![How to use 1](img/how-to-use-1.png)
 
    You could use context menu of either your migrations or startup project.
 3. Clicking action will show appropriate dialog:
 
-   ![Logo](img/how-to-use-2.png)
-4. After you press <kbd>Ok</kbd>, selected action will be executed in background:
+   ![How to use 2](img/how-to-use-2.png)
+4. After you press <kbd>Ok</kbd>, selected action will be executed in console-like window (by default):
 
-   ![Logo](img/how-to-use-3.png)
+   ![How to use 3](img/how-to-use-3.png)
 
-   ![Logo](img/how-to-use-4.png)
+5. You could also configure dialog's behavior in Settings, under <kbd>Tools</kbd>/<kbd>EF Core UI</kbd> section:
+
+   ![How to use 4](img/how-to-use-4.png)
 
 More about features and available dialogs you could read in [**the blog post**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/).
 
@@ -75,7 +77,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Development
 
-> **Note**: You should have JDK 17 and .NET SDK 5.0+ installed and configured.
+> **Note**: You should have JDK 17 and .NET SDK 7.0+ installed and configured.
 
 #### Preparing
 
@@ -83,7 +85,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 #### Building plugin parts
 
-  `./gradlew buildPlugin`
+`./gradlew buildPlugin`
 
 It will build both frontend and backend parts.
 
