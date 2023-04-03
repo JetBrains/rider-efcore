@@ -1,4 +1,4 @@
-package me.seclerp.rider.plugins.efcore.features.connections
+package me.seclerp.rider.plugins.efcore.features.connections.impl
 
 import com.intellij.database.Dbms
 import com.intellij.database.dataSource.LocalDataSource
@@ -7,6 +7,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.RdProjectDescriptor
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
+import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
 
 @Service
 class DataGripConnectionProvider(private val intellijProject: Project) : DbConnectionProvider {

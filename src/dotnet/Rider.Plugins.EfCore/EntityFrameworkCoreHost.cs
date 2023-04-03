@@ -11,6 +11,7 @@ using JetBrains.RdBackend.Common.Features;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using Rider.Plugins.EfCore.Compatibility;
+using Rider.Plugins.EfCore.Connection;
 using Rider.Plugins.EfCore.DbContext;
 using Rider.Plugins.EfCore.Exceptions;
 using Rider.Plugins.EfCore.Logging;
@@ -22,7 +23,7 @@ using Rider.Plugins.EfCore.Tracking;
 namespace Rider.Plugins.EfCore
 {
   [SolutionComponent]
-  public class EfCoreSolutionComponent
+  public class EntityFrameworkCoreHost
   {
     private readonly Lifetime _lifetime;
     private readonly ISolution _solution;
@@ -31,13 +32,14 @@ namespace Rider.Plugins.EfCore
     private readonly SupportedStartupProjectsProvider _supportedStartupProjectsProvider;
     private readonly MigrationsProvider _migrationsProvider;
     private readonly DbContextProvider _dbContextProvider;
+    private readonly DbProviderService _dbProviderService;
     private readonly ILogger _logger;
 
     private readonly RiderEfCoreModel _efCoreModel;
 
     private bool _toolsNotInstalledNotified = false;
 
-    public EfCoreSolutionComponent(
+    public EntityFrameworkCoreHost(
       Lifetime lifetime,
       ISolution solution,
       SolutionTracker solutionTracker,
@@ -46,6 +48,7 @@ namespace Rider.Plugins.EfCore
       SupportedStartupProjectsProvider supportedStartupProjectsProvider,
       MigrationsProvider migrationsProvider,
       DbContextProvider dbContextProvider,
+      DbProviderService dbProviderService,
       ILogger logger)
     {
       _lifetime = lifetime;
@@ -55,6 +58,7 @@ namespace Rider.Plugins.EfCore
       _supportedStartupProjectsProvider = supportedStartupProjectsProvider;
       _migrationsProvider = migrationsProvider;
       _dbContextProvider = dbContextProvider;
+      _dbProviderService = dbProviderService;
       _logger = logger;
 
       _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
@@ -62,6 +66,7 @@ namespace Rider.Plugins.EfCore
       _efCoreModel.HasAvailableMigrations.SetSync(HasAvailableMigrations);
       _efCoreModel.GetAvailableMigrations.SetSync(GetAvailableMigrations);
       _efCoreModel.GetAvailableDbContexts.SetSync(GetAvailableDbContexts);
+      _efCoreModel.GetAvailableDbProviders.SetSync(GetAvailableDbProviders);
 
       solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
       solutionTracker.OnAfterToolsCacheUpdate += InvalidateEfToolsDefinition;
@@ -153,7 +158,7 @@ namespace Rider.Plugins.EfCore
       {
         _efCoreModel.AvailableStartupProjects.Value = allProjectNames;
 
-        _logger.LogFlow($"{nameof(EfCoreSolutionComponent)}.{nameof(InvalidateStartupProjects)}",
+        _logger.LogFlow($"{nameof(EntityFrameworkCoreHost)}.{nameof(InvalidateStartupProjects)}",
           "Startup projects invalidated:" +
           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableStartupProjects.Value.Select(project => project.Name))}");
       });
@@ -172,7 +177,7 @@ namespace Rider.Plugins.EfCore
       {
         _efCoreModel.AvailableMigrationProjects.Value = allProjectNames;
 
-        _logger.LogFlow($"{nameof(EfCoreSolutionComponent)}.{nameof(InvalidateMigrationsProjects)}",
+        _logger.LogFlow($"{nameof(EntityFrameworkCoreHost)}.{nameof(InvalidateMigrationsProjects)}",
           "Migration projects invalidated:" +
           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableMigrationProjects.Value.Select(project => project.Name))}");
       });
@@ -185,12 +190,7 @@ namespace Rider.Plugins.EfCore
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByGuid(identity.ProjectId);
-        if (project is null)
-        {
-          throw new ProjectNotFoundException(identity.ProjectId);
-        }
-
+        var project = GetProjectById(identity.ProjectId);
         return _migrationsProvider.HasMigrations(project, identity.DbContextClassFullName);
       }
     }
@@ -199,12 +199,7 @@ namespace Rider.Plugins.EfCore
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByGuid(identity.ProjectId);
-        if (project is null)
-        {
-          throw new ProjectNotFoundException(identity.ProjectId);
-        }
-
+        var project = GetProjectById(identity.ProjectId);
         return _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
       }
     }
@@ -213,14 +208,29 @@ namespace Rider.Plugins.EfCore
     {
       using (ReadLockCookie.Create())
       {
-        var project = _solution.GetProjectByGuid(projectId);
-        if (project is null)
-        {
-          throw new ProjectNotFoundException(projectId);
-        }
-
+        var project = GetProjectById(projectId);
         return _dbContextProvider.GetDbContexts(project).ToList();
       }
+    }
+
+    private List<DbProviderInfo> GetAvailableDbProviders(Lifetime lifetime, Guid projectId)
+    {
+      using (ReadLockCookie.Create())
+      {
+        var project = GetProjectById(projectId);
+        return _dbProviderService.GetDbProviders(project).ToList();
+      }
+    }
+
+    private IProject GetProjectById(Guid projectId)
+    {
+      var project = _solution.GetProjectByGuid(projectId);
+      if (project is null)
+      {
+        throw new ProjectNotFoundException(projectId);
+      }
+
+      return project;
     }
   }
 }

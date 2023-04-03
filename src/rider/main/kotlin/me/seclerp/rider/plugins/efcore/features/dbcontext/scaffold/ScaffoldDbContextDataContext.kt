@@ -1,9 +1,11 @@
 package me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold
 
 import com.intellij.openapi.project.Project
+import com.intellij.util.containers.init
 import me.seclerp.observables.observable
 import me.seclerp.observables.observableList
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableConnections
+import me.seclerp.rider.plugins.efcore.features.shared.ObservableDbProviders
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
@@ -12,6 +14,7 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
     val connection = observable("")
     val observableConnections = ObservableConnections(intellijProject, startupProject)
     val provider = observable("")
+    val observableDbProviders = ObservableDbProviders(intellijProject, migrationsProject)
     val outputFolder = observable("Entities")
 
     val useAttributes = observable(false)
@@ -32,6 +35,7 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         super.initBindings()
 
         observableConnections.initBinding()
+        observableDbProviders.initBinding()
     }
 
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {

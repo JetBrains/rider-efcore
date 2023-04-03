@@ -6,6 +6,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.workspaceModel.ide.WorkspaceModel
 import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.projectView.workspace.findProjects
+import me.seclerp.rider.plugins.efcore.features.connections.impl.AppSettingsConnectionProvider
+import me.seclerp.rider.plugins.efcore.features.connections.impl.DataGripConnectionProvider
+import me.seclerp.rider.plugins.efcore.features.connections.impl.UserSecretsConnectionProvider
 import java.util.*
 
 @Service

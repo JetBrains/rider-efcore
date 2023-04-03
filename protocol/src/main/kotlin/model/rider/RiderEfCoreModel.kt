@@ -40,6 +40,11 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("fullName", string)
     }
 
+    private val DbProviderInfo = structdef {
+        field("id", string)
+        field("version", string)
+    }
+
     private val EfToolDefinition = structdef {
         field("version", string)
         field("toolKind", enum {
@@ -60,6 +65,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
         call("getAvailableDbContexts", guid, immutableList(DbContextInfo))
+        call("getAvailableDbProviders", guid, immutableList(DbProviderInfo))
 
         callback("onMissingEfCoreToolsDetected", void, void)
     }
