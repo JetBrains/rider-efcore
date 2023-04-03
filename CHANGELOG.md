@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Connection strings auto-detection for "Connection" field  in "Update Database" and "Scaffold Database" dialogs from such sources:
+  * Startup project's `appsettings.json`, including environment-specific ones like `appsettings.Development.json`
+  * Startup project's user secrets
+  * "Database" tool window connections (experimental, only SQLite sources are currently supported)
+- "Provider" NuGets auto-detection for "Scaffold Database" dialog from Migrations project's NuGet packages
+- Support for .NET 8 Preview projects
+
 ## [231.0.2-eap04] - 2023-02-17
 ### Added
 - Cherry-pick changes from bugfix [223.3.2]
@@ -159,7 +168,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.1-eap01...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.2-eap04...HEAD
+[231.0.2-eap04]: https://github.com/seclerp/rider-efcore/compare/v231.0.1-eap01...v231.0.2-eap04
 [231.0.1-eap01]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...v231.0.1-eap01
 [231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v231.0.0-eap01
 [223.3.2]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v223.3.2
