@@ -35,6 +35,9 @@ val productVersion: String by project
 val pluginVersion: String by project
 val buildConfiguration = ext.properties["buildConfiguration"] ?: "Debug"
 
+val publishToken: String by project
+val publishChannel: String by project
+
 val rdLibDirectory: () -> File = { file("${tasks.setupDependencies.get().idea.get().classes}/lib/rd") }
 extra["rdLibDirectory"] = rdLibDirectory
 
@@ -273,5 +276,10 @@ tasks {
                 if (!file.exists()) throw RuntimeException("File \"$file\" does not exist")
             }
         }
+    }
+
+    publishPlugin {
+        token.set(publishToken)
+        channels.set(listOf(publishChannel))
     }
 }

@@ -55,4 +55,4 @@ jobs:
       - name: 🚀 Publish Plugin
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publishPlugin -PpublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PpublishChannel=${{ github.event.inputs.channel }}
+          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PPublishChannel=${{ github.event.inputs.channel }}
