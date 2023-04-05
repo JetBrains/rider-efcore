@@ -5,10 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [231.1.0] - 2023-04-05
 ### Added
-- Connection strings auto-detection for "Connection" field  in "Update Database" and "Scaffold Database" dialogs from such sources:
-  * Startup project's `appsettings.json`, including environment-specific ones like `appsettings.Development.json`
-  * Startup project's user secrets
-  * "Database" tool window connections (experimental, only SQLite sources are currently supported)
+- Connection strings auto-detection for "Connection" field  in "Update Database" and "Scaffold Database" dialogs from 
+  `appsettings` (Startup project),
+  `appsettings.{env}.json` (Startup project),
+  user secrets (Migrations project)
+  and "Database" tool window (the last one is experimental and currently only available for SQLite)
 - "Provider" NuGets auto-detection for "Scaffold Database" dialog from Migrations project's NuGet packages
 - Support for .NET 8 Preview projects
 
