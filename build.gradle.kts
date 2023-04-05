@@ -17,7 +17,7 @@ buildscript {
 plugins {
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
     id("org.jetbrains.changelog") version "2.0.0"
-    id("org.jetbrains.intellij") version "1.13.2"
+    id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.kotlin.jvm") version "1.7.20"
 }
 
@@ -238,6 +238,11 @@ tasks {
 
     buildPlugin {
         dependsOn(compileDotNet)
+
+        copy {
+            from("${buildDir}/distributions/${rootProject.name}-${version}.zip")
+            into("${rootDir}/output")
+        }
     }
 
     runIde {
