@@ -24,7 +24,7 @@ jobs:
       - name: 🔍 Extract Version
         id: version
         run: |
-          echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=PluginVersion: ).*')" >> $GITHUB_ENV
+          echo "PLUGIN_VERSION=$(./gradlew properties | grep -oP '(?<=pluginVersion: ).*')" >> $GITHUB_ENV
 
       - name: 🏗 Build Plugin
         uses: gradle/gradle-build-action@v2
@@ -55,4 +55,4 @@ jobs:
       - name: 🚀 Publish Plugin
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publishPlugin -PPublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PPublishChannel=${{ github.event.inputs.channel }}
+          arguments: publishPlugin -PpublishToken=${{ secrets.JB_PUBLISH_TOKEN }} -PpublishChannel=${{ github.event.inputs.channel }}
