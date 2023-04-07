@@ -15,7 +15,7 @@ class ObservableDbProviders(
     fun initBinding() {
         this.bind(migrationsProject) {
             if (it != null) {
-                val projectId = migrationsProject.value!!.id
+                val projectId = it.id
                 val dbProviders = intellijProject.solution.riderEfCoreModel.getAvailableDbProviders.runUnderProgress(
                     projectId, intellijProject, "Loading available DB providers...",
                     isCancelable = true,
