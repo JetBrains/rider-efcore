@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.features.connections.impl
 
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -18,7 +19,10 @@ import kotlin.io.path.name
 @Service
 class AppSettingsConnectionProvider : DbConnectionProvider {
     companion object {
-        private val json = jacksonObjectMapper()
+        private val json =
+            jacksonObjectMapper()
+                .enable(JsonParser.Feature.ALLOW_COMMENTS)
+
         fun getInstance(intellijProject: Project) = intellijProject.service<AppSettingsConnectionProvider>()
     }
 
