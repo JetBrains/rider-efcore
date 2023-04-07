@@ -2,17 +2,30 @@ package me.seclerp.observables
 
 import com.intellij.openapi.diagnostic.logger
 
-fun <T> observable(defaultValue: T): ObservableProperty<T> = ObservableProperty(defaultValue)
+fun <TSource> observable(defaultValue: TSource): ObservableProperty<TSource> = ObservableProperty(defaultValue)
 
-fun <T, T2> Observable<T>.bind(bindTo: Observable<T2>, mappingTo: (T2) -> T) {
-    bindTo.afterChange {
-        value = mappingTo(it)
+fun <TSource, TDest> Observable<TSource>.bind(bindFrom: Observable<TDest>, mappingFrom: (TDest) -> TSource) {
+    bindFrom.afterChange {
+        value = mappingFrom(it)
     }
 }
 
-fun <T, T2> Observable<T>.bind(bindTo: Observable<T2>, mappingTo: (T2) -> T, mappingFrom: (T) -> T2) {
-    bind(bindTo, mappingTo)
-    bindTo.bind(this, mappingFrom)
+fun <TSource, TDest : TDestSafe?, TDestSafe> Observable<TSource>.bindSafe(bindFrom: Observable<TDest>, mappingFrom: (TDestSafe) -> TSource) {
+    bindFrom.afterChange {
+        if (it != null) {
+            value = mappingFrom(it)
+        }
+    }
+}
+
+fun <TSource, TDest> Observable<TSource>.bind(bindFrom: Observable<TDest>, mappingFrom: (TDest) -> TSource, mappingTo: (TSource) -> TDest) {
+    bind(bindFrom, mappingFrom)
+    bindFrom.bind(this, mappingTo)
+}
+
+fun <TSource, TDest : TDestSafe?, TDestSafe> Observable<TSource>.bindSafe(bindFrom: Observable<TDest>, mappingFrom: (TDestSafe) -> TSource, mappingTo: (TSource) -> TDest) {
+    bindSafe(bindFrom, mappingFrom)
+    bindFrom.bind(this, mappingTo)
 }
 
 inline fun <reified TValue, reified TObservable : Observable<TValue>> TObservable.withLogger(propertyDebugName: String? = null): TObservable {
