@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [231.1.1] - 2023-04-10
+### Fixed
+- Connections: Exception when having `.json` files with comments (#158)
+- Common: Exception when opening dialogs while there are no applicable Migrations projects exists in the solution (#158) 
+
 ## [231.1.0] - 2023-04-05
 ### Added
 - Connection strings auto-detection for "Connection" field  in "Update Database" and "Scaffold Database" dialogs from 
@@ -169,7 +174,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.0.2-eap04...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.1.1...HEAD
+[231.1.1]: https://github.com/seclerp/rider-efcore/compare/v231.1.0...v231.1.1
+[231.1.0]: https://github.com/seclerp/rider-efcore/compare/v231.0.2-eap04...v231.1.0
 [231.0.2-eap04]: https://github.com/seclerp/rider-efcore/compare/v231.0.1-eap01...v231.0.2-eap04
 [231.0.1-eap01]: https://github.com/seclerp/rider-efcore/compare/v231.0.0-eap01...v231.0.1-eap01
 [231.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v223.3.1...v231.0.0-eap01
