@@ -60,7 +60,7 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2022.3+**
+- JetBrains Rider **2023.1+**
 
 - EF Core **5.0+** with projects under such target frameworks:
   - `net8.0` (preview)
