@@ -24,7 +24,7 @@ public class NotificationCommandResultProcessor(
                 .notify(project)
         } else {
             val errorTextBuilder = StringBuilder()
-            errorTextBuilder.append(EfCoreUiBundle.message("initial.command"), result.command)
+            errorTextBuilder.append(EfCoreUiBundle.message("initial.command", result.command))
 
             if (result.output.trim().isNotEmpty())
                 errorTextBuilder.append("\n\n${EfCoreUiBundle.message("output", result.output)}")
