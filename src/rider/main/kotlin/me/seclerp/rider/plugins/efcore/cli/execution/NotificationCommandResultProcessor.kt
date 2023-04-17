@@ -24,15 +24,15 @@ public class NotificationCommandResultProcessor(
                 .notify(project)
         } else {
             val errorTextBuilder = StringBuilder()
-            errorTextBuilder.append("${EfCoreUiBundle.message("command")}: ${result.command}")
+            errorTextBuilder.append("${EfCoreUiBundle.message("command")} ${result.command}")
 
             if (result.output.trim().isNotEmpty())
-                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("output")}:\n${result.output}")
+                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("output", result.output)}")
 
             if (result.error?.trim()?.isNotEmpty() == true)
-                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("error")}:\n${result.error}")
+                errorTextBuilder.append("\n\n${EfCoreUiBundle.message("error", result.error)}")
 
-            errorTextBuilder.append("\n\n${EfCoreUiBundle.message("exit.code")}: ${result.exitCode}")
+            errorTextBuilder.append("\n\n${EfCoreUiBundle.message("exit.code", result.exitCode)}")
 
             NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
                 .createNotification(

@@ -8,7 +8,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.EfCommandBuilder
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 
-@Service
+@Service(Service.Level.PROJECT)
 class MigrationsCommandFactory(private val intellijProject: Project) {
     fun add(options: CommonOptions, migrationName: String, outputDirectory: String? = null, namespace: String? = null): GeneralCommandLine =
         EfCommandBuilder(intellijProject, KnownEfCommands.Migrations.add, options).apply {

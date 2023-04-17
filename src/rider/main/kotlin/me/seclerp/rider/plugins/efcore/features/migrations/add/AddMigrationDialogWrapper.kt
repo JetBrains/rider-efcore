@@ -99,10 +99,10 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    @NonNls
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
         dataCtx.availableMigrations.afterChange {
             if (!userInputReceived.value) {
+                @NonNls
                 val migrationName = if (it.isNotEmpty()) "" else "Initial"
 
                 if (migrationNameField.text != migrationName) {

@@ -8,7 +8,7 @@ import me.seclerp.rider.plugins.efcore.rd.StartupProjectInfo
 import me.seclerp.rider.plugins.efcore.state.CommonOptionsStateService
 import java.util.*
 
-@Service
+@Service(Service.Level.PROJECT)
 class PreferredProjectsManager(
     intellijProject: Project
 ) {

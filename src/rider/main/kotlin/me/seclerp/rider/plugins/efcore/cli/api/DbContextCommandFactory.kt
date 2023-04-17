@@ -8,7 +8,7 @@ import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.EfCommandBuilder
 
-@Service
+@Service(Service.Level.PROJECT)
 class DbContextCommandFactory(private val intellijProject: Project) {
     fun scaffold(efCoreVersion: DotnetEfVersion, options: CommonOptions, connection: String, provider: String,
                  outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,

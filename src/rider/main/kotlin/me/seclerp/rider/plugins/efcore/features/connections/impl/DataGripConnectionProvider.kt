@@ -12,7 +12,7 @@ import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
 import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import org.jetbrains.annotations.NonNls
 
-@Service
+@Service(Service.Level.PROJECT)
 class DataGripConnectionProvider(private val intellijProject: Project) : DbConnectionProvider {
     companion object {
         fun getInstance(intellijProject: Project) = intellijProject.service<DataGripConnectionProvider>()

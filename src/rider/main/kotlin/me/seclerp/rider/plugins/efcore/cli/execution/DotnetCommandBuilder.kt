@@ -11,8 +11,7 @@ import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.nio.charset.Charset
 
-@NonNls
-open class DotnetCommandBuilder(private val intellijProject: Project, vararg baseCommands: String) {
+open class DotnetCommandBuilder(private val intellijProject: Project, vararg baseCommands: @NonNls String) {
     private val activeRuntime by lazy { intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull }
     protected val solutionDirectory = intellijProject.solutionDirectoryPath.toString()
 

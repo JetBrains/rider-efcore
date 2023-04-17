@@ -17,6 +17,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.application
 import com.intellij.util.io.BaseOutputReader
 import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
+import org.jetbrains.annotations.NonNls
 import java.util.logging.Logger
 
 class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(intellijProject) {
@@ -87,7 +88,7 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
     }
 
     @Suppress("UnstableApiUsage")
-    @Service
+    @Service(Service.Level.PROJECT)
     class ConsoleViewProvider(private val intellijProject: Project) {
         companion object {
             private val TOOL_WINDOW_TASK_ID = EfCoreUiBundle.message("tab.task.ef.core")
