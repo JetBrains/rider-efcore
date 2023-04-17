@@ -60,20 +60,29 @@ More about features and available dialogs you could read in [**the blog post**](
 
 ### Requirements
 
-- JetBrains Rider **2023.1+**
+#### TL;DR:
+- the most recent stable version of **JetBrains Rider**,
+- [officially supported](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core#lifecycle) versions of **.NET**, **EF Core tools** and **EF Core NuGets**.
 
-- EF Core **5.0+** with projects under such target frameworks:
+Before opening the issue, please make sure that your projects and development environment completely satisfies these requirements:
+
+- IDE
+  - JetBrains Rider **2023.1 or higher**
+
+- Target frameworks
   - `net8.0` (preview)
   - `net7.0`
   - `net6.0`
   - `net5.0`
   - `netcoreapp3.1`
-  - `netstandard2.1` (only for Migrations projects)
-  - `netstandard2.0` (only for Migrations projects)
+  - `netstandard2.1` <kbd>*</kbd>
+  - `netstandard2.0` <kbd>*</kbd>
 
-- EF Core tools (`dotnet ef`) **5.0+** installed
+  <kbd>*</kbd>: only for Migrations projects
 
-> **Note**: Projects with older versions of EF Core might work, but with issues
+- `Microsoft.EntityFrameworkCore.*`: **5.0.0 or higher**
+
+- Tools (`dotnet ef`): **5.0 or higher**
 
 ### Development
 
