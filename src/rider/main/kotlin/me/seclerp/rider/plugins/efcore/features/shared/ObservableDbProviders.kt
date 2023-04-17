@@ -6,6 +6,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.observables.ObservableCollection
 import me.seclerp.observables.ObservableProperty
 import me.seclerp.observables.bind
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.rd.*
 
 class ObservableDbProviders(
@@ -17,7 +18,7 @@ class ObservableDbProviders(
             if (it != null) {
                 val projectId = it.id
                 val dbProviders = intellijProject.solution.riderEfCoreModel.getAvailableDbProviders.runUnderProgress(
-                    projectId, intellijProject, "Loading available DB providers...",
+                    projectId, intellijProject, EfCoreUiBundle.message("progress.title.loading.available.db.providers"),
                     isCancelable = true,
                     throwFault = true
                 )

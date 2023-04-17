@@ -11,7 +11,7 @@ import me.seclerp.rider.plugins.efcore.features.connections.impl.DataGripConnect
 import me.seclerp.rider.plugins.efcore.features.connections.impl.UserSecretsConnectionProvider
 import java.util.*
 
-@Service
+@Service(Service.Level.PROJECT)
 @Suppress("UnstableApiUsage")
 class DbConnectionsCollector(private val intellijProject: Project) {
     companion object {

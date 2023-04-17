@@ -5,6 +5,7 @@ import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.observables.*
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.rd.*
 import me.seclerp.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
@@ -34,7 +35,7 @@ open class CommonDataContext(
         if (requireDbContext) {
             availableDbContexts.bindSafe(migrationsProject) {
                 beModel.getAvailableDbContexts.runUnderProgress(
-                    it.id, intellijProject, "Loading DbContext classes...",
+                    it.id, intellijProject, EfCoreUiBundle.message("progress.title.loading.dbcontext.classes"),
                     isCancelable = true,
                     throwFault = true
                 )?.toMutableList() ?: mutableListOf()

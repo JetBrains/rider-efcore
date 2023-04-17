@@ -1,5 +1,6 @@
 package me.seclerp.rider.plugins.efcore.ui.items
 
+import org.jetbrains.annotations.NonNls
 import javax.swing.Icon
 
 open class IconItem<T>(
@@ -7,6 +8,7 @@ open class IconItem<T>(
     val icon: Icon?,
     val data: T
 ) {
+    @NonNls
     override fun toString() =
         "${this::class.java.simpleName}(" +
             "displayName=${displayName}" +

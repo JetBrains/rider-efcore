@@ -16,6 +16,8 @@ import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.application
 import com.intellij.util.io.BaseOutputReader
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
+import org.jetbrains.annotations.NonNls
 import java.util.logging.Logger
 
 class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(intellijProject) {
@@ -69,7 +71,7 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
         }
 
         override fun notifyProcessTerminated(exitCode: Int) {
-            consoleView.print("Process terminated with exit code $exitCode", ConsoleViewContentType.SYSTEM_OUTPUT)
+            consoleView.print(EfCoreUiBundle.message("process.terminated.with.exit.code", exitCode), ConsoleViewContentType.SYSTEM_OUTPUT)
 
             val result = CliCommandResult(
                 command.commandLineString,
@@ -86,11 +88,11 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
     }
 
     @Suppress("UnstableApiUsage")
-    @Service
+    @Service(Service.Level.PROJECT)
     class ConsoleViewProvider(private val intellijProject: Project) {
         companion object {
-            const val TOOL_WINDOW_TASK_ID = "EF Core"
-            const val TAB_NAME = "EF Core Command"
+            private val TOOL_WINDOW_TASK_ID = EfCoreUiBundle.message("tab.task.ef.core")
+            val TAB_NAME = EfCoreUiBundle.message("tab.ef.core.command")
         }
 
         val toolWindow = lazy {

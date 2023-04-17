@@ -5,6 +5,7 @@ import me.seclerp.observables.*
 import me.seclerp.rider.plugins.efcore.features.shared.ObservableMigrations
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
+import org.jetbrains.annotations.NonNls
 
 class GenerateScriptDataContext(
     intellijProject: Project
@@ -71,8 +72,11 @@ class GenerateScriptDataContext(
     }
 
     object KnownStateKeys {
+        @NonNls
         const val OUTPUT_FILE = "outputFilePath"
+        @NonNls
         const val IDEMPOTENT = "idempotent"
+        @NonNls
         const val NO_TRANSACTIONS = "noTransactions"
     }
 }

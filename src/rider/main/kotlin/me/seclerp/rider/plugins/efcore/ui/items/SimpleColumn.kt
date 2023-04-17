@@ -1,8 +1,9 @@
 package me.seclerp.rider.plugins.efcore.ui.items
 
 import com.intellij.util.ui.ColumnInfo
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 
-class SimpleColumn : ColumnInfo<SimpleItem, String>("Table Name") {
+class SimpleColumn : ColumnInfo<SimpleItem, String>(EfCoreUiBundle.message("simple.column.name")) {
     override fun isCellEditable(item: SimpleItem?): Boolean {
         return true
     }

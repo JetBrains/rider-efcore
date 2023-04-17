@@ -1,7 +1,5 @@
 package me.seclerp.observables
 
-import java.util.*
-
 open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : ObservableProperty<List<T>>(initialCollection), MutableList<T> {
     private var items = initialCollection.toMutableList()
 

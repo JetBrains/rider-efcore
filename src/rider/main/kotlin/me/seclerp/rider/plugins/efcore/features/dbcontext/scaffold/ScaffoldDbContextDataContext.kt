@@ -9,6 +9,7 @@ import me.seclerp.rider.plugins.efcore.features.shared.ObservableDbProviders
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import me.seclerp.rider.plugins.efcore.state.DialogsStateService
 import me.seclerp.rider.plugins.efcore.ui.items.SimpleItem
+import org.jetbrains.annotations.NonNls
 
 class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext(intellijProject, false) {
     val connection = observable("")
@@ -98,14 +99,23 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
     }
 
     object KnownStateKeys {
+        @NonNls
         const val CONNECTION = "connection"
+        @NonNls
         const val PROVIDER = "provider"
+        @NonNls
         const val OUTPUT_FOLDER = "outputFolder"
+        @NonNls
         const val USE_ATTRIBUTES = "useAttributes"
+        @NonNls
         const val USE_DATABASE_NAMES = "useDatabaseNames"
+        @NonNls
         const val GENERATE_ON_CONFIGURING = "generateOnConfiguring"
+        @NonNls
         const val USE_PLURALIZER = "usePluralizer"
+        @NonNls
         const val DB_CONTEXT_NAME = "dbContextName"
+        @NonNls
         const val DB_CONTEXT_FOLDER = "dbContextFolder"
     }
 }

@@ -7,8 +7,10 @@ import me.seclerp.rider.plugins.efcore.cli.execution.CommonOptions
 import me.seclerp.rider.plugins.efcore.cli.execution.KnownEfCommands
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.EfCommandBuilder
+import org.jetbrains.annotations.NonNls
 
-@Service
+@Service(Service.Level.PROJECT)
+@NonNls
 class DatabaseCommandFactory(private val intellijProject: Project) {
     fun update(efCoreVersion: DotnetEfVersion, options: CommonOptions, targetMigration: String, connectionString: String? = null): GeneralCommandLine =
         EfCommandBuilder(intellijProject, KnownEfCommands.Database.update, options).apply {

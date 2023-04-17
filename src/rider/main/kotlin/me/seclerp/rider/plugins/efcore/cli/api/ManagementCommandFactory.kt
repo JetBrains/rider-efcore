@@ -5,7 +5,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import me.seclerp.rider.plugins.efcore.cli.execution.DotnetCommandBuilder
 
-@Service
+@Service(Service.Level.PROJECT)
 class ManagementCommandFactory(private val intellijProject: Project) {
     fun installEfCoreTools(): GeneralCommandLine =
         DotnetCommandBuilder(intellijProject, "tool", "install").apply {

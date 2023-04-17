@@ -8,10 +8,12 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.util.application
 import com.jetbrains.rd.framework.impl.RdTask
 import com.jetbrains.rider.projectView.solution
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 
+// TODO: Remove obsolete API usage
 class EfCoreStartupActivity : StartupActivity, DumbAware {
     override fun runActivity(intellijProject: Project) {
         application.invokeAndWait {
@@ -20,8 +22,8 @@ class EfCoreStartupActivity : StartupActivity, DumbAware {
                     .getInstance()
                     .getNotificationGroup(KnownNotificationGroups.efCore)
                     .createNotification(
-                        "EF Core tools are not installed",
-                        "These tools are required to execute EF Core commands",
+                        EfCoreUiBundle.message("notification.title.ef.core.tools.are.not.installed"),
+                        EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
                         NotificationType.WARNING
                     )
                     .addAction(InstallDotnetEfAction())

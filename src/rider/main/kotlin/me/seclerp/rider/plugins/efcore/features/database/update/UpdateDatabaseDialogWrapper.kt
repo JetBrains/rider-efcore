@@ -13,6 +13,7 @@ import me.seclerp.observables.observableList
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.editableComboBox
 import me.seclerp.observables.ui.dsl.iconComboBox
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
@@ -29,7 +30,7 @@ class UpdateDatabaseDialogWrapper(
 ) : CommonDialogWrapper<UpdateDatabaseDataContext>(
     UpdateDatabaseDataContext(intellijProject),
     toolsVersion,
-    "Update Database",
+    EfCoreUiBundle.message("action.EfCore.Features.Database.UpdateDatabaseAction.text"),
     intellijProject,
     selectedProjectId,
     true
@@ -82,27 +83,27 @@ class UpdateDatabaseDialogWrapper(
     //
     // UI
     override fun Panel.createPrimaryOptions() {
-        row("Target migration:") {
+        row(EfCoreUiBundle.message("target.migration")) {
             iconComboBox(targetMigrationView, targetMigrationsView)
                 .validationOnApply(validator.targetMigrationValidation())
                 .validationOnInput(validator.targetMigrationValidation())
-                .comment("Use <code>0</code> as a target migration to undo all applied migrations")
+                .comment(EfCoreUiBundle.message("undo.all.applied.migrations.comment"))
                 .align(AlignX.FILL)
                 .focused()
         }
     }
 
     override fun Panel.createAdditionalGroup() {
-        groupRowsRange("Additional Options") {
+        groupRowsRange(EfCoreUiBundle.message("section.additional.options")) {
             if (efCoreVersion.major >= 5) {
                 var useDefaultConnectionCheckbox: JBCheckBox? = null
                 row {
                     useDefaultConnectionCheckbox =
-                        checkBox("Use default connection of startup project")
+                        checkBox(EfCoreUiBundle.message("checkbox.use.default.connection.startup.project"))
                             .bindSelected(dataCtx.useDefaultConnection)
                             .component
                 }
-                row("Connection:") {
+                row(EfCoreUiBundle.message("connection")) {
                     editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
                         .applyToComponent { renderer = DbConnectionItemRenderer() }
                         .validationOnInput(validator.connectionValidation())

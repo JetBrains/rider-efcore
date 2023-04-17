@@ -10,6 +10,7 @@ import me.seclerp.observables.observableList
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.observables.ui.dsl.iconComboBox
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
@@ -23,7 +24,7 @@ class GenerateScriptDialogWrapper(
 ) : CommonDialogWrapper<GenerateScriptDataContext>(
     GenerateScriptDataContext(intellijProject),
     toolsVersion,
-    "Generate SQL Script",
+    EfCoreUiBundle.message("generate.sql.script"),
     intellijProject,
     selectedProjectId,
     requireMigrationsInProject = true
@@ -90,20 +91,20 @@ class GenerateScriptDialogWrapper(
     }
 
     override fun Panel.createAdditionalGroup() {
-        groupRowsRange("Additional Options") {
-            row("Output file") {
+        groupRowsRange(EfCoreUiBundle.message("section.additional.options")) {
+            row(EfCoreUiBundle.message("output.file")) {
                 textField()
                     .bindText(dataCtx.outputFilePath)
                     .validationOnApply(validator.outputFileValidation())
                     .validationOnInput(validator.outputFileValidation())
             }
             row {
-                checkBox("Make script idempotent")
+                checkBox(EfCoreUiBundle.message("checkbox.make.script.idempotent"))
                     .bindSelected(dataCtx.idempotent)
             }
             if (efCoreVersion.major >= 5) {
                 row {
-                    checkBox("No transactions")
+                    checkBox(EfCoreUiBundle.message("checkbox.no.transactions"))
                         .bindSelected(dataCtx.noTransactions)
                 }
             }
@@ -111,16 +112,16 @@ class GenerateScriptDialogWrapper(
     }
 
     private fun Panel.createMigrationRows() {
-        row("From migration:") {
+        row(EfCoreUiBundle.message("from.migration")) {
             iconComboBox(fromMigrationView, fromMigrationsView)
                 .validationOnApply(validator.fromMigrationValidation())
                 .validationOnInput(validator.fromMigrationValidation())
-                .comment("'0' means before the first migration")
+                .comment(EfCoreUiBundle.message("before.first.migration.comment"))
                 .align(AlignX.FILL)
                 .focused()
         }
 
-        row("To migration:") {
+        row(EfCoreUiBundle.message("to.migration")) {
             iconComboBox(toMigrationView, toMigrationsView)
                 .align(AlignX.FILL)
                 .focused()

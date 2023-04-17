@@ -4,13 +4,14 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil
 import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import java.io.IOException
 
 class SilentCommandExecutor(
     intellijProject: Project
 ) : CliCommandExecutor(intellijProject) {
     override fun execute(command: GeneralCommandLine, resultProcessor: CliCommandResultProcessor?) {
-        runBackgroundableTask("Executing EF Core command...", intellijProject, false) {
+        runBackgroundableTask(EfCoreUiBundle.message("progress.title.executing.ef.core.command"), intellijProject, false) {
             try {
                 val executionResult = ExecUtil.execAndGetOutput(command)
                 val output = executionResult.stdout

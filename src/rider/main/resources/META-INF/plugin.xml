@@ -6,6 +6,7 @@
   <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
   <depends>com.intellij.database</depends>
+  <resource-bundle>messages.EfCoreUiBundle</resource-bundle>
 
   <description>
 <![CDATA[
@@ -32,7 +33,7 @@
   </description>
 
   <extensions defaultExtensionNs="com.intellij">
-    <notificationGroup id="EF Core Notifications Group" displayType="BALLOON"/>
+    <notificationGroup id="EfCore.Groups.Notifications" displayType="BALLOON"/>
     <postStartupActivity implementation="me.seclerp.rider.plugins.efcore.startup.EfCoreStartupActivity" />
     <applicationConfigurable
       parentId="tools"
@@ -40,36 +41,25 @@
   </extensions>
 
   <actions>
-    <group id="me.seclerp.rider.plugins.efcore.EfCoreTools" text="Entity Framework Core" popup="true">
+    <group id="EfCore.Groups.Dialogs" popup="true">
       <add-to-group group-id="ProjectViewPopupMenu"/>
       <add-to-group group-id="ToolsMenu"/>
 
       <action id="EfCore.Features.Migrations.AddMigrationAction"
-              class="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction"
-              text="Add Migration"
-              description="Add new code-first migration"/>
+              class="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction"/>
       <action id="EfCore.Features.Migrations.RemoveLastMigrationAction"
               class="me.seclerp.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction"
-              text="Remove Last Migration"
               description="Removes last created migration"/>
       <action id="EfCore.Features.Migrations.GenerateScriptAction"
-              class="me.seclerp.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"
-              text="Generate SQL Script"
-              description="Generates file with SQL script generated from a set of migrations"/>
+              class="me.seclerp.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"/>
       <separator />
       <action id="EfCore.Features.Database.UpdateDatabaseAction"
-              class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"
-              text="Update Database"
-              description="Update database using a selected migration as a target"/>
+              class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"/>
       <action id="EfCore.Features.Database.DropDatabaseAction"
-              class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"
-              text="Drop Database"
-              description="Drop database used by a DbContext"/>
+              class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"/>
       <separator />
       <action id="EfCore.Features.DbContext.ScaffoldDbContextAction"
-              class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"
-              text="Scaffold DbContext"
-              description="Generates code for a DbContext and entity types for a database"/>
+              class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"/>
     </group>
 
     <action id="EfCore.Shared.OpenQuickEfCoreActionsAction"

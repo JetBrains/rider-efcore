@@ -6,6 +6,7 @@ import com.jetbrains.rider.util.idea.runUnderProgress
 import me.seclerp.observables.ObservableCollection
 import me.seclerp.observables.ObservableProperty
 import me.seclerp.observables.bind
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.rd.*
 
 class ObservableMigrations(
@@ -19,7 +20,7 @@ class ObservableMigrations(
                 val migrationsProjectId = migrationsProject.value!!.id
                 val dbContextName = it.fullName
                 val migrations = intellijProject.solution.riderEfCoreModel.getAvailableMigrations.runUnderProgress(
-                    MigrationsIdentity(migrationsProjectId, dbContextName), intellijProject, "Loading available migrations...",
+                    MigrationsIdentity(migrationsProjectId, dbContextName), intellijProject, EfCoreUiBundle.message("progress.title.loading.available.migrations"),
                     isCancelable = true,
                     throwFault = true
                 )

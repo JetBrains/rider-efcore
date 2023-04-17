@@ -15,6 +15,7 @@ import com.jetbrains.rider.model.dotNetActiveRuntimeModel
 import me.seclerp.rider.plugins.efcore.rd.RiderEfCoreModel
 import me.seclerp.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.KnownNotificationGroups
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.cli.execution.NotificationCommandResultProcessor
@@ -33,7 +34,7 @@ abstract class BaseCommandAction(
 
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val intellijProject = actionEvent.project!!
-        ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, "Getting dotnet ef version...", false) {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, EfCoreUiBundle.message("progress.title.getting.dotnet.ef.version"), false) {
             override fun run(progress: ProgressIndicator) {
                 val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
                 val dotnetCliPath = intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull?.dotNetCliExePath
@@ -89,14 +90,14 @@ abstract class BaseCommandAction(
 
     private fun notifyEfIsNotInstalled(intellijProject: Project) {
         NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
-            .createNotification("EF Core tools are required to execute this action", NotificationType.ERROR)
+            .createNotification(EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"), NotificationType.ERROR)
             .addAction(InstallDotnetEfAction())
             .notify(intellijProject)
     }
 
     private fun notifyDotnetIsNotInstalled(intellijProject: Project) {
         NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
-            .createNotification(".NET / .NET Core is required to execute this action", NotificationType.ERROR)
+            .createNotification(EfCoreUiBundle.message("notification.content.net.net.core.required.to.execute.this.action"), NotificationType.ERROR)
             .notify(intellijProject)
     }
 }

@@ -22,6 +22,7 @@ import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrappe
 import me.seclerp.observables.ui.dsl.bindSelected
 import me.seclerp.observables.ui.dsl.bindText
 import me.seclerp.observables.ui.dsl.editableComboBox
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.rd.DbProviderInfo
 import me.seclerp.rider.plugins.efcore.ui.DbConnectionItemRenderer
@@ -40,7 +41,7 @@ class ScaffoldDbContextDialogWrapper(
 ) : CommonDialogWrapper<ScaffoldDbContextDataContext>(
     ScaffoldDbContextDataContext(intellijProject),
     toolsVersion,
-    "Scaffold DbContext",
+    EfCoreUiBundle.message("action.EfCore.Features.DbContext.ScaffoldDbContextAction.text"),
     intellijProject,
     selectedProjectId,
     requireMigrationsInProject = false
@@ -120,10 +121,10 @@ class ScaffoldDbContextDialogWrapper(
         tablesTab = createTablesTab()
         schemaTab = createSchemasTab()
 
-        tabbedPane.addTab("Main", mainTab)
-        tabbedPane.addTab("DbContext", dbContextTab)
-        tabbedPane.addTab("Tables", tablesTab)
-        tabbedPane.addTab("Schemas", schemaTab)
+        tabbedPane.addTab(EfCoreUiBundle.message("tab.main"), mainTab)
+        tabbedPane.addTab(EfCoreUiBundle.message("tab.dbcontext"), dbContextTab)
+        tabbedPane.addTab(EfCoreUiBundle.message("tab.tables"), tablesTab)
+        tabbedPane.addTab(EfCoreUiBundle.message("tab.schemas"), schemaTab)
 
         return panel {
             row {
@@ -142,7 +143,7 @@ class ScaffoldDbContextDialogWrapper(
     private fun createMainTab(): DialogPanel = createMainUI()
 
     override fun Panel.createPrimaryOptions() {
-        row("Connection:") {
+        row(EfCoreUiBundle.message("connection")) {
             editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
                 .applyToComponent { renderer = DbConnectionItemRenderer() }
                 .align(AlignX.FILL)
@@ -150,7 +151,7 @@ class ScaffoldDbContextDialogWrapper(
                 .validationOnApply(validator.connectionValidation())
         }
 
-        row("Provider:") {
+        row(EfCoreUiBundle.message("provider")) {
             editableComboBox(dataCtx.provider, availableDbProvidersView) { it.id }
                 .applyToComponent { renderer = DbProviderItemRenderer() }
                 .align(AlignX.FILL)
@@ -160,12 +161,12 @@ class ScaffoldDbContextDialogWrapper(
     }
 
     override fun Panel.createAdditionalGroup() {
-        groupRowsRange("Additional Options") {
-            row("Output folder:") {
+        groupRowsRange(EfCoreUiBundle.message("section.additional.options")) {
+            row(EfCoreUiBundle.message("output.folder")) {
                 textFieldForRelativeFolder(
                     migrationProjectFolder.getter,
                     intellijProject,
-                    "Select Output Folder")
+                    EfCoreUiBundle.message("select.output.folder"))
                     .bindText(dataCtx.outputFolder)
                     .align(AlignX.FILL)
                     .validationOnInput(validator.outputFolderValidation())
@@ -174,23 +175,23 @@ class ScaffoldDbContextDialogWrapper(
             }
 
             row {
-                checkBox("Use attributes to generate the model")
+                checkBox(EfCoreUiBundle.message("checkbox.use.attributes.to.generate.model"))
                     .bindSelected(dataCtx.useAttributes)
             }
 
             row {
-                checkBox("Use database names")
+                checkBox(EfCoreUiBundle.message("checkbox.use.database.names"))
                     .bindSelected(dataCtx.useDatabaseNames)
             }
 
             if (efCoreVersion.major >= 5) {
                 row {
-                    checkBox("Generate OnConfiguring method")
+                    checkBox(EfCoreUiBundle.message("checkbox.generate.onconfiguring.method"))
                         .bindSelected(dataCtx.generateOnConfiguring)
                 }
 
                 row {
-                    checkBox("Use the pluralizer")
+                    checkBox(EfCoreUiBundle.message("checkbox.use.pluralizer"))
                         .bindSelected(dataCtx.usePluralizer)
                 }
             }
@@ -198,7 +199,7 @@ class ScaffoldDbContextDialogWrapper(
     }
 
     private fun createDbContextTab(): DialogPanel = panel {
-        row("Generated DbContext name:") {
+        row(EfCoreUiBundle.message("generated.dbcontext.name")) {
             textField()
                 .bindText(dataCtx.dbContextName)
                 .align(AlignX.FILL)
@@ -206,11 +207,11 @@ class ScaffoldDbContextDialogWrapper(
                 .validationOnInput(validator.dbContextNameValidation())
         }
 
-        row("Generated DbContext folder:") {
+        row(EfCoreUiBundle.message("generated.dbcontext.folder")) {
             textFieldForRelativeFolder(
                 migrationProjectFolder.getter,
                 intellijProject,
-                "Select Generated DbContext Folder")
+                EfCoreUiBundle.message("select.generated.dbcontext.folder"))
                 .bindText(dataCtx.dbContextFolder)
                 .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
@@ -220,10 +221,10 @@ class ScaffoldDbContextDialogWrapper(
     }
 
     private fun createTablesTab(): DialogPanel =
-        createToggleableTablePanel(tablesModel, "Scaffold all tables", dataCtx.scaffoldAllTables)
+        createToggleableTablePanel(tablesModel, EfCoreUiBundle.message("checkbox.scaffold.all.tables"), dataCtx.scaffoldAllTables)
 
     private fun createSchemasTab(): DialogPanel =
-        createToggleableTablePanel(schemasModel, "Scaffold all schemas", dataCtx.scaffoldAllSchemas)
+        createToggleableTablePanel(schemasModel, EfCoreUiBundle.message("checkbox.scaffold.all.schemas"), dataCtx.scaffoldAllSchemas)
 
     private fun createToggleableTablePanel(
         tableModel: SimpleListTableModel,

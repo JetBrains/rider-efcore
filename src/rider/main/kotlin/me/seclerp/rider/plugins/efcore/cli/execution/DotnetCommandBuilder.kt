@@ -7,13 +7,15 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.run.FormatPreservingCommandLine
 import com.jetbrains.rider.run.withRawParameters
+import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.nio.charset.Charset
 
-open class DotnetCommandBuilder(private val intellijProject: Project, vararg baseCommands: String) {
+open class DotnetCommandBuilder(private val intellijProject: Project, vararg baseCommands: @NonNls String) {
     private val activeRuntime by lazy { intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull }
     protected val solutionDirectory = intellijProject.solutionDirectoryPath.toString()
 
+    @NonNls
     private var generalCommandLine: GeneralCommandLine =
         FormatPreservingCommandLine()
             .withExePath(getDotnetExePath())
@@ -24,24 +26,29 @@ open class DotnetCommandBuilder(private val intellijProject: Project, vararg bas
             .withEnvironment("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "true")
             .withEnvironment("DOTNET_NOLOGO", "true")
 
+    @NonNls
     fun add(value: String) {
         generalCommandLine = generalCommandLine.withParameters(value)
     }
 
+    @NonNls
     fun addNullable(value: String?) {
         if (value != null)
             generalCommandLine = generalCommandLine.withParameters(value)
     }
 
+    @NonNls
     fun addIf(key: String, condition: Boolean) {
         if (condition)
             generalCommandLine = generalCommandLine.withParameters(key)
     }
 
+    @NonNls
     fun addNamed(name: String, value: String) {
         generalCommandLine = generalCommandLine.withParameters(name, value)
     }
 
+    @NonNls
     fun addNamedNullable(name: String, value: String?) {
         if (value != null)
             generalCommandLine = generalCommandLine.withParameters(name, value)

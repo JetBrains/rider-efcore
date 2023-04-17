@@ -13,6 +13,8 @@ import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.projectView.nodes.getUserData
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
+import org.jetbrains.annotations.NonNls
 import kotlin.io.path.Path
 
 @Service
@@ -22,6 +24,7 @@ class UserSecretsConnectionProvider : DbConnectionProvider {
             jacksonObjectMapper()
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
 
+        @NonNls
         private val userSecretsFolder = if (SystemInfo.isWindows)
             Path(WindowsEnvVariables.applicationData, "Microsoft", "UserSecrets")
         else
@@ -39,7 +42,7 @@ class UserSecretsConnectionProvider : DbConnectionProvider {
             obj.fieldNames().forEach { connName ->
                 val connString = (obj[connName] as TextNode?)?.textValue()
                 if (connString != null)
-                    add(DbConnectionInfo(connName, connString, "User secrets", null))
+                    add(DbConnectionInfo(connName, connString, EfCoreUiBundle.message("source.user.secrets"), null))
             }
         }.toList()
 }

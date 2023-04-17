@@ -13,8 +13,10 @@ import me.seclerp.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import me.seclerp.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import me.seclerp.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import me.seclerp.observables.ui.dsl.bindText
+import me.seclerp.rider.plugins.efcore.EfCoreUiBundle
 import me.seclerp.rider.plugins.efcore.ui.AnyInputDocumentListener
 import me.seclerp.rider.plugins.efcore.ui.textFieldForRelativeFolder
+import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.util.UUID
 
@@ -25,7 +27,7 @@ class AddMigrationDialogWrapper(
 ) : CommonDialogWrapper<AddMigrationDataContext>(
     AddMigrationDataContext(intellijProject),
     toolsVersion,
-    "Add Migration",
+    EfCoreUiBundle.message("action.EfCore.Features.Migrations.AddMigrationAction.text"),
     intellijProject,
     selectedProjectId
 ) {
@@ -69,7 +71,7 @@ class AddMigrationDialogWrapper(
     //
     // UI
     override fun Panel.createPrimaryOptions() {
-        row("Migration name:") {
+        row(EfCoreUiBundle.message("migration.name")) {
             textField()
                 .bindText(dataCtx.migrationName)
                 .align(AlignX.FILL)
@@ -83,9 +85,9 @@ class AddMigrationDialogWrapper(
     }
 
     override fun Panel.createAdditionalGroup() {
-        groupRowsRange("Additional Options"){
-            row("Migrations folder:") {
-                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, "Select Migrations Folder")
+        groupRowsRange(EfCoreUiBundle.message("section.additional.options")){
+            row(EfCoreUiBundle.message("migrations.folder")) {
+                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, EfCoreUiBundle.message("select.migrations.folder"))
                     .bindText(dataCtx.migrationsOutputFolder)
                     .align(AlignX.FILL)
                     .validationOnInput(validator.migrationsOutputFolderValidation())
@@ -100,6 +102,7 @@ class AddMigrationDialogWrapper(
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
         dataCtx.availableMigrations.afterChange {
             if (!userInputReceived.value) {
+                @NonNls
                 val migrationName = if (it.isNotEmpty()) "" else "Initial"
 
                 if (migrationNameField.text != migrationName) {
