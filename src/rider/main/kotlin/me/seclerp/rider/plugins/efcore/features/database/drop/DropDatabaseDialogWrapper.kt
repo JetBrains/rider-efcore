@@ -32,11 +32,14 @@ class DropDatabaseDialogWrapper(
     }
 
     override fun doOKAction() {
-        if (showYesNoDialog(
-            EfCoreUiBundle.message("dialog.title.confirmation"),
-            EfCoreUiBundle.message("drop.database.confirmation", dataCtx.migrationsProject.value?.name ?: EfCoreUiBundle.message("selected.project")),
-            intellijProject)
-        ) {
+        val projectName = dataCtx.migrationsProject.value?.name
+        val confirmationMessage =
+            if (projectName != null)
+                EfCoreUiBundle.message("drop.database.confirmation.named", projectName)
+            else
+                EfCoreUiBundle.message("drop.database.confirmation.selected")
+
+        if (showYesNoDialog(EfCoreUiBundle.message("dialog.title.confirmation"), confirmationMessage, intellijProject)) {
             super.doOKAction()
         }
     }
