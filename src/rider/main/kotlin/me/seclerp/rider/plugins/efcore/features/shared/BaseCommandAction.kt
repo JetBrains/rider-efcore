@@ -73,7 +73,7 @@ abstract class BaseCommandAction(
             val processor = NotificationCommandResultProcessor(
                 intellijProject,
                 actionPerformedText,
-                false
+                true
             ).withPostExecuted {
                 dialog.postCommandExecute(it)
             }
