@@ -1,9 +1,7 @@
 package me.seclerp.rider.plugins.efcore.features.connections.impl
 
-import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -12,20 +10,19 @@ import com.jetbrains.rider.model.RdCustomLocation
 import com.jetbrains.rider.model.RdProjectDescriptor
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionProvider
+import me.seclerp.rider.plugins.efcore.features.shared.services.JsonSerializer
 import org.jetbrains.annotations.NonNls
 import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
 @Service
-class AppSettingsConnectionProvider : DbConnectionProvider {
+class AppSettingsConnectionProvider(intellijProject: Project) : DbConnectionProvider {
     companion object {
-        private val json =
-            jacksonObjectMapper()
-                .enable(JsonParser.Feature.ALLOW_COMMENTS)
-
         fun getInstance(intellijProject: Project) = intellijProject.service<AppSettingsConnectionProvider>()
     }
+
+    private val serializer = intellijProject.service<JsonSerializer>()
 
     override fun getAvailableConnections(project: RdProjectDescriptor) =
         buildList {
@@ -33,8 +30,8 @@ class AppSettingsConnectionProvider : DbConnectionProvider {
             @NonNls
             val connectionStrings = directory.listDirectoryEntries("appsettings*.json")
                 .filter { it.isFile() }
-                .map { it.name to json.readTree(it.toFile()) }
-                .mapNotNull { (fileName, json) -> (json.get("ConnectionStrings") as ObjectNode?)?.let { fileName to it } }
+                .map { it.name to serializer.deserializeNode(it.toFile()) }
+                .mapNotNull { (fileName, json) -> (json?.get("ConnectionStrings") as ObjectNode?)?.let { fileName to it } }
                 .flatMap { (fileName, obj) ->
                     obj.fieldNames().asSequence().map { connName ->
                         (obj[connName] as TextNode?)?.let { node -> Triple(fileName, connName, node.textValue()) }
