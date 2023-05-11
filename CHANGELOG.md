@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [231.1.3] - 2023-05-11
+### Fixed
+- Notifications: Exceptions when plugin tries to show notifications (#162, #163, #164)
+
 ## [231.1.2] - 2023-04-24
 ### Fixed
 - Connections: Exception when having `.json` files with single quotes (#159)
@@ -179,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.1.2...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.1.3...HEAD
+[231.1.3]: https://github.com/seclerp/rider-efcore/compare/v231.1.2...v231.1.3
 [231.1.2]: https://github.com/seclerp/rider-efcore/compare/v231.1.1...v231.1.2
 [231.1.1]: https://github.com/seclerp/rider-efcore/compare/v231.1.0...v231.1.1
 [231.1.0]: https://github.com/seclerp/rider-efcore/compare/v231.0.2-eap04...v231.1.0
