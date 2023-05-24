@@ -3,7 +3,6 @@ using System.Linq;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.RiderTutorials.Utils;
 using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Migrations;
 using Rider.Plugins.EfCore.Rd;
@@ -21,7 +20,7 @@ namespace Rider.Plugins.EfCore.DbContext
           .GetPsiModules()
           .SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.DbContextBaseClass))
           // To get around of multiple modules (multiple target frameworks)
-          .Distinct(dbContextClass => dbContextClass.GetFullClrName())
+          .Distinct(dbContextClass => dbContextClass.GetClrName().FullName)
           .TrySelect<IClass, DbContextInfo>(TryGetDbContextInfo)
           .ToList();
 
@@ -36,7 +35,7 @@ namespace Rider.Plugins.EfCore.DbContext
       if (@class.IsAbstract)
         return false;
 
-      dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetFullClrName());
+      dbContextInfo = new DbContextInfo(@class.ShortName, @class.GetClrName().FullName);
 
       return true;
     }

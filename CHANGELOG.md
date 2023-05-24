@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [232.0.0] - 2023-05-24
+### Added
+- Enable support for Rider 2023.2 EAP 2
+
+### Fixed
+- Common: Rider version incompatibility (`EntityFrameworkCoreHost` construction has failed ...)
+
 ## [231.1.4] - 2023-05-24
 ### Fixed
 - Scaffolding: Impossible to execute scaffolding on non-empty folder (#168)
@@ -188,7 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v231.1.4...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap02...HEAD
+[v232.0.0-eap02]: https://github.com/seclerp/rider-efcore/compare/v231.1.4...v232.0.0-eap02
 [231.1.4]: https://github.com/seclerp/rider-efcore/compare/v231.1.3...v231.1.4
 [231.1.3]: https://github.com/seclerp/rider-efcore/compare/v231.1.2...v231.1.3
 [231.1.2]: https://github.com/seclerp/rider-efcore/compare/v231.1.1...v231.1.2

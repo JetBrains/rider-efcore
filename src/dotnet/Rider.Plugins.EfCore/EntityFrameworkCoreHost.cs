@@ -7,7 +7,7 @@ using JetBrains.Platform.RdFramework.Impl;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.DotNetTools;
 using JetBrains.Rd.Tasks;
-using JetBrains.RdBackend.Common.Features;
+using JetBrains.ReSharper.Feature.Services.Protocol;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using Rider.Plugins.EfCore.Compatibility;

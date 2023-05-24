@@ -67,7 +67,7 @@ More about features and available dialogs you could read in [**the blog post**](
 Before opening the issue, please make sure that your projects and development environment completely satisfies these requirements:
 
 - IDE
-  - JetBrains Rider **2023.1 or higher**
+  - JetBrains Rider **2023.1+ or latest EAP**
 
 - Target frameworks
   - `net8.0` (preview)

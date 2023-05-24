@@ -16,9 +16,10 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Platform.Core.Ide" />
+    <PackageReference Include="JetBrains.Platform.Core.Text" />
+    <PackageReference Include="JetBrains.Platform.Core.Shell" />
     <PackageReference Include="JetBrains.Psi.Features.Core" />
     <PackageReference Include="JetBrains.Rider.RdBackend.Common" />
-    <PackageReference Include="JetBrains.Rider.RiderTutorials" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

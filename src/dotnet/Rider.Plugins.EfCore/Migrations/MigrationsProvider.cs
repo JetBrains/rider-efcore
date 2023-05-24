@@ -3,7 +3,6 @@ using System.Linq;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.RiderTutorials.Utils;
 using Rider.Plugins.EfCore.Extensions;
 using Rider.Plugins.EfCore.Rd;
 
@@ -34,7 +33,7 @@ namespace Rider.Plugins.EfCore.Migrations
           .GetPsiModules()
           .SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.MigrationBaseClass))
           // To get around of multiple modules (multiple target frameworks)
-          .Distinct(migrationClass => migrationClass.GetFullClrName())
+          .Distinct(migrationClass => migrationClass.GetClrName().FullName)
           .TrySelect<IClass, MigrationInfo>(TryGetMigrationInfo)
           .Where(m => m.DbContextClassFullName == dbContextFullName)
           .ToList();
