@@ -222,7 +222,7 @@ tasks {
     }
 
     patchPluginXml {
-        untilBuild.set("232.*")
+        untilBuild.set("231.*")
         val latestChangelog = try {
             changelog.getUnreleased()
         } catch (_: MissingVersionException) {
