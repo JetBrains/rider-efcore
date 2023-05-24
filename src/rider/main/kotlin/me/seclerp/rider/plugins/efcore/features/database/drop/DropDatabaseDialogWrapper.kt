@@ -16,7 +16,7 @@ class DropDatabaseDialogWrapper(
     intellijProject: Project,
     selectedProjectId: UUID?,
 ) : CommonDialogWrapper<CommonDataContext>(
-    CommonDataContext(intellijProject, false),
+    CommonDataContext(intellijProject, true),
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.DropDatabaseAction.text"),
     intellijProject,
@@ -33,9 +33,10 @@ class DropDatabaseDialogWrapper(
 
     override fun doOKAction() {
         val projectName = dataCtx.migrationsProject.value?.name
+        val dbContext = dataCtx.dbContext.value?.name
         val confirmationMessage =
-            if (projectName != null)
-                EfCoreUiBundle.message("drop.database.confirmation.named", projectName)
+            if (projectName != null && dbContext != null)
+                EfCoreUiBundle.message("drop.database.confirmation.named", projectName, dbContext)
             else
                 EfCoreUiBundle.message("drop.database.confirmation.selected")
 
