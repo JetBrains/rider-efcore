@@ -21,7 +21,7 @@ class DbContextCommandFactory(private val intellijProject: Project) {
             addIf("--data-annotations", useAttributes)
             addNamed("--context", dbContextName)
             addNamed("--context-dir", dbContextFolder)
-            //addIf("--force", force)
+            add("--force")
             addNamed("--output-dir", outputFolder)
 
             if (!scaffoldAllSchemas) {
