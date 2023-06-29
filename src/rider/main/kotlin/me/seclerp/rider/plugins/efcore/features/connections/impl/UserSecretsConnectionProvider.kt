@@ -2,11 +2,11 @@ package me.seclerp.rider.plugins.efcore.features.connections.impl
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import com.intellij.ide.customize.transferSettings.db.WindowsEnvVariables
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
-import com.jetbrains.rider.ideaInterop.welcomeWizard.transferSettingsRider.utilities.WindowsEnvVariables
 import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.projectView.nodes.getUserData
 import me.seclerp.rider.plugins.efcore.features.connections.DbConnectionInfo

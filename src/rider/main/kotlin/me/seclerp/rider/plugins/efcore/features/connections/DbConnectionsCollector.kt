@@ -3,7 +3,7 @@ package me.seclerp.rider.plugins.efcore.features.connections
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.workspaceModel.ide.WorkspaceModel
+import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.projectView.workspace.findProjects
 import me.seclerp.rider.plugins.efcore.features.connections.impl.AppSettingsConnectionProvider
