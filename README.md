@@ -4,7 +4,9 @@
   <br /><br />
   This plugin introduces Entity Framework Core commands' UI inside JetBrains Rider.
   <br /><br />
-  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build.yml"><img src="https://github.com/seclerp/rider-efcore/actions/workflows/build.yml/badge.svg" alt="Build"></a>
+  <a href="https://github.com/JetBrains"><img src="https://img.shields.io/badge/JetBrains-official-orange" alt="JetBrains Official"></a>
+  <a href="https://plugins.jetbrains.com/plugin/18147-entity-framework-core-ui"><img src="https://img.shields.io/jetbrains/plugin/v/18147.svg?label=Rider%20&colorB=0A7BBB" alt="Version"></a>
+  <a href="https://github.com/seclerp/rider-efcore/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/JetBrains/rider-efcore/build.yml?logo=github" alt="Build"></a>
 </div>
 
 ---
@@ -23,7 +25,9 @@ There are a couple of UI stuff for:
 
 ### How to install
 
-#### Using marketplace:
+**Starting from Rider 2023.3, the plugin will be bundled into main Rider distribution. No additional actions will be required.**
+
+#### Using marketplace
 
 1. Go to `Settings` / `Plugins` / `Marketplace`
 1. Search for "Entity Framework Core UI"
