@@ -90,7 +90,7 @@ configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
         language = "kotlin"
         transform = "asis"
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "me.seclerp.rider.plugins.efcore.model"
+        namespace = "com.jetbrains.rider.plugins.efcore.model"
         directory = "$ktOutput"
     }
 

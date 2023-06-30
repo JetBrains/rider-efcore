@@ -56,7 +56,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
 
     init {
         setting(CSharp50Generator.Namespace, "Rider.Plugins.EfCore.Rd")
-        setting(Kotlin11Generator.Namespace, "me.seclerp.rider.plugins.efcore.rd")
+        setting(Kotlin11Generator.Namespace, "com.jetbrains.rider.plugins.efcore.rd")
 
         property("efToolsDefinition", EfToolDefinition)
         property("availableStartupProjects", immutableList(StartupProjectInfo))

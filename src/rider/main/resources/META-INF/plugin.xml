@@ -1,8 +1,8 @@
 <idea-plugin require-restart="true">
-  <id>me.seclerp.rider.plugins.efcore</id>
+  <id>com.jetbrains.rider.plugins.efcore</id>
   <name>Entity Framework Core UI</name>
   <version>_PLACEHOLDER_</version>
-  <vendor url="https://github.com/seclerp">Andrii Rublov</vendor>
+  <vendor url="https://github.com/JetBrains">JetBrains</vendor>
   <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
   <depends>com.intellij.database</depends>
@@ -34,10 +34,10 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="EfCore.Groups.Notifications" displayType="BALLOON"/>
-    <postStartupActivity implementation="me.seclerp.rider.plugins.efcore.startup.EfCoreStartupActivity" />
+    <postStartupActivity implementation="com.jetbrains.rider.plugins.efcore.startup.EfCoreStartupActivity" />
     <applicationConfigurable
       parentId="tools"
-      instance="me.seclerp.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
+      instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
   </extensions>
 
   <actions>
@@ -46,24 +46,24 @@
       <add-to-group group-id="ToolsMenu"/>
 
       <action id="EfCore.Features.Migrations.AddMigrationAction"
-              class="me.seclerp.rider.plugins.efcore.features.migrations.add.AddMigrationAction"/>
+              class="com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationAction"/>
       <action id="EfCore.Features.Migrations.RemoveLastMigrationAction"
-              class="me.seclerp.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction"
+              class="com.jetbrains.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction"
               description="Removes last created migration"/>
       <action id="EfCore.Features.Migrations.GenerateScriptAction"
-              class="me.seclerp.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"/>
+              class="com.jetbrains.rider.plugins.efcore.features.migrations.script.GenerateScriptAction"/>
       <separator />
       <action id="EfCore.Features.Database.UpdateDatabaseAction"
-              class="me.seclerp.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"/>
+              class="com.jetbrains.rider.plugins.efcore.features.database.update.UpdateDatabaseAction"/>
       <action id="EfCore.Features.Database.DropDatabaseAction"
-              class="me.seclerp.rider.plugins.efcore.features.database.drop.DropDatabaseAction"/>
+              class="com.jetbrains.rider.plugins.efcore.features.database.drop.DropDatabaseAction"/>
       <separator />
       <action id="EfCore.Features.DbContext.ScaffoldDbContextAction"
-              class="me.seclerp.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"/>
+              class="com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextAction"/>
     </group>
 
     <action id="EfCore.Shared.OpenQuickEfCoreActionsAction"
-            class="me.seclerp.rider.plugins.efcore.features.shared.OpenQuickEfCoreActionsAction"
+            class="com.jetbrains.rider.plugins.efcore.features.shared.OpenQuickEfCoreActionsAction"
             text="Entity Framework Core Quick Actions"
             description="Opens available EF Core quick actions"/>
   </actions>
