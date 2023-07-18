@@ -76,7 +76,7 @@ apply(plugin = "com.jetbrains.rdgen")
 configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
     val modelDir = file("$projectDir/protocol/src/main/kotlin/model")
     val csOutput = file("$projectDir/src/dotnet/$dotnetPluginId/Rd")
-    val ktOutput = file("$projectDir/src/rider/main/kotlin/${riderPluginId.replace('.','/').toLowerCase()}/rd")
+    val ktOutput = file("$projectDir/src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd")
 
     verbose = true
     classpath({
