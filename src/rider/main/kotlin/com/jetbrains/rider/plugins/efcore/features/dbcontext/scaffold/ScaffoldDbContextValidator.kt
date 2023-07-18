@@ -30,7 +30,7 @@ class ScaffoldDbContextValidator {
 
     fun outputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.output.folder.could.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
         else
             null
     }
@@ -44,7 +44,11 @@ class ScaffoldDbContextValidator {
 
     fun dbContextFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.could.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.should.not.be.empty"))
+        else
+            null
+    }
+
     fun tablesValidation(
         tablesList: ObservableCollection<SimpleItem>,
         scaffoldAllTables: ComponentPredicate

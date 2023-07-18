@@ -204,7 +204,7 @@ class ScaffoldDbContextDialogWrapper(
                 .bindText(dataCtx.dbContextName)
                 .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
-                .validationOnInput(validator.dbContextNameValidation())
+                .validationOnApply(validator.dbContextNameValidation())
         }
 
         row(EfCoreUiBundle.message("generated.dbcontext.folder")) {
@@ -215,7 +215,7 @@ class ScaffoldDbContextDialogWrapper(
                 .bindText(dataCtx.dbContextFolder)
                 .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
-                .validationOnInput(validator.dbContextFolderValidation())
+                .validationOnApply(validator.dbContextFolderValidation())
                 .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
         }
     }
