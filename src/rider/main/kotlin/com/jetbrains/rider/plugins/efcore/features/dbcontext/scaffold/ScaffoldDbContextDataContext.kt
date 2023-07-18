@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold
 
 import com.intellij.openapi.project.Project
-import com.intellij.util.containers.init
 import com.jetbrains.observables.observable
 import com.jetbrains.observables.observableList
 import com.jetbrains.rider.plugins.efcore.features.shared.ObservableConnections
@@ -79,6 +78,13 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         commonDialogState.get(KnownStateKeys.DB_CONTEXT_FOLDER)?.apply {
             dbContextFolder.value = this
         }
+
+        commonDialogState.get(KnownStateKeys.TABLES)?.apply {
+            // We assign the value directly as a listOf() because using tablesList.removeAll() causes the menu to not open at all
+            tablesList.value = listOf()
+            tablesList.addAll(this.split(',').map { SimpleItem(it) })
+            scaffoldAllTables.value = this.isEmpty()
+        }
     }
 
     override fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
@@ -96,6 +102,9 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         commonDialogState.set(KnownStateKeys.USE_PLURALIZER, usePluralizer.value)
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_NAME, dbContextName.value)
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_FOLDER, dbContextFolder.value)
+
+         val filteredTables = tablesList.value.filter { it.data.isNotEmpty() }
+         commonDialogState.set(KnownStateKeys.TABLES, filteredTables.joinToString { it.data })
     }
 
     object KnownStateKeys {
@@ -117,5 +126,7 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         const val DB_CONTEXT_NAME = "dbContextName"
         @NonNls
         const val DB_CONTEXT_FOLDER = "dbContextFolder"
+        @NonNls
+        const val TABLES = "tables"
     }
 }
