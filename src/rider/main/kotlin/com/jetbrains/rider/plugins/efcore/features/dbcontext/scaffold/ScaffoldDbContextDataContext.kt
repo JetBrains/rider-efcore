@@ -81,7 +81,7 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
 
         commonDialogState.get(KnownStateKeys.TABLES)?.apply {
             // We assign the value directly as a listOf() because using tablesList.removeAll() causes the menu to not open at all
-            tablesList.value = listOf()
+            tablesList.value = mutableListOf()
             tablesList.addAll(this.split(',').map { SimpleItem(it) })
             scaffoldAllTables.value = this.isEmpty()
         }
