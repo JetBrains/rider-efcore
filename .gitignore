@@ -13,8 +13,19 @@ output
 *.cache
 
 # IDEs
-**/.idea/
-!**/.idea/runConfigurations/
+.idea/*
+!.idea/icon.svg
+!.idea/runConfigurations
+!.idea/runConfigurations/*
+
+!.idea/.idea.*
+.idea/.idea.*/*
+
+!.idea/.idea.*/.idea
+.idea/.idea.*/.idea/*
+!.idea/.idea.*/.idea/runConfigurations
+!.idea/.idea.*/.idea/runConfigurations/*
+
 .vs
 _ReSharper*
 _dotTrace*
