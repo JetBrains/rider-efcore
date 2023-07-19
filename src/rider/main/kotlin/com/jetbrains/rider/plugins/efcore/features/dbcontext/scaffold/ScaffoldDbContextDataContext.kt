@@ -85,6 +85,13 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
             tablesList.addAll(this.split(',').map { SimpleItem(it) })
             scaffoldAllTables.value = this.isEmpty()
         }
+
+        commonDialogState.get(KnownStateKeys.SCHEMAS)?.apply {
+            // We assign the value directly as a listOf() because using tablesList.removeAll() causes the menu to not open at all
+            schemasList.value = mutableListOf()
+            schemasList.addAll(this.split(',').map { SimpleItem(it) })
+            scaffoldAllSchemas.value = this.isEmpty()
+        }
     }
 
     override fun saveState(commonDialogState: DialogsStateService.SpecificDialogState) {
@@ -103,8 +110,11 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_NAME, dbContextName.value)
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_FOLDER, dbContextFolder.value)
 
-         val filteredTables = tablesList.value.filter { it.data.isNotEmpty() }
-         commonDialogState.set(KnownStateKeys.TABLES, filteredTables.joinToString { it.data })
+        val filteredTables = tablesList.value.filter { it.data.isNotEmpty() }
+        commonDialogState.set(KnownStateKeys.TABLES, filteredTables.joinToString { it.data })
+
+        val filteredSchemas = schemasList.value.filter { it.data.isNotEmpty() }
+        commonDialogState.set(KnownStateKeys.SCHEMAS, filteredSchemas.joinToString { it.data })
     }
 
     object KnownStateKeys {
@@ -128,5 +138,7 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         const val DB_CONTEXT_FOLDER = "dbContextFolder"
         @NonNls
         const val TABLES = "tables"
+        @NonNls
+        const val SCHEMAS = "schemas"
     }
 }

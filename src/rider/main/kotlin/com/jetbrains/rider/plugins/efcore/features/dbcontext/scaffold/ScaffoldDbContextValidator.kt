@@ -49,12 +49,12 @@ class ScaffoldDbContextValidator {
             null
     }
 
-    fun tablesValidation(
+    fun tableSchemaValidation(
         tablesList: ObservableCollection<SimpleItem>,
         scaffoldAllTables: ComponentPredicate
     ): ValidationInfoBuilder.(JPanel) -> ValidationInfo? = {
         if (!scaffoldAllTables.invoke() && tablesList.none { it.data.isNotEmpty() })
-            error(EfCoreUiBundle.message("dialog.message.tables.should.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.tables.schemas.should.not.be.empty"))
         else
             null
     }
