@@ -1,10 +1,10 @@
 package com.jetbrains.observables
 
-open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : com.jetbrains.observables.ObservableProperty<List<T>>(initialCollection), MutableList<T> {
+open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : ObservableProperty<List<T>>(initialCollection), MutableList<T> {
     private var items = initialCollection.toMutableList()
 
-    val onAdded: com.jetbrains.observables.Event<T> = com.jetbrains.observables.Event()
-    val onRemoved: com.jetbrains.observables.Event<T> = com.jetbrains.observables.Event()
+    val onAdded: Event<T> = Event()
+    val onRemoved: Event<T> = Event()
 
     fun afterAdded(effect: (T) -> Unit) {
         onAdded += effect
@@ -38,10 +38,10 @@ open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : com.
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        var changed = false
-        elements.forEach {
-            if (this.add(it)) {
-                changed = true
+        val changed = items.addAll(elements)
+        if (changed) {
+            elements.forEach {
+                onAdded.invoke(it)
             }
         }
 
@@ -61,10 +61,10 @@ open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : com.
     }
 
     override fun removeAll(elements: Collection<T>): Boolean {
-        var removed = false
-        elements.forEach {
-            if (this.remove(it)) {
-                removed = true
+        val removed = items.removeAll(elements)
+        if (removed) {
+            elements.forEach {
+                onRemoved.invoke(it)
             }
         }
 
@@ -75,9 +75,11 @@ open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : com.
         get() = items.size
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
-        var changed = false
-        for (element in elements) {
-            changed = add(element)
+        val changed = items.addAll(index, elements)
+        if (changed) {
+            elements.forEach {
+                onAdded.invoke(it)
+            }
         }
 
         return changed
