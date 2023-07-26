@@ -11,6 +11,8 @@ import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
 import org.jetbrains.annotations.NonNls
 
 class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext(intellijProject, false) {
+    private val listSeparator = "@_#@@"
+
     val connection = observable("")
     val observableConnections = ObservableConnections(intellijProject, startupProject)
     val provider = observable("")
@@ -80,16 +82,14 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         }
 
         commonDialogState.get(KnownStateKeys.TABLES)?.apply {
-            // We assign the value directly as a listOf() because using tablesList.removeAll() causes the menu to not open at all
-            tablesList.value = mutableListOf()
-            tablesList.addAll(this.split(',').map { SimpleItem(it) })
+            tablesList.clear()
+            tablesList.addAll(this.split(listSeparator).map { SimpleItem(it) })
             scaffoldAllTables.value = this.isEmpty()
         }
 
         commonDialogState.get(KnownStateKeys.SCHEMAS)?.apply {
-            // We assign the value directly as a listOf() because using tablesList.removeAll() causes the menu to not open at all
-            schemasList.value = mutableListOf()
-            schemasList.addAll(this.split(',').map { SimpleItem(it) })
+            schemasList.clear()
+            schemasList.addAll(this.split(listSeparator).map { SimpleItem(it) })
             scaffoldAllSchemas.value = this.isEmpty()
         }
     }
@@ -111,10 +111,10 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_FOLDER, dbContextFolder.value)
 
         val filteredTables = tablesList.value.filter { it.data.isNotEmpty() }
-        commonDialogState.set(KnownStateKeys.TABLES, filteredTables.joinToString { it.data })
+        commonDialogState.set(KnownStateKeys.TABLES, filteredTables.joinToString(listSeparator) { it.data })
 
         val filteredSchemas = schemasList.value.filter { it.data.isNotEmpty() }
-        commonDialogState.set(KnownStateKeys.SCHEMAS, filteredSchemas.joinToString { it.data })
+        commonDialogState.set(KnownStateKeys.SCHEMAS, filteredSchemas.joinToString(listSeparator) { it.data })
     }
 
     object KnownStateKeys {
