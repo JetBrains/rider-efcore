@@ -264,7 +264,6 @@ class ScaffoldDbContextDialogWrapper(
                 cell(tablePanel)
                     .align(Align.FILL)
                     .enabledIf(scaffoldAll.not())
-                    .validationOnInput(validator.tableSchemaValidation(items, scaffoldAll))
                     .validationOnApply(validator.tableSchemaValidation(items, scaffoldAll))
             }.resizableRow()
         }
