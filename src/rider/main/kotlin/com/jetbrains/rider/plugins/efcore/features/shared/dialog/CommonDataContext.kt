@@ -104,23 +104,23 @@ open class CommonDataContext(
         }
 
         if (requireDbContext) {
-            val dbContextName = commonDialogState.get("${migrationsProjectId}:${KnownStateKeys.DB_CONTEXT}")
+            val dbContextName = commonDialogState.get<String>("${migrationsProjectId}:${KnownStateKeys.DB_CONTEXT}")
             availableDbContexts.value.firstOrNull { it.fullName == dbContextName }?.apply {
                 dbContext.value = this
             }
         }
 
-        val buildConfigurationName = commonDialogState.get(KnownStateKeys.BUILD_CONFIGURATION)
+        val buildConfigurationName = commonDialogState.get<String>(KnownStateKeys.BUILD_CONFIGURATION)
         availableBuildConfigurations.firstOrNull { it == buildConfigurationName }?.apply {
             buildConfiguration.value = this
         }
 
-        val targetFrameworkName = commonDialogState.get("${startupProjectId}:${KnownStateKeys.TARGET_FRAMEWORK}")
+        val targetFrameworkName = commonDialogState.get<String>("${startupProjectId}:${KnownStateKeys.TARGET_FRAMEWORK}")
         availableTargetFrameworks.value.firstOrNull { it == targetFrameworkName }?.apply {
             targetFramework.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.NO_BUILD)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.NO_BUILD)?.apply {
             noBuild.value = this
         }
 

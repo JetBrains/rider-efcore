@@ -48,36 +48,48 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
             }
         }
 
-        commonDialogState.get(KnownStateKeys.PROVIDER)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.PROVIDER)?.apply {
             provider.value = this
         }
 
-        commonDialogState.get(KnownStateKeys.OUTPUT_FOLDER)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.OUTPUT_FOLDER)?.apply {
             outputFolder.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.USE_ATTRIBUTES)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.USE_ATTRIBUTES)?.apply {
             useAttributes.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.USE_DATABASE_NAMES)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.USE_DATABASE_NAMES)?.apply {
             useDatabaseNames.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.GENERATE_ON_CONFIGURING)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.GENERATE_ON_CONFIGURING)?.apply {
             generateOnConfiguring.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.USE_PLURALIZER)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.USE_PLURALIZER)?.apply {
             usePluralizer.value = this
         }
 
-        commonDialogState.get(KnownStateKeys.DB_CONTEXT_NAME)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.DB_CONTEXT_NAME)?.apply {
             dbContextName.value = this
         }
 
-        commonDialogState.get(KnownStateKeys.DB_CONTEXT_FOLDER)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.DB_CONTEXT_FOLDER)?.apply {
             dbContextFolder.value = this
+        }
+
+        commonDialogState.get<List<String>>(KnownStateKeys.TABLES)?.apply {
+            tablesList.clear()
+            tablesList.addAll(this.map { SimpleItem(it) })
+            scaffoldAllTables.value = this.isEmpty()
+        }
+
+        commonDialogState.get<List<String>>(KnownStateKeys.SCHEMAS)?.apply {
+            schemasList.clear()
+            schemasList.addAll(this.map { SimpleItem(it) })
+            scaffoldAllSchemas.value = this.isEmpty()
         }
     }
 
@@ -96,6 +108,12 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
         commonDialogState.set(KnownStateKeys.USE_PLURALIZER, usePluralizer.value)
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_NAME, dbContextName.value)
         commonDialogState.set(KnownStateKeys.DB_CONTEXT_FOLDER, dbContextFolder.value)
+
+        val filteredTables = tablesList.value.filter { it.data.isNotEmpty() }
+        commonDialogState.set(KnownStateKeys.TABLES, filteredTables.map { it.data })
+
+        val filteredSchemas = schemasList.value.filter { it.data.isNotEmpty() }
+        commonDialogState.set(KnownStateKeys.SCHEMAS, filteredSchemas.map { it.data })
     }
 
     object KnownStateKeys {

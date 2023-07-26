@@ -50,15 +50,15 @@ class GenerateScriptDataContext(
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
         super.loadState(commonDialogState)
 
-        commonDialogState.get(KnownStateKeys.OUTPUT_FILE)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.OUTPUT_FILE)?.apply {
             outputFilePath.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.IDEMPOTENT)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.IDEMPOTENT)?.apply {
             idempotent.value = this
         }
 
-        commonDialogState.getBool(KnownStateKeys.NO_TRANSACTIONS)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.NO_TRANSACTIONS)?.apply {
             noTransactions.value = this
         }
     }

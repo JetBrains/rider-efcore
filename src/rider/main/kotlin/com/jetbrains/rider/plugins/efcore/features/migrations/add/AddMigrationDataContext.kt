@@ -29,7 +29,7 @@ class AddMigrationDataContext(
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
         super.loadState(commonDialogState)
 
-        commonDialogState.get(KnownStateKeys.OUTPUT_FOLDER)?.apply {
+        commonDialogState.get<String>(KnownStateKeys.OUTPUT_FOLDER)?.apply {
             migrationsOutputFolder.value = this
         }
     }

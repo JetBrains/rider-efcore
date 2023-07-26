@@ -262,8 +262,11 @@ class ScaffoldDbContextDialogWrapper(
             tablePanel.isVisible = !enabledCheckbox!!.isSelected
 
             row {
+                val scaffoldAll = enabledCheckbox!!.selected
                 cell(tablePanel)
                     .align(Align.FILL)
+                    .enabledIf(scaffoldAll.not())
+                    .validationOnApply(validator.tableSchemaValidation(items, scaffoldAll))
                     .enabledIf(enabledCheckbox!!.selected.not())
             }.resizableRow()
         }

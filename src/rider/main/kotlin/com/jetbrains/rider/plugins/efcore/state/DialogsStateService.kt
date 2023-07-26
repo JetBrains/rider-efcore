@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.efcore.state
 import com.intellij.credentialStore.CredentialAttributes
 import com.intellij.credentialStore.Credentials
 import com.intellij.credentialStore.generateServiceName
+import com.intellij.database.util.common.castTo
 import com.intellij.ide.passwordSafe.PasswordSafe
 import com.intellij.openapi.components.*
 import org.jetbrains.annotations.NonNls
@@ -36,27 +37,19 @@ class DialogsStateService : PersistentStateComponent<DialogsState> {
 
     @NonNls
     class SpecificDialogState(
-        private val dialogId: String,
-        private val storage: MutableMap<String, String>,
+        val dialogId: String,
+        private val storageMap: MutableMap<String, Any?>,
         private val storedSecureAttributes: MutableSet<CredentialAttributes>
     ) {
+        val storage: Map<String, Any?> get() = storageMap
 
         @NonNls
-        fun get(key: String) =
-            storage["${dialogId}:${key}"]
+        inline fun <reified T> get(key: String) =
+            storage["${dialogId}:${key}"] as? T
 
         @NonNls
-        fun getBool(key: String) =
-            get(key)?.toBoolean()
-
-        @NonNls
-        fun set(key: String, value: String) {
-            storage["${dialogId}:${key}"] = value
-        }
-
-        @NonNls
-        fun set(key: String, value: Boolean) {
-            storage["${dialogId}:${key}"] = value.toString()
+        fun <T> set(key: String, value: T) {
+            storageMap["${dialogId}:${key}"] = value as Any
         }
 
         @NonNls

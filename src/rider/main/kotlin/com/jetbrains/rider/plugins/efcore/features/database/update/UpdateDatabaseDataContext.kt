@@ -45,7 +45,7 @@ class UpdateDatabaseDataContext(intellijProject: Project): CommonDataContext(int
     override fun loadState(commonDialogState: DialogsStateService.SpecificDialogState) {
         super.loadState(commonDialogState)
 
-        commonDialogState.getBool(KnownStateKeys.USE_DEFAULT_CONNECTION)?.apply {
+        commonDialogState.get<Boolean>(KnownStateKeys.USE_DEFAULT_CONNECTION)?.apply {
             useDefaultConnection.value = this
         }
 

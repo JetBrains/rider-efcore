@@ -21,6 +21,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.intellij
     id("org.jetbrains.intellij") version "1.15.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
 apply {
