@@ -17,9 +17,9 @@ buildscript {
 plugins {
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.changelog
-    id("org.jetbrains.changelog") version "2.1.0"
+    id("org.jetbrains.changelog") version "2.1.2"
     // https://plugins.gradle.org/plugin/org.jetbrains.intellij
-    id("org.jetbrains.intellij") version "1.14.2"
+    id("org.jetbrains.intellij") version "1.15.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
 }
 
@@ -76,7 +76,7 @@ apply(plugin = "com.jetbrains.rdgen")
 configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
     val modelDir = file("$projectDir/protocol/src/main/kotlin/model")
     val csOutput = file("$projectDir/src/dotnet/$dotnetPluginId/Rd")
-    val ktOutput = file("$projectDir/src/rider/main/kotlin/${riderPluginId.replace('.','/').toLowerCase()}/rd")
+    val ktOutput = file("$projectDir/src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd")
 
     verbose = true
     classpath({
@@ -114,7 +114,7 @@ intellij {
 
 tasks {
     wrapper {
-        gradleVersion = "7.5.1"
+        gradleVersion = "8.2.1"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
