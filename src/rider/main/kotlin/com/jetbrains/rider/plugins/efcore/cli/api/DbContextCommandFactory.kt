@@ -31,9 +31,9 @@ class DbContextCommandFactory(private val intellijProject: Project) {
             }
 
             if (!scaffoldAllTables) {
-                tablesList.forEach {
-                    addNamed("--table", it)
-                }
+                tablesList
+                    .filter { it.isNotEmpty() }
+                    .forEach { addNamed("--table", it) }
             }
 
             addIf("--use-database-names", useDatabaseNames)

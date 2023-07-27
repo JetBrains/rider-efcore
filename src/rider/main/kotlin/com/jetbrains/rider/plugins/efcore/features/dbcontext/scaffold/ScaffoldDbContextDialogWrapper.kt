@@ -12,10 +12,7 @@ import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
-import com.jetbrains.observables.ObservableProperty
-import com.jetbrains.observables.bind
-import com.jetbrains.observables.observable
-import com.jetbrains.observables.observableList
+import com.jetbrains.observables.*
 import com.jetbrains.rider.plugins.efcore.cli.api.DbContextCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
@@ -204,7 +201,7 @@ class ScaffoldDbContextDialogWrapper(
                 .bindText(dataCtx.dbContextName)
                 .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextNameValidation())
-                .validationOnInput(validator.dbContextNameValidation())
+                .validationOnApply(validator.dbContextNameValidation())
         }
 
         row(EfCoreUiBundle.message("generated.dbcontext.folder")) {
@@ -215,20 +212,21 @@ class ScaffoldDbContextDialogWrapper(
                 .bindText(dataCtx.dbContextFolder)
                 .align(AlignX.FILL)
                 .validationOnInput(validator.dbContextFolderValidation())
-                .validationOnInput(validator.dbContextFolderValidation())
+                .validationOnApply(validator.dbContextFolderValidation())
                 .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
         }
     }
 
     private fun createTablesTab(): DialogPanel =
-        createToggleableTablePanel(tablesModel, EfCoreUiBundle.message("checkbox.scaffold.all.tables"), dataCtx.scaffoldAllTables)
+        createToggleableTablePanel(tablesModel, EfCoreUiBundle.message("checkbox.scaffold.all.tables"), dataCtx.tablesList, dataCtx.scaffoldAllTables)
 
     private fun createSchemasTab(): DialogPanel =
-        createToggleableTablePanel(schemasModel, EfCoreUiBundle.message("checkbox.scaffold.all.schemas"), dataCtx.scaffoldAllSchemas)
+        createToggleableTablePanel(schemasModel, EfCoreUiBundle.message("checkbox.scaffold.all.schemas"), dataCtx.schemasList, dataCtx.scaffoldAllSchemas)
 
     private fun createToggleableTablePanel(
         tableModel: SimpleListTableModel,
         checkboxText: String,
+        items: ObservableCollection<SimpleItem>,
         checkboxProperty: ObservableProperty<Boolean>
     ): DialogPanel {
         val table = JBTable(tableModel)
@@ -262,9 +260,11 @@ class ScaffoldDbContextDialogWrapper(
             tablePanel.isVisible = !enabledCheckbox!!.isSelected
 
             row {
+                val scaffoldAll = enabledCheckbox!!.selected
                 cell(tablePanel)
                     .align(Align.FILL)
-                    .enabledIf(enabledCheckbox!!.selected.not())
+                    .enabledIf(scaffoldAll.not())
+                    .validationOnApply(validator.tableSchemaValidation(items, scaffoldAll))
             }.resizableRow()
         }
     }

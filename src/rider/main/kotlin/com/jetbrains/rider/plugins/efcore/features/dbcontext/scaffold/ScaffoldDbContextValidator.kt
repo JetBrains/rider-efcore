@@ -3,10 +3,14 @@ package com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
+import com.jetbrains.observables.ObservableCollection
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
 import com.jetbrains.rider.plugins.efcore.ui.items.DbProviderItem
+import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
+import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.text.JTextComponent
 
@@ -26,7 +30,7 @@ class ScaffoldDbContextValidator {
 
     fun outputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.output.folder.could.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
         else
             null
     }
@@ -40,7 +44,17 @@ class ScaffoldDbContextValidator {
 
     fun dbContextFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.could.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.should.not.be.empty"))
+        else
+            null
+    }
+
+    fun tableSchemaValidation(
+        tablesList: ObservableCollection<SimpleItem>,
+        scaffoldAllTables: ComponentPredicate
+    ): ValidationInfoBuilder.(JPanel) -> ValidationInfo? = {
+        if (!scaffoldAllTables.invoke() && tablesList.none { it.data.isNotEmpty() })
+            error(EfCoreUiBundle.message("dialog.message.tables.schemas.should.not.be.empty"))
         else
             null
     }
