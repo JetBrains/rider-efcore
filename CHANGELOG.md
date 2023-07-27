@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [232.0.0-rc1] - 2023-07-27
+### Added
+- Scaffold: Additional Schema/Tables validations (#175 by @tcortega)
+- Scaffold: Persist Schema/Tables between dialog instances (#175 by @tcortega)
+
 ## [232.0.0-eap07] - 2023-07-10
 ### Fixed
 - Common: `NoClassDefFoundError` and other issues caused by Workspace model package restructuring since EAP 2 (#171)
@@ -200,6 +205,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleting used database
 
 [Unreleased]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...HEAD
+[v232.0.0-rc1]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...v232.0.0-rc1
 [v232.0.0-eap07]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap02...v232.0.0-eap07
 [v232.0.0-eap02]: https://github.com/seclerp/rider-efcore/compare/v231.1.4...v232.0.0-eap02
 [231.1.4]: https://github.com/seclerp/rider-efcore/compare/v231.1.3...v231.1.4

@@ -7,11 +7,14 @@ buildscript {
     repositories {
         maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
     }
-
-    // https://search.maven.org/artifact/com.jetbrains.rd/rd-gen
     dependencies {
         classpath("com.jetbrains.rd:rd-gen:2023.2.2")
     }
+}
+
+repositories {
+    maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
+    maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
 plugins {
