@@ -51,6 +51,14 @@ val dotNetSrcDir = File(projectDir, "src/dotnet")
 val nuGetSdkPackagesVersionsFile = File(dotNetSrcDir, "RiderSdk.PackageVersions.Generated.props")
 val nuGetConfigFile = File(dotNetSrcDir, "nuget.config")
 
+val ktOutputRelativePath = "src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd"
+
+val productMonorepoDir = getProductMonorepoRoot()
+val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("Plugins/_RiderEfCore.Pregenerated") ?: error("Building not in monorepo") }
+val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
+val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
+val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
+
 version = pluginVersion
 
 fun File.writeTextIfChanged(content: String) {
@@ -77,15 +85,30 @@ sourceSets {
 apply(plugin = "com.jetbrains.rdgen")
 
 configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
+    val inMonorepo = productMonorepoDir != null
     val modelDir = file("$projectDir/protocol/src/main/kotlin/model")
-    val csOutput = file("$projectDir/src/dotnet/$dotnetPluginId/Rd")
-    val ktOutput = file("$projectDir/src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd")
+    val csOutput =
+        if (inMonorepo) monorepoPreGeneratedBackendDir
+        else file("$projectDir/src/dotnet/$dotnetPluginId/Rd")
+    val ktOutput =
+        if (inMonorepo) ktOutputMonorepoRoot
+        else file("$projectDir/$ktOutputRelativePath")
 
     verbose = true
-    classpath({
-        "${rdLibDirectory()}/rider-model.jar"
-    })
-    sources("$modelDir/rider")
+    if (inMonorepo) {
+        sources(
+            listOf(
+                File("$productMonorepoDir/Rider/Frontend/rider/model/sources"),
+                File("$productMonorepoDir/Rider/ultimate/remote-dev/rd-ide-model-sources"),
+                File("$modelDir/rider")
+            )
+        )
+    } else {
+        classpath({
+            "${rdLibDirectory()}/rider-model.jar"
+        })
+        sources("$modelDir/rider")
+    }
     hashFolder = "$buildDir"
     packages = "model.rider"
 
@@ -95,6 +118,7 @@ configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "com.jetbrains.rider.plugins.efcore.model"
         directory = "$ktOutput"
+        if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
 
     generator {
@@ -103,6 +127,7 @@ configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
         root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
         namespace = "Rider.Plugins.EfCore"
         directory = "$csOutput"
+        if (inMonorepo) generatedFileSuffix = ".Pregenerated"
     }
 }
 
@@ -130,17 +155,34 @@ tasks {
         return@lazy path
     }
 
+    val prepareRiderBuildProps by registering {
+        val generatedFile = project.buildDir.resolve("DotNetSdkPath.generated.props")
+
+        inputs.property("dotNetSdkFile", { riderSdkPath })
+        outputs.file(generatedFile)
+
+        doLast {
+            project.file(generatedFile).writeText(
+                """<Project>
+                |  <PropertyGroup>
+                |    <DotNetSdkPath>$riderSdkPath</DotNetSdkPath>
+                |  </PropertyGroup>
+                |</Project>""".trimMargin()
+            )
+        }
+    }
+
     val generateNuGetConfig by registering {
         doLast {
             nuGetConfigFile.writeTextIfChanged("""
-                <?xml version="1.0" encoding="utf-8"?>
-                <!-- Auto-generated from 'generateNuGetConfig' task of old.build_gradle.kts -->
-                <!-- Run `gradlew :prepare` to regenerate -->
-                <configuration>
-                  <packageSources>
-                    <add key="rider-sdk" value="$riderSdkPath" />
-                  </packageSources>
-                </configuration>
+            <?xml version="1.0" encoding="utf-8"?>
+            <!-- Auto-generated from 'generateNuGetConfig' task of old.build_gradle.kts -->
+            <!-- Run `gradlew :prepare` to regenerate -->
+            <configuration>
+            <packageSources>
+            <add key="rider-sdk" value="$riderSdkPath" />
+            </packageSources>
+            </configuration>
             """.trimIndent())
         }
     }
@@ -164,10 +206,10 @@ tasks {
 
             val directoryPackagesFileContents = buildString {
                 appendLine("""
-                    <!-- Auto-generated from 'generateSdkPackagesVersionsLock' task of old.build_gradle.kts -->
-                    <!-- Run `gradlew :prepare` to regenerate -->
-                    <Project>
-                      <ItemGroup>
+                <!-- Auto-generated from 'generateSdkPackagesVersionsLock' task of old.build_gradle.kts -->
+                <!-- Run `gradlew :prepare` to regenerate -->
+                <Project>
+                <ItemGroup>
                 """.trimIndent())
                 for ((packageId, version) in packagesWithVersions) {
                     appendLine(
@@ -175,8 +217,8 @@ tasks {
                     )
                 }
                 appendLine("""
-                    </ItemGroup>
-                  </Project>
+                </ItemGroup>
+                </Project>
                 """.trimIndent())
             }
 
@@ -187,11 +229,11 @@ tasks {
     val rdgen by existing
 
     register("prepare") {
-        dependsOn(rdgen, generateNuGetConfig, generateSdkPackagesVersionsLock)
+        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps, generateSdkPackagesVersionsLock)
     }
 
     val compileDotNet by registering {
-        dependsOn(rdgen, generateNuGetConfig, generateSdkPackagesVersionsLock)
+        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps, generateSdkPackagesVersionsLock)
         doLast {
             exec {
                 workingDir(dotNetSrcDir)
@@ -274,7 +316,7 @@ tasks {
             "$outputFolder/$dotnetPluginId.dll",
             "$outputFolder/$dotnetPluginId.pdb"
 
-            // TODO: add additional assemblies
+        // TODO: add additional assemblies
         )
 
         for (f in backendFiles) {
@@ -293,4 +335,17 @@ tasks {
         token.set(publishToken)
         channels.set(listOf(publishChannel))
     }
+}
+
+fun getProductMonorepoRoot(): File? {
+    var currentDir = projectDir
+
+    while (currentDir.parent != null) {
+        if (currentDir.listFiles()?.any { it.name == ".dotnet-products.root.marker" } == true) {
+            return currentDir
+        }
+        currentDir = currentDir.parentFile
+    }
+
+    return null
 }
