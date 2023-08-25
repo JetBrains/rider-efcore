@@ -49,7 +49,7 @@ jobs:
           tag: v${{ env.PLUGIN_VERSION }} # 'v' + version from gradle.properties
           draft: true
           body: ${{ steps.changelog_step.outputs.CHANGELOG_ALL }}
-          artifacts: "output/*.zip"
+          artifacts: "build/distributions/*.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🚀 Publish Plugin
