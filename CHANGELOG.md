@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [232.1.0] - 2023-08-03
+### Added
+- Enable support for Rider 2023.2
+
 ## [232.0.0-rc1] - 2023-07-27
 ### Added
 - Scaffold: Additional Schema/Tables validations (#175 by @tcortega)
@@ -204,10 +208,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...HEAD
-[v232.0.0-rc1]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...v232.0.0-rc1
-[v232.0.0-eap07]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap02...v232.0.0-eap07
-[v232.0.0-eap02]: https://github.com/seclerp/rider-efcore/compare/v231.1.4...v232.0.0-eap02
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v232.1.0...HEAD
+[232.1.0]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-rc1...v232.1.0
+[232.0.0-rc1]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...v232.0.0-rc1
+[232.0.0-eap07]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap02...v232.0.0-eap07
+[232.0.0-eap02]: https://github.com/seclerp/rider-efcore/compare/v231.1.4...v232.0.0-eap02
 [231.1.4]: https://github.com/seclerp/rider-efcore/compare/v231.1.3...v231.1.4
 [231.1.3]: https://github.com/seclerp/rider-efcore/compare/v231.1.2...v231.1.3
 [231.1.2]: https://github.com/seclerp/rider-efcore/compare/v231.1.1...v231.1.2
