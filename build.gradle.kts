@@ -142,7 +142,7 @@ intellij {
 
 tasks {
     wrapper {
-        gradleVersion = "8.2.1"
+        gradleVersion = "8.3"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
@@ -256,8 +256,8 @@ tasks {
 
     runIde {
         // For statistics:
-         jvmArgs("-Xmx1500m", "-Didea.is.internal=true", "-Dfus.internal.test.mode=true")
-//        jvmArgs("-Xmx1500m")
+        // jvmArgs("-Xmx1500m", "-Didea.is.internal=true", "-Dfus.internal.test.mode=true")
+        jvmArgs("-Xmx1500m")
     }
 
     test {
