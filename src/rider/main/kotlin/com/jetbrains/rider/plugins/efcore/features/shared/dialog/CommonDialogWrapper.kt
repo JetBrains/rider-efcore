@@ -66,10 +66,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     private val isSolutionLevelMode = selectedProjectId == null
 
     //
-    // Validation
-    private val validator = CommonDialogValidator(dataCtx, beModel, intellijProject, requireMigrationsInProject)
-
-    //
     // Preferences
     private val preferredProjectsManager = intellijProject.service<PreferredProjectsManager>()
     private val settingsStateService = EfCoreUiSettingsStateService.getInstance()
@@ -244,7 +240,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             override fun actionPerformed(e: ActionEvent?) {
                 applyFields()
                 if (panel.validateAll().isEmpty()) {
-                    val dialog = CommandPreviewDialogWrapper(generateCommand())
+                    val dialog = CommandPreviewDialogWrapper(dataCtx.generateCommand())
                     dialog.show()
                 }
             }
@@ -280,16 +276,16 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected fun Panel.createMigrationsProjectRow() {
         row(EfCoreUiBundle.message("migrations.project")) {
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
-                .validationOnInput(validator.migrationsProjectValidation())
-                .validationOnApply(validator.migrationsProjectValidation())
+                .validationOnInput { dataCtx.migrationsProjectValidation(it.item?.data) }
+                .validationOnApply { dataCtx.migrationsProjectValidation(it.item?.data) }
         }
     }
 
     protected fun Panel.createStartupProjectRow() {
         row(EfCoreUiBundle.message("startup.project")) {
             iconComboBox(startupProjectView, availableStartupProjectsView)
-                .validationOnInput(validator.startupProjectValidation())
-                .validationOnApply(validator.startupProjectValidation())
+                .validationOnInput { dataCtx.startupProjectValidation(it.item?.data) }
+                .validationOnApply { dataCtx.startupProjectValidation(it.item?.data) }
                 .comment(EfCoreUiBundle.message("startup.project.missing.comment"))
         }
     }
@@ -297,8 +293,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected fun Panel.createDbContextProjectRow() {
         row(EfCoreUiBundle.message("dbcontext.class")) {
             iconComboBox(dbContextView, availableDbContextsView)
-                .validationOnInput(validator.dbContextValidation())
-                .validationOnApply(validator.dbContextValidation())
+                .validationOnInput { dataCtx.dbContextValidation(it.item?.data) }
+                .validationOnApply { dataCtx.dbContextValidation(it.item?.data) }
         }
     }
 
@@ -317,14 +313,14 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
             row(EfCoreUiBundle.message("build.configuration")) {
                 iconComboBox(buildConfigurationView, availableBuildConfigurationView)
-                    .validationOnInput(validator.buildConfigurationValidation())
-                    .validationOnApply(validator.buildConfigurationValidation())
+                    .validationOnInput { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data) else null }
+                    .validationOnApply { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data) else null }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row(EfCoreUiBundle.message("target.framework")) {
                 iconComboBox(targetFrameworksView, availableTargetFrameworksView)
-                    .validationOnInput(validator.targetFrameworkValidation())
-                    .validationOnInput(validator.targetFrameworkValidation())
+                    .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data) else null }
+                    .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data) else null }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }
@@ -351,18 +347,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
         }
     }
-
-    //
-    // Helpers
-    protected fun getCommonOptions(): CommonOptions = CommonOptions(
-        dataCtx.migrationsProject.value!!.fullPath,
-        dataCtx.startupProject.value!!.fullPath,
-        dataCtx.dbContext.value?.fullName,
-        dataCtx.buildConfiguration.value!!,
-        dataCtx.targetFramework.value,
-        dataCtx.noBuild.value,
-        dataCtx.additionalArguments.value
-    )
 
     companion object {
         @NonNls

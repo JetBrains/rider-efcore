@@ -28,7 +28,7 @@ class UpdateDatabaseDialogWrapper(
     intellijProject: Project,
     selectedProjectId: UUID?
 ) : CommonDialogWrapper<UpdateDatabaseDataContext>(
-    UpdateDatabaseDataContext(intellijProject),
+    UpdateDatabaseDataContext(intellijProject, toolsVersion),
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.UpdateDatabaseAction.text"),
     intellijProject,
@@ -43,10 +43,6 @@ class UpdateDatabaseDialogWrapper(
     private val targetMigrationsView = observableList<MigrationItem?>()
     private val targetMigrationView = observable<MigrationItem?>(null)
     private val availableDbConnectionsView = observableList<DbConnectionItem>()
-
-    //
-    // Validation
-    private val validator = UpdateDatabaseValidator(targetMigrationsView)
 
     //
     // Constructor
@@ -72,21 +68,13 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
-        val commonOptions = getCommonOptions()
-        val targetMigration = dataCtx.targetMigration.value!!.trim()
-        val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
-
-        return databaseCommandFactory.update(efCoreVersion, commonOptions, targetMigration, connection)
-    }
-
     //
     // UI
     override fun Panel.createPrimaryOptions() {
         row(EfCoreUiBundle.message("target.migration")) {
             iconComboBox(targetMigrationView, targetMigrationsView)
-                .validationOnApply(validator.targetMigrationValidation())
-                .validationOnInput(validator.targetMigrationValidation())
+                .validationOnApply { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data) }
+                .validationOnInput { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data) }
                 .comment(EfCoreUiBundle.message("undo.all.applied.migrations.comment"))
                 .align(AlignX.FILL)
                 .focused()
@@ -106,8 +94,8 @@ class UpdateDatabaseDialogWrapper(
                 row(EfCoreUiBundle.message("connection")) {
                     editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
                         .applyToComponent { renderer = DbConnectionItemRenderer() }
-                        .validationOnInput(validator.connectionValidation())
-                        .validationOnApply(validator.connectionValidation())
+                        .validationOnInput { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) }
+                        .validationOnApply { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) }
                         .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
                 }
             }

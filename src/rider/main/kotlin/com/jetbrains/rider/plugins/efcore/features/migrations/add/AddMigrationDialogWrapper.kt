@@ -31,17 +31,11 @@ class AddMigrationDialogWrapper(
     intellijProject,
     selectedProjectId
 ) {
-    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
-
     //
     // Internal data
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
     private val userInputReceived = observable(false).withLogger("userInputReceived")
     private val migrationNameChangedListener = AnyInputDocumentListener(userInputReceived)
-
-    //
-    // Validation
-    private val validator = AddMigrationValidator(dataCtx)
 
     //
     // Constructor
@@ -60,14 +54,6 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
-        val commonOptions = getCommonOptions()
-        val migrationName = dataCtx.migrationName.value.trim()
-        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value
-
-        return migrationsCommandFactory.add(commonOptions, migrationName, migrationsOutputFolder)
-    }
-
     //
     // UI
     override fun Panel.createPrimaryOptions() {
@@ -75,8 +61,8 @@ class AddMigrationDialogWrapper(
             textField()
                 .bindText(dataCtx.migrationName)
                 .align(AlignX.FILL)
-                .validationOnInput(validator.migrationNameValidation())
-                .validationOnApply(validator.migrationNameValidation())
+                .validationOnInput { dataCtx.migrationNameValidation(it.text) }
+                .validationOnInput { dataCtx.migrationNameValidation(it.text) }
                 .focused()
                 .applyToComponent {
                     setupInitialMigrationNameListener(this)
@@ -90,8 +76,8 @@ class AddMigrationDialogWrapper(
                 textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, EfCoreUiBundle.message("select.migrations.folder"))
                     .bindText(dataCtx.migrationsOutputFolder)
                     .align(AlignX.FILL)
-                    .validationOnInput(validator.migrationsOutputFolderValidation())
-                    .validationOnApply(validator.migrationsOutputFolderValidation())
+                    .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text) }
+                    .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text) }
                     .applyToComponent {
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }

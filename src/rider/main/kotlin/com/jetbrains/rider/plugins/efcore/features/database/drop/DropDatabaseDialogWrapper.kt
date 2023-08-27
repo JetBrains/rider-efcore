@@ -15,18 +15,14 @@ class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedProjectId: UUID?,
-) : CommonDialogWrapper<CommonDataContext>(
-    CommonDataContext(intellijProject, true),
+) : CommonDialogWrapper<DropDatabaseDataContext>(
+    DropDatabaseDataContext(intellijProject),
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.DropDatabaseAction.text"),
     intellijProject,
     selectedProjectId,
     false
 ) {
-    private val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
-
-    //
-    // Constructor
     init {
         initUi()
     }
@@ -43,10 +39,5 @@ class DropDatabaseDialogWrapper(
         if (showYesNoDialog(EfCoreUiBundle.message("dialog.title.confirmation"), confirmationMessage, intellijProject)) {
             super.doOKAction()
         }
-    }
-
-    override fun generateCommand(): GeneralCommandLine {
-        val options = getCommonOptions()
-        return databaseCommandFactory.drop(options)
     }
 }

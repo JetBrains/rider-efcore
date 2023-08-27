@@ -1,20 +1,24 @@
 package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ValidationInfo
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
 import com.jetbrains.observables.*
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.cli.execution.CommonOptions
 import com.jetbrains.rider.plugins.efcore.rd.*
 import com.jetbrains.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
+import com.jetbrains.rider.plugins.efcore.ui.items.*
 
 open class CommonDataContext(
     protected val intellijProject: Project,
-    val requireDbContext: Boolean
+    val requireDbContext: Boolean,
+    val requireMigrationsInProject: Boolean,
 ) : DataContext() {
-    protected val beModel = intellijProject.solution.riderEfCoreModel
+    private val beModel = intellijProject.solution.riderEfCoreModel
     protected val pluginSettings by lazy { EfCoreUiSettingsStateService.getInstance() }
 
     val availableStartupProjects = observableList<StartupProjectInfo>().withLogger("availableStartupProjects")
@@ -30,6 +34,57 @@ open class CommonDataContext(
     val buildConfiguration = observable<String?>(null).withLogger("buildConfiguration")
     val noBuild = observable(false).withLogger("noBuild")
     val additionalArguments = observable("").withLogger("additionalArguments")
+
+    val migrationsProjectValidation: (MigrationsProjectInfo?) -> ValidationInfo? = {
+        if (it == null)
+            error(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.migrations.project"))
+        else null
+    }
+
+    val startupProjectValidation: (StartupProjectInfo?) -> ValidationInfo? = {
+        if (it == null)
+            error(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.startup.project"))
+        else
+            null
+    }
+
+    val dbContextValidation: (DbContextInfo?) -> ValidationInfo? = {
+        if (it == null || availableDbContexts.value.isEmpty())
+            error(EfCoreUiBundle.message("dialog.message.migrations.project.should.have.at.least.dbcontext"))
+        else if (requireMigrationsInProject) {
+            if (dbContext.value == null || migrationsProject.value == null)
+                null
+            else {
+                val migrationsIdentity = MigrationsIdentity(
+                    migrationsProject.value!!.id,
+                    it.fullName)
+
+                val hasMigrations = beModel.hasAvailableMigrations.runUnderProgress(
+                    migrationsIdentity, intellijProject, EfCoreUiBundle.message("progress.title.checking.migrations"),
+                    isCancelable = true,
+                    throwFault = true
+                )
+
+                if (hasMigrations == null || !hasMigrations)
+                    error(EfCoreUiBundle.message("dialog.message.selected.dbcontext.doesnt.have.migrations"))
+                else null
+            }
+        } else null
+    }
+
+    val buildConfigurationValidation: (String?) -> ValidationInfo? = {
+        if (it == null || availableBuildConfigurations.value.isEmpty())
+            error(EfCoreUiBundle.message("dialog.message.solution.doesnt.have.any.build.configurations"))
+        else
+            null
+    }
+
+    val targetFrameworkValidation: (String?) -> ValidationInfo? = {
+        if (it == null || availableTargetFrameworks.value.isEmpty())
+            error(EfCoreUiBundle.message("dialog.message.startup.project.should.have.at.least.supported.target.framework"))
+        else
+            null
+    }
 
     override fun initBindings() {
         if (requireDbContext) {
@@ -152,6 +207,24 @@ open class CommonDataContext(
             commonDialogState.setSensitive(KnownStateKeys.ADDITIONAL_ARGUMENTS, additionalArguments.value)
         }
     }
+
+    override fun validate() = buildList {
+        migrationsProjectValidation(migrationsProject.value)?.let { add(it) }
+        startupProjectValidation(startupProject.value)?.let { add(it) }
+        dbContextValidation(dbContext.value)?.let { add(it) }
+        buildConfigurationValidation(buildConfiguration.value)?.let { add(it) }
+        targetFrameworkValidation(targetFramework.value)?.let { add(it) }
+    }
+
+    protected fun getCommonOptions(): CommonOptions = CommonOptions(
+        migrationsProject.value!!.fullPath,
+        startupProject.value!!.fullPath,
+        dbContext.value?.fullName,
+        buildConfiguration.value!!,
+        targetFramework.value,
+        noBuild.value,
+        additionalArguments.value
+    )
 
     private object KnownStateKeys {
         const val DB_CONTEXT = "dbContext"
