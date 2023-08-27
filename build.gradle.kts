@@ -30,10 +30,6 @@ apply {
     plugin("com.jetbrains.rdgen")
 }
 
-dependencies {
-    testImplementation("org.testng:testng:7.7.0")
-}
-
 val riderPluginId: String by project
 val dotnetPluginId: String by project
 val productVersion: String by project
@@ -117,7 +113,7 @@ intellij {
 
 tasks {
     wrapper {
-        gradleVersion = "8.2.1"
+        gradleVersion = "8.3"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
@@ -225,7 +221,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232.0")
+        sinceBuild.set("232.1")
         untilBuild.set("232.*")
         val latestChangelog = try {
             changelog.getUnreleased()
