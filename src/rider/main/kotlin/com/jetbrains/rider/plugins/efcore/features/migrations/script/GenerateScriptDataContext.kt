@@ -40,14 +40,14 @@ class GenerateScriptDataContext(
 
     val outputFileValidation: (String?) -> ValidationInfo? = {
         if (it?.trim().isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.script.output.file.could.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.script.output.file.could.not.be.empty"))
         else
             null
     }
 
     val fromMigrationValidation: (String?) -> ValidationInfo? = {
         if (it == null)
-            error(EfCoreUiBundle.message("dialog.message.from.migration.should.be.specified"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.from.migration.should.be.specified"))
         else
             null
     }

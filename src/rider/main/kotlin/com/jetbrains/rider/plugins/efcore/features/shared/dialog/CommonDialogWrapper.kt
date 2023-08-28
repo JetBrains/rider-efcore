@@ -279,16 +279,16 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected fun Panel.createMigrationsProjectRow() {
         row(EfCoreUiBundle.message("migrations.project")) {
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
-                .validationOnInput { dataCtx.migrationsProjectValidation(it.item?.data) }
-                .validationOnApply { dataCtx.migrationsProjectValidation(it.item?.data) }
+                .validationOnInput { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
+                .validationOnApply { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
         }
     }
 
     protected fun Panel.createStartupProjectRow() {
         row(EfCoreUiBundle.message("startup.project")) {
             iconComboBox(startupProjectView, availableStartupProjectsView)
-                .validationOnInput { dataCtx.startupProjectValidation(it.item?.data) }
-                .validationOnApply { dataCtx.startupProjectValidation(it.item?.data) }
+                .validationOnInput { dataCtx.startupProjectValidation(it.item?.data)?.forComponent(it) }
+                .validationOnApply { dataCtx.startupProjectValidation(it.item?.data)?.forComponent(it) }
                 .comment(EfCoreUiBundle.message("startup.project.missing.comment"))
         }
     }
@@ -296,8 +296,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected fun Panel.createDbContextProjectRow() {
         row(EfCoreUiBundle.message("dbcontext.class")) {
             iconComboBox(dbContextView, availableDbContextsView)
-                .validationOnInput { dataCtx.dbContextValidation(it.item?.data) }
-                .validationOnApply { dataCtx.dbContextValidation(it.item?.data) }
+                .validationOnInput { dataCtx.dbContextValidation(it.item?.data)?.forComponent(it) }
+                .validationOnApply { dataCtx.dbContextValidation(it.item?.data)?.forComponent(it) }
         }
     }
 
@@ -316,14 +316,14 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
             row(EfCoreUiBundle.message("build.configuration")) {
                 iconComboBox(buildConfigurationView, availableBuildConfigurationView)
-                    .validationOnInput { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data) else null }
-                    .validationOnApply { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data) else null }
+                    .validationOnInput { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data)?.forComponent(it) else null }
+                    .validationOnApply { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data)?.forComponent(it) else null }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row(EfCoreUiBundle.message("target.framework")) {
                 iconComboBox(targetFrameworksView, availableTargetFrameworksView)
-                    .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data) else null }
-                    .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data) else null }
+                    .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data)?.forComponent(it) else null }
+                    .validationOnApply { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data)?.forComponent(it) else null }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }

@@ -39,14 +39,14 @@ class UpdateDatabaseDataContext(intellijProject: Project, private val efCoreVers
 
     val targetMigrationValidation: (String?) -> ValidationInfo? = {
         if (it.isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.target.migration.should.be.specified"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.target.migration.should.be.specified"))
         else
             null
     }
 
     val connectionValidation: (String?) -> ValidationInfo? = {
         if (it.isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
         else null
     }
 

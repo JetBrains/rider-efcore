@@ -12,7 +12,7 @@ class InstallDotnetEfAction : AnAction(EfCoreUiBundle.message("action.fix.text")
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val project = actionEvent.project!!
         val executor = project.service<PreferredCommandExecutorProvider>().getExecutor()
-        val command = project.service<ManagementCommandFactory>().installEfCoreTools()
+        val command = project.service<ManagementCommandFactory>().installGlobalTools()
         val processor = NotificationCommandResultProcessor(
             project,
             EfCoreUiBundle.message("ef.core.global.tools.have.been.successfully.installed"),

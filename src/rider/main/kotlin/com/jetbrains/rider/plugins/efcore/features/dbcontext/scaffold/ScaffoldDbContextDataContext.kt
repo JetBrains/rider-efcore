@@ -48,34 +48,34 @@ class ScaffoldDbContextDataContext(intellijProject: Project, private val efCoreV
 
     val connectionValidation: (String?) -> ValidationInfo? = {
         if (it.isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
         else null
     }
 
     val providerValidation: (DbProviderInfo?) -> ValidationInfo? = {
         if (it == null)
-            error(EfCoreUiBundle.message("dialog.message.provider.should.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.provider.should.not.be.empty"))
         else
             null
     }
 
     val outputFolderValidation: (String?) -> ValidationInfo? = {
         if (it?.trim().isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
         else
             null
     }
 
     val dbContextNameValidation: (String?) -> ValidationInfo? = {
         if (it?.trim().isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.dbcontext.class.name.could.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.dbcontext.class.name.could.not.be.empty"))
         else
             null
     }
 
     val dbContextFolderValidation: (String?) -> ValidationInfo? = {
         if (it?.trim().isNullOrEmpty())
-            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.should.not.be.empty"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.dbcontext.folder.should.not.be.empty"))
         else
             null
     }

@@ -72,8 +72,8 @@ class UpdateDatabaseDialogWrapper(
     override fun Panel.createPrimaryOptions() {
         row(EfCoreUiBundle.message("target.migration")) {
             iconComboBox(targetMigrationView, targetMigrationsView)
-                .validationOnApply { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data) }
-                .validationOnInput { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data) }
+                .validationOnApply { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data)?.forComponent(it) }
+                .validationOnInput { dataCtx.targetMigrationValidation((it.selectedItem as? MigrationItem)?.data)?.forComponent(it) }
                 .comment(EfCoreUiBundle.message("undo.all.applied.migrations.comment"))
                 .align(AlignX.FILL)
                 .focused()
@@ -93,8 +93,8 @@ class UpdateDatabaseDialogWrapper(
                 row(EfCoreUiBundle.message("connection")) {
                     editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
                         .applyToComponent { renderer = DbConnectionItemRenderer() }
-                        .validationOnInput { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) }
-                        .validationOnApply { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) }
+                        .validationOnInput { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString)?.forComponent(it) }
+                        .validationOnApply { dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString)?.forComponent(it) }
                         .enabledIf(useDefaultConnectionCheckbox!!.selected.not())
                 }
             }

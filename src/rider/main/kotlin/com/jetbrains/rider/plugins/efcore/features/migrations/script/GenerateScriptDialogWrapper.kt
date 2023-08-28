@@ -77,8 +77,8 @@ class GenerateScriptDialogWrapper(
             row(EfCoreUiBundle.message("output.file")) {
                 textField()
                     .bindText(dataCtx.outputFilePath)
-                    .validationOnApply { dataCtx.outputFileValidation(it.text) }
-                    .validationOnInput { dataCtx.outputFileValidation(it.text) }
+                    .validationOnApply { dataCtx.outputFileValidation(it.text)?.forComponent(it) }
+                    .validationOnInput { dataCtx.outputFileValidation(it.text)?.forComponent(it) }
             }
             row {
                 checkBox(EfCoreUiBundle.message("checkbox.make.script.idempotent"))
@@ -96,8 +96,8 @@ class GenerateScriptDialogWrapper(
     private fun Panel.createMigrationRows() {
         row(EfCoreUiBundle.message("from.migration")) {
             iconComboBox(fromMigrationView, fromMigrationsView)
-                .validationOnApply { dataCtx.fromMigrationValidation(it.item.data) }
-                .validationOnInput { dataCtx.fromMigrationValidation(it.item.data) }
+                .validationOnApply { dataCtx.fromMigrationValidation(it.item.data)?.forComponent(it) }
+                .validationOnInput { dataCtx.fromMigrationValidation(it.item.data)?.forComponent(it) }
                 .comment(EfCoreUiBundle.message("before.first.migration.comment"))
                 .align(AlignX.FILL)
                 .focused()

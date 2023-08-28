@@ -61,8 +61,8 @@ class AddMigrationDialogWrapper(
             textField()
                 .bindText(dataCtx.migrationName)
                 .align(AlignX.FILL)
-                .validationOnInput { dataCtx.migrationNameValidation(it.text) }
-                .validationOnInput { dataCtx.migrationNameValidation(it.text) }
+                .validationOnInput { dataCtx.migrationNameValidation(it.text)?.forComponent(it) }
+                .validationOnApply { dataCtx.migrationNameValidation(it.text)?.forComponent(it) }
                 .focused()
                 .applyToComponent {
                     setupInitialMigrationNameListener(this)
@@ -76,8 +76,8 @@ class AddMigrationDialogWrapper(
                 textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, EfCoreUiBundle.message("select.migrations.folder"))
                     .bindText(dataCtx.migrationsOutputFolder)
                     .align(AlignX.FILL)
-                    .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text) }
-                    .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text) }
+                    .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text)?.forComponent(it) }
+                    .validationOnApply { dataCtx.migrationsOutputFolderValidation(it.text)?.forComponent(it) }
                     .applyToComponent {
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }

@@ -22,4 +22,6 @@ data class DotnetEfVersion(val major: Int, val minor: Int, val patch: Int) {
             return DotnetEfVersion(major.toInt(), minor.toInt(), patch.toInt())
         }
     }
+
+    override fun toString() = "$major.$minor.$patch"
 }

@@ -37,20 +37,20 @@ open class CommonDataContext(
 
     val migrationsProjectValidation: (MigrationsProjectInfo?) -> ValidationInfo? = {
         if (it == null)
-            error(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.migrations.project"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.migrations.project"))
         else null
     }
 
     val startupProjectValidation: (StartupProjectInfo?) -> ValidationInfo? = {
         if (it == null)
-            error(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.startup.project"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.you.should.selected.valid.startup.project"))
         else
             null
     }
 
     val dbContextValidation: (DbContextInfo?) -> ValidationInfo? = {
         if (it == null || availableDbContexts.value.isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.migrations.project.should.have.at.least.dbcontext"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.migrations.project.should.have.at.least.dbcontext"))
         else if (requireMigrationsInProject) {
             if (dbContext.value == null || migrationsProject.value == null)
                 null
@@ -74,14 +74,14 @@ open class CommonDataContext(
 
     val buildConfigurationValidation: (String?) -> ValidationInfo? = {
         if (it == null || availableBuildConfigurations.value.isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.solution.doesnt.have.any.build.configurations"))
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.solution.doesnt.have.any.build.configurations"))
         else
             null
     }
 
     val targetFrameworkValidation: (String?) -> ValidationInfo? = {
-        if (it == null || availableTargetFrameworks.value.isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.startup.project.should.have.at.least.supported.target.framework"))
+        if (availableTargetFrameworks.value.isEmpty())
+            ValidationInfo(EfCoreUiBundle.message("dialog.message.startup.project.should.have.at.least.supported.target.framework"))
         else
             null
     }
