@@ -22,14 +22,12 @@ class GenerateScriptDialogWrapper(
     intellijProject: Project,
     selectedProjectId: UUID?
 ) : CommonDialogWrapper<GenerateScriptDataContext>(
-    GenerateScriptDataContext(intellijProject),
+    GenerateScriptDataContext(intellijProject, toolsVersion),
     toolsVersion,
     EfCoreUiBundle.message("generate.sql.script"),
     intellijProject,
-    selectedProjectId,
-    requireMigrationsInProject = true
+    selectedProjectId
 ) {
-    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
 
     //
     // Internal data
@@ -38,10 +36,6 @@ class GenerateScriptDialogWrapper(
 
     private val fromMigrationView = observable<MigrationItem?>(null)
     private val toMigrationView = observable<MigrationItem?>(null)
-
-    //
-    // Validation
-    private val validator = GenerateScriptValidator()
 
     //
     // Constructor
@@ -72,18 +66,6 @@ class GenerateScriptDialogWrapper(
             mappings.migration.fromItem)
     }
 
-    override fun generateCommand(): GeneralCommandLine {
-        val commonOptions = getCommonOptions()
-        val fromMigration = dataCtx.fromMigration.value!!.trim()
-        val toMigration = dataCtx.toMigration.value?.trim()
-        val outputFile = dataCtx.outputFilePath.value
-        val idempotent = dataCtx.idempotent.value
-        val noTransactions = dataCtx.noTransactions.value
-
-        return migrationsCommandFactory.generateScript(
-            efCoreVersion, commonOptions, fromMigration, toMigration, outputFile, idempotent, noTransactions)
-    }
-
     //
     // UI
     override fun Panel.createPrimaryOptions() {
@@ -95,8 +77,8 @@ class GenerateScriptDialogWrapper(
             row(EfCoreUiBundle.message("output.file")) {
                 textField()
                     .bindText(dataCtx.outputFilePath)
-                    .validationOnApply(validator.outputFileValidation())
-                    .validationOnInput(validator.outputFileValidation())
+                    .validationOnApply { dataCtx.outputFileValidation(it.text) }
+                    .validationOnInput { dataCtx.outputFileValidation(it.text) }
             }
             row {
                 checkBox(EfCoreUiBundle.message("checkbox.make.script.idempotent"))
@@ -114,8 +96,8 @@ class GenerateScriptDialogWrapper(
     private fun Panel.createMigrationRows() {
         row(EfCoreUiBundle.message("from.migration")) {
             iconComboBox(fromMigrationView, fromMigrationsView)
-                .validationOnApply(validator.fromMigrationValidation())
-                .validationOnInput(validator.fromMigrationValidation())
+                .validationOnApply { dataCtx.fromMigrationValidation(it.item.data) }
+                .validationOnInput { dataCtx.fromMigrationValidation(it.item.data) }
                 .comment(EfCoreUiBundle.message("before.first.migration.comment"))
                 .align(AlignX.FILL)
                 .focused()

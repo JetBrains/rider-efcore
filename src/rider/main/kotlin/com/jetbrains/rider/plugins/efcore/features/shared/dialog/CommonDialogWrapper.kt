@@ -41,8 +41,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected val efCoreVersion: DotnetEfVersion,
     dialogTitle: String,
     protected val intellijProject: Project,
-    private val selectedProjectId: UUID?,
-    requireMigrationsInProject: Boolean = false
+    private val selectedProjectId: UUID?
 ) : BaseDialogWrapper() {
 
     private val dialogId = dialogTitle.replace(" ", "")

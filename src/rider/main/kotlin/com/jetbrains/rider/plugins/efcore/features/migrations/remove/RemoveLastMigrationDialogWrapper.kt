@@ -1,10 +1,8 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.remove
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
@@ -19,21 +17,12 @@ class RemoveLastMigrationDialogWrapper(
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Migrations.RemoveLastMigrationAction.text"),
     intellijProject,
-    selectedProjectId,
-    true
+    selectedProjectId
 ) {
-    private val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
-
     //
     // Constructor
     init {
         initUi()
-    }
-
-    override fun generateCommand(): GeneralCommandLine {
-        val commonOptions = getCommonOptions()
-
-        return migrationsCommandFactory.removeLast(commonOptions)
     }
 
     override fun postCommandExecute(commandResult: CliCommandResult) {
