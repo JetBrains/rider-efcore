@@ -1,17 +1,30 @@
 package com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold
 
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.layout.ComponentPredicate
+import com.intellij.ui.layout.ValidationInfoBuilder
+import com.jetbrains.observables.ObservableCollection
 import com.jetbrains.observables.observable
 import com.jetbrains.observables.observableList
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.cli.api.DbContextCommandFactory
+import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.ObservableConnections
 import com.jetbrains.rider.plugins.efcore.features.shared.ObservableDbProviders
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import com.jetbrains.rider.plugins.efcore.rd.DbProviderInfo
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
 import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
 import org.jetbrains.annotations.NonNls
+import javax.swing.JPanel
 
-class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext(intellijProject, false) {
+class ScaffoldDbContextDataContext(intellijProject: Project, private val efCoreVersion: DotnetEfVersion) : CommonDataContext(intellijProject, false, false) {
     private val listSeparator = "@_#@@"
+
+    private val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
 
     val connection = observable("")
     val observableConnections = ObservableConnections(intellijProject, startupProject)
@@ -32,6 +45,50 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
 
     val scaffoldAllTables = observable(true)
     val scaffoldAllSchemas = observable(true)
+
+    val connectionValidation: (String?) -> ValidationInfo? = {
+        if (it.isNullOrEmpty())
+            error(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
+        else null
+    }
+
+    val providerValidation: (DbProviderInfo?) -> ValidationInfo? = {
+        if (it == null)
+            error(EfCoreUiBundle.message("dialog.message.provider.should.not.be.empty"))
+        else
+            null
+    }
+
+    val outputFolderValidation: (String?) -> ValidationInfo? = {
+        if (it?.trim().isNullOrEmpty())
+            error(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
+        else
+            null
+    }
+
+    val dbContextNameValidation: (String?) -> ValidationInfo? = {
+        if (it?.trim().isNullOrEmpty())
+            error(EfCoreUiBundle.message("dialog.message.dbcontext.class.name.could.not.be.empty"))
+        else
+            null
+    }
+
+    val dbContextFolderValidation: (String?) -> ValidationInfo? = {
+        if (it?.trim().isNullOrEmpty())
+            error(EfCoreUiBundle.message("dialog.message.dbcontext.folder.should.not.be.empty"))
+        else
+            null
+    }
+
+    fun tableSchemaValidation(
+        tablesList: ObservableCollection<SimpleItem>,
+        scaffoldAllTables: ComponentPredicate
+    ): ValidationInfoBuilder.(JPanel) -> ValidationInfo? = {
+        if (!scaffoldAllTables.invoke() && tablesList.none { it.data.isNotEmpty() })
+            error(EfCoreUiBundle.message("dialog.message.tables.schemas.should.not.be.empty"))
+        else
+            null
+    }
 
     override fun initBindings() {
         super.initBindings()
@@ -115,6 +172,30 @@ class ScaffoldDbContextDataContext(intellijProject: Project) : CommonDataContext
 
         val filteredSchemas = schemasList.value.filter { it.data.isNotEmpty() }
         commonDialogState.set(KnownStateKeys.SCHEMAS, filteredSchemas.joinToString(listSeparator) { it.data })
+    }
+
+    override fun generateCommand(): GeneralCommandLine {
+        val commonOptions = getCommonOptions()
+
+        return dbContextCommandFactory.scaffold(
+            efCoreVersion, commonOptions,
+            connection.value,
+            provider.value,
+            outputFolder.value,
+            useAttributes.value,
+            useDatabaseNames.value,
+            generateOnConfiguring.value,
+            usePluralizer.value,
+            dbContextName.value,
+            dbContextFolder.value,
+            scaffoldAllTables.value,
+            tablesList.map { it.data },
+            scaffoldAllSchemas.value,
+            schemasList.map { it.data })
+    }
+
+    override fun validate(): List<ValidationInfo> {
+        return super.validate()
     }
 
     object KnownStateKeys {

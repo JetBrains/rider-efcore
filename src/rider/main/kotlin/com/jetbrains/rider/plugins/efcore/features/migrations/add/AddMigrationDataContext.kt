@@ -21,7 +21,7 @@ class AddMigrationDataContext(
 
     val migrationNameValidation : (String) -> ValidationInfo? = {
         if (it.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.migration.name.could.not.be.empty"))
+            error(EfCoreUiBundle.message("dialog.message.migration.name.should.not.be.empty"))
         else if (availableMigrations.value.any { migration -> migration.migrationLongName == it.trim() })
             error(EfCoreUiBundle.message("dialog.message.migration.with.such.name.already.exist"))
         else
@@ -63,6 +63,7 @@ class AddMigrationDataContext(
     }
 
     override fun validate() = buildList {
+        addAll(super.validate())
         migrationNameValidation(migrationName.value)?.let { add(it) }
         migrationsOutputFolderValidation(migrationName.value)?.let { add(it) }
     }

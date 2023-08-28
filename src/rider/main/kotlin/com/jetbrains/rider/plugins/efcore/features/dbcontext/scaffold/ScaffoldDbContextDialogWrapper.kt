@@ -36,15 +36,13 @@ class ScaffoldDbContextDialogWrapper(
     intellijProject: Project,
     selectedProjectId: UUID?,
 ) : CommonDialogWrapper<ScaffoldDbContextDataContext>(
-    ScaffoldDbContextDataContext(intellijProject),
+    ScaffoldDbContextDataContext(intellijProject, toolsVersion),
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.DbContext.ScaffoldDbContextAction.text"),
     intellijProject,
     selectedProjectId,
     requireMigrationsInProject = false
 ) {
-    val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
-
     //
     // Internal data
     private lateinit var mainTab: DialogPanel
@@ -58,10 +56,6 @@ class ScaffoldDbContextDialogWrapper(
     private val migrationProjectFolder = observable("")
     private val availableDbConnectionsView = observableList<DbConnectionItem>()
     private val availableDbProvidersView = observableList<DbProviderItem>()
-
-    //
-    // Validation
-    private val validator = ScaffoldDbContextValidator()
 
     //
     // Constructor
@@ -86,26 +80,6 @@ class ScaffoldDbContextDialogWrapper(
         availableDbProvidersView.bind(dataCtx.observableDbProviders) {
             it.map(mappings.dbProvider.toItem)
         }
-    }
-
-    override fun generateCommand(): GeneralCommandLine {
-        val commonOptions = getCommonOptions()
-
-        return dbContextCommandFactory.scaffold(
-            efCoreVersion, commonOptions,
-            dataCtx.connection.value,
-            dataCtx.provider.value,
-            dataCtx.outputFolder.value,
-            dataCtx.useAttributes.value,
-            dataCtx.useDatabaseNames.value,
-            dataCtx.generateOnConfiguring.value,
-            dataCtx.usePluralizer.value,
-            dataCtx.dbContextName.value,
-            dataCtx.dbContextFolder.value,
-            dataCtx.scaffoldAllTables.value,
-            dataCtx.tablesList.map { it.data },
-            dataCtx.scaffoldAllSchemas.value,
-            dataCtx.schemasList.map { it.data })
     }
 
     //
@@ -144,16 +118,16 @@ class ScaffoldDbContextDialogWrapper(
             editableComboBox(dataCtx.connection, availableDbConnectionsView) { it.connectionString }
                 .applyToComponent { renderer = DbConnectionItemRenderer() }
                 .align(AlignX.FILL)
-                .validationOnInput(validator.connectionValidation())
-                .validationOnApply(validator.connectionValidation())
+                .validationOnInput { if (it.isEnabled) dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) else null }
+                .validationOnApply { if (it.isEnabled) dataCtx.connectionValidation((it.selectedItem as? DbConnectionItem)?.data?.connectionString) else null }
         }
 
         row(EfCoreUiBundle.message("provider")) {
             editableComboBox(dataCtx.provider, availableDbProvidersView) { it.id }
                 .applyToComponent { renderer = DbProviderItemRenderer() }
                 .align(AlignX.FILL)
-                .validationOnInput(validator.providerValidation())
-                .validationOnApply(validator.providerValidation())
+                .validationOnInput { if (it.isEnabled) dataCtx.providerValidation((it.selectedItem as? DbProviderItem)?.data) else null }
+                .validationOnApply { if (it.isEnabled) dataCtx.providerValidation((it.selectedItem as? DbProviderItem)?.data) else null }
         }
     }
 
@@ -166,8 +140,8 @@ class ScaffoldDbContextDialogWrapper(
                     EfCoreUiBundle.message("select.output.folder"))
                     .bindText(dataCtx.outputFolder)
                     .align(AlignX.FILL)
-                    .validationOnInput(validator.outputFolderValidation())
-                    .validationOnApply(validator.outputFolderValidation())
+                    .validationOnInput { dataCtx.outputFolderValidation(it.text) }
+                    .validationOnApply { dataCtx.outputFolderValidation(it.text) }
                     .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
             }
 
@@ -200,8 +174,8 @@ class ScaffoldDbContextDialogWrapper(
             textField()
                 .bindText(dataCtx.dbContextName)
                 .align(AlignX.FILL)
-                .validationOnInput(validator.dbContextNameValidation())
-                .validationOnApply(validator.dbContextNameValidation())
+                .validationOnInput { dataCtx.dbContextNameValidation(it.text) }
+                .validationOnApply { dataCtx.dbContextNameValidation(it.text) }
         }
 
         row(EfCoreUiBundle.message("generated.dbcontext.folder")) {
@@ -211,8 +185,8 @@ class ScaffoldDbContextDialogWrapper(
                 EfCoreUiBundle.message("select.generated.dbcontext.folder"))
                 .bindText(dataCtx.dbContextFolder)
                 .align(AlignX.FILL)
-                .validationOnInput(validator.dbContextFolderValidation())
-                .validationOnApply(validator.dbContextFolderValidation())
+                .validationOnInput { dataCtx.dbContextFolderValidation(it.text) }
+                .validationOnApply { dataCtx.dbContextFolderValidation(it.text) }
                 .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
         }
     }
@@ -264,7 +238,7 @@ class ScaffoldDbContextDialogWrapper(
                 cell(tablePanel)
                     .align(Align.FILL)
                     .enabledIf(scaffoldAll.not())
-                    .validationOnApply(validator.tableSchemaValidation(items, scaffoldAll))
+                    .validationOnApply(dataCtx.tableSchemaValidation(items, scaffoldAll))
             }.resizableRow()
         }
     }

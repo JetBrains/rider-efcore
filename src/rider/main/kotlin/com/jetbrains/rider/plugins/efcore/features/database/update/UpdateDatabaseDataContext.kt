@@ -97,6 +97,7 @@ class UpdateDatabaseDataContext(intellijProject: Project, private val efCoreVers
     }
 
     override fun validate() = buildList {
+        addAll(super.validate())
         targetMigrationValidation(targetMigration.value)?.let { add(it) }
         connectionValidation(connection.value)?.let { add(it) }
     }
