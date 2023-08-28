@@ -21,11 +21,12 @@ import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.NotificationCommandResultProcessor
 import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
-import com.jetbrains.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
 import java.util.UUID
 
-abstract class BaseCommandAction(
+abstract class BaseCommandAction<TDataContext : CommonDataContext>(
     private val actionPerformedText: String
 ) : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
@@ -59,7 +60,7 @@ abstract class BaseCommandAction(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,
         model: RiderEfCoreModel,
-        currentDotnetProjectId: UUID?): BaseDialogWrapper
+        currentDotnetProjectId: UUID?): CommonDialogWrapper<TDataContext>
 
     private fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
         val intellijProject = actionEvent.project!!
@@ -69,7 +70,7 @@ abstract class BaseCommandAction(
 
         if (dialog.showAndGet()) {
             val executor = intellijProject.service<PreferredCommandExecutorProvider>().getExecutor()
-            val command = dialog.generateCommand()
+            val command = dialog.dataCtx.generateCommand()
             val processor = NotificationCommandResultProcessor(
                 intellijProject,
                 actionPerformedText,

@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.*
 
-class RemoveLastMigrationAction : BaseCommandAction(EfCoreUiBundle.message("last.migration.has.been.removed")) {
+class RemoveLastMigrationAction : BaseCommandAction<RemoveLastMigrationDataContext>(EfCoreUiBundle.message("last.migration.has.been.removed")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

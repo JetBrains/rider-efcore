@@ -32,8 +32,7 @@ class UpdateDatabaseDialogWrapper(
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.UpdateDatabaseAction.text"),
     intellijProject,
-    selectedProjectId,
-    true
+    selectedProjectId
 ) {
 
     val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()

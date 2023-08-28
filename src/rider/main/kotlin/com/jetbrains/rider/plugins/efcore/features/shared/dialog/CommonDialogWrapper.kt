@@ -3,6 +3,7 @@ package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
@@ -25,6 +26,7 @@ import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
 import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.ui.items.*
 import com.jetbrains.rider.plugins.efcore.ui.localize
 import com.jetbrains.rider.plugins.efcore.ui.simpleExpandableTextField
@@ -37,12 +39,12 @@ import javax.swing.JComponent
 
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class CommonDialogWrapper<TContext : CommonDataContext>(
-    protected val dataCtx: TContext,
+    val dataCtx: TContext,
     protected val efCoreVersion: DotnetEfVersion,
     dialogTitle: String,
     protected val intellijProject: Project,
     private val selectedProjectId: UUID?
-) : BaseDialogWrapper() {
+) : DialogWrapper(true) {
 
     private val dialogId = dialogTitle.replace(" ", "")
 
@@ -225,6 +227,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             dataCtx.saveState(dialogsStateService.forDialog(COMMON_DIALOG_ID))
         }
     }
+
+    open fun postCommandExecute(commandResult: CliCommandResult) {}
 
     //
     // UI

@@ -40,8 +40,7 @@ class ScaffoldDbContextDialogWrapper(
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.DbContext.ScaffoldDbContextAction.text"),
     intellijProject,
-    selectedProjectId,
-    requireMigrationsInProject = false
+    selectedProjectId
 ) {
     //
     // Internal data

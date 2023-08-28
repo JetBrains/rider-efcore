@@ -20,8 +20,7 @@ class DropDatabaseDialogWrapper(
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.DropDatabaseAction.text"),
     intellijProject,
-    selectedProjectId,
-    false
+    selectedProjectId
 ) {
     init {
         initUi()

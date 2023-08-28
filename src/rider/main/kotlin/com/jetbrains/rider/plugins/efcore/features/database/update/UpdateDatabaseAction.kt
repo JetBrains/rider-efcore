@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.*
 
-class UpdateDatabaseAction : BaseCommandAction(EfCoreUiBundle.message("database.has.been.updated")) {
+class UpdateDatabaseAction : BaseCommandAction<UpdateDatabaseDataContext>(EfCoreUiBundle.message("database.has.been.updated")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.*
 
-class AddMigrationAction : BaseCommandAction(EfCoreUiBundle.message("new.migration.has.been.created")) {
+class AddMigrationAction : BaseCommandAction<AddMigrationDataContext>(EfCoreUiBundle.message("new.migration.has.been.created")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

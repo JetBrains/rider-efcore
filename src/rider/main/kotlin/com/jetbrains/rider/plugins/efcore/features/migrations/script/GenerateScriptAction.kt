@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.*
 
-class GenerateScriptAction : BaseCommandAction(EfCoreUiBundle.message("script.has.been.generated")) {
+class GenerateScriptAction : BaseCommandAction<GenerateScriptDataContext>(EfCoreUiBundle.message("script.has.been.generated")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

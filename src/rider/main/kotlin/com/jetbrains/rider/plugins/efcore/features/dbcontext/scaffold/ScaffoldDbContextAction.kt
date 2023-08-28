@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.*
 
-class ScaffoldDbContextAction : BaseCommandAction(EfCoreUiBundle.message("dbcontext.has.been.scaffolded")) {
+class ScaffoldDbContextAction : BaseCommandAction<ScaffoldDbContextDataContext>(EfCoreUiBundle.message("dbcontext.has.been.scaffolded")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

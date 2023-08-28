@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.UUID
 
-class DropDatabaseAction : BaseCommandAction(EfCoreUiBundle.message("database.has.been.deleted")) {
+class DropDatabaseAction : BaseCommandAction<DropDatabaseDataContext>(EfCoreUiBundle.message("database.has.been.deleted")) {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,
