@@ -1,6 +1,8 @@
 package com.jetbrains.rider.plugins.efcore.ui
 
 import com.intellij.openapi.util.IconLoader
+import icons.ReSharperIcons
+import icons.RiderIcons
 import org.jetbrains.annotations.NonNls
 import javax.swing.Icon
 
@@ -12,24 +14,20 @@ object DotnetIconResolver {
 
     @NonNls
     fun resolveForExtension(extension: String): Icon? {
-        val iconPath = when (extension) {
-            csprojExtension -> "resharper/ProjectModel/CsharpCoreProject.svg"
-            fsprojExtension -> "resharper/ProjectModel/FsharpCoreProject.svg"
+        return when(extension) {
+            csprojExtension -> ReSharperIcons.ProjectModel.CsharpCoreProject
+            fsprojExtension -> ReSharperIcons.ProjectModel.FsharpCoreProject
             else -> null
-        } ?: return null
-
-        return IconLoader.getIcon(iconPath, javaClass)
+        }
     }
 
     @NonNls
     fun resolveForType(type: DotnetIconType): Icon {
-        val iconPath = when (type) {
-            DotnetIconType.BUILD_CONFIGURATION -> "resharper/ProjectModel/ProjectProperties.svg"
-            DotnetIconType.TARGET_FRAMEWORK -> "rider/runConfigurations/application.svg"
-            DotnetIconType.CSHARP_CLASS -> "resharper/PsiCSharp/Csharp.svg"
+        return when(type) {
+            DotnetIconType.BUILD_CONFIGURATION -> ReSharperIcons.ProjectModel.ProjectProperties
+            DotnetIconType.TARGET_FRAMEWORK -> RiderIcons.RunConfigurations.Application
+            DotnetIconType.CSHARP_CLASS -> ReSharperIcons.PsiCSharp.Csharp
         }
-
-        return IconLoader.getIcon(iconPath, javaClass)
     }
 }
 
