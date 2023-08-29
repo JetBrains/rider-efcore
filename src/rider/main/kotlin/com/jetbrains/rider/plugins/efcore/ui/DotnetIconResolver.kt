@@ -15,7 +15,7 @@ object DotnetIconResolver {
     fun resolveForExtension(extension: String): Icon? {
         return when(extension) {
             csprojExtension -> ReSharperIcons.ProjectModel.CsharpProject
-            fsprojExtension -> ReSharperIcons.ProjectModel.FsharpCoreProject
+            fsprojExtension -> ReSharperIcons.ProjectModel.FsharpProject
             else -> null
         }
     }
