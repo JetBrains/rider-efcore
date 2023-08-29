@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.ui
 
-import com.intellij.openapi.util.IconLoader
 import icons.ReSharperIcons
 import icons.RiderIcons
 import org.jetbrains.annotations.NonNls
@@ -15,7 +14,7 @@ object DotnetIconResolver {
     @NonNls
     fun resolveForExtension(extension: String): Icon? {
         return when(extension) {
-            csprojExtension -> ReSharperIcons.ProjectModel.CsharpCoreProject
+            csprojExtension -> ReSharperIcons.ProjectModel.CsharpProject
             fsprojExtension -> ReSharperIcons.ProjectModel.FsharpCoreProject
             else -> null
         }
