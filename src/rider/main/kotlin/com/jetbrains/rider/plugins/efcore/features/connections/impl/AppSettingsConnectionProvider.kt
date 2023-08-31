@@ -16,8 +16,8 @@ import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
-@Service
-class AppSettingsConnectionProvider(intellijProject: Project) : DbConnectionProvider {
+@Service(Service.Level.PROJECT)
+class AppSettingsConnectionProvider(private val intellijProject: Project) : DbConnectionProvider {
     companion object {
         fun getInstance(intellijProject: Project) = intellijProject.service<AppSettingsConnectionProvider>()
     }
@@ -31,16 +31,12 @@ class AppSettingsConnectionProvider(intellijProject: Project) : DbConnectionProv
             val connectionStrings = directory.listDirectoryEntries("appsettings*.json")
                 .filter { it.isFile() }
                 .map { it.name to serializer.deserializeNode(it.toFile()) }
-                .mapNotNull { (fileName, json) -> (json?.get("ConnectionStrings") as ObjectNode?)?.let { fileName to it } }
-                .flatMap { (fileName, obj) ->
-                    obj.fieldNames().asSequence().map { connName ->
-                        (obj[connName] as TextNode?)?.let { node -> Triple(fileName, connName, node.textValue()) }
-                    }
+                .flatMap { (fileName, json) ->
+                    json?.let {
+                        JsonConnectionStringsManager.getInstance(intellijProject).collectConnectionStrings(fileName, json)
+                    } ?: emptyList()
                 }
-                .filterNotNull()
-                .map { (fileName, connName, connString) -> DbConnectionInfo(connName, connString, fileName, null) }
-
             addAll(connectionStrings)
-        }.toList()
+        }
 }
 
