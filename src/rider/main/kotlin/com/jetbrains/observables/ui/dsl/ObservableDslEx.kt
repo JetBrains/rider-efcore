@@ -11,15 +11,11 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
-import com.jetbrains.observables.Observable
 import com.jetbrains.observables.ObservableProperty
 import com.jetbrains.rider.plugins.efcore.ui.IconComboBoxRendererAdapter
 import com.jetbrains.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
-import javax.swing.ComboBoxEditor
-import javax.swing.DefaultComboBoxModel
-import javax.swing.Icon
-import javax.swing.JTextField
+import javax.swing.*
 import javax.swing.plaf.basic.BasicComboBoxEditor
 
 fun <T : IconItem<*>> Row.iconComboBox(
@@ -68,6 +64,7 @@ fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
 
     return comboBox(model, IconComboBoxRendererAdapter())
         .applyToComponent {
+            setMinimumAndPreferredWidth(0)
             isEditable = true
             editor = object : BasicComboBoxEditor() {
                 override fun setItem(anObject: Any?) {
