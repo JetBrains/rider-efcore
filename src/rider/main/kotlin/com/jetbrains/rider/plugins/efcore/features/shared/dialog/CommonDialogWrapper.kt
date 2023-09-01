@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
@@ -17,7 +18,6 @@ import com.jetbrains.observables.observable
 import com.jetbrains.observables.observableList
 import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.CommonOptions
 import com.jetbrains.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import com.jetbrains.rider.plugins.efcore.rd.*
@@ -31,6 +31,7 @@ import com.jetbrains.rider.plugins.efcore.ui.items.*
 import com.jetbrains.rider.plugins.efcore.ui.localize
 import com.jetbrains.rider.plugins.efcore.ui.simpleExpandableTextField
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.AbstractAction
@@ -75,6 +76,21 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     //
     // UI
     protected lateinit var panel: DialogPanel
+
+    @TestOnly
+    internal var migrationProjectComponent: ComboBox<MigrationsProjectItem>? = null
+
+    @TestOnly
+    internal var startupProjectComponent: ComboBox<StartupProjectItem>? = null
+
+    @TestOnly
+    internal var dbContextComponent: ComboBox<DbContextItem>? = null
+
+    @TestOnly
+    internal var targetFrameworkComponent: ComboBox<BaseTargetFrameworkItem>? = null
+
+    @TestOnly
+    internal var buildConfigurationComponent: ComboBox<BuildConfigurationItem>? = null
 
     //
     // Constructor
@@ -230,6 +246,12 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
     open fun postCommandExecute(commandResult: CliCommandResult) {}
 
+    @TestOnly
+    open fun createPanel(): DialogPanel {
+        createCenterPanel()
+        return panel
+    }
+
     //
     // UI
     override fun createCenterPanel(): JComponent =
@@ -281,6 +303,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
                 .validationOnInput { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
                 .validationOnApply { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
+                .applyToComponent { migrationProjectComponent = this }
         }
     }
 
@@ -290,6 +313,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
                 .validationOnInput { dataCtx.startupProjectValidation(it.item?.data)?.forComponent(it) }
                 .validationOnApply { dataCtx.startupProjectValidation(it.item?.data)?.forComponent(it) }
                 .comment(EfCoreUiBundle.message("startup.project.missing.comment"))
+                .applyToComponent { startupProjectComponent = this }
         }
     }
 
@@ -298,6 +322,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(dbContextView, availableDbContextsView)
                 .validationOnInput { dataCtx.dbContextValidation(it.item?.data)?.forComponent(it) }
                 .validationOnApply { dataCtx.dbContextValidation(it.item?.data)?.forComponent(it) }
+                .applyToComponent { dbContextComponent = this }
         }
     }
 
@@ -318,12 +343,14 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
                 iconComboBox(buildConfigurationView, availableBuildConfigurationView)
                     .validationOnInput { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data)?.forComponent(it) else null }
                     .validationOnApply { if (it.isEnabled) dataCtx.buildConfigurationValidation(it.item?.data)?.forComponent(it) else null }
+                    .applyToComponent { buildConfigurationComponent = this }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row(EfCoreUiBundle.message("target.framework")) {
                 iconComboBox(targetFrameworksView, availableTargetFrameworksView)
                     .validationOnInput { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data)?.forComponent(it) else null }
                     .validationOnApply { if (it.isEnabled) dataCtx.targetFrameworkValidation(it.item?.data)?.forComponent(it) else null }
+                    .applyToComponent { targetFrameworkComponent = this }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }

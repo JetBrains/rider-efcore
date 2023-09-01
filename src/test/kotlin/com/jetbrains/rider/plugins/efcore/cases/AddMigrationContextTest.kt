@@ -1,39 +1,28 @@
 package com.jetbrains.rider.plugins.efcore.cases
 
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.intellij.platform.backend.workspace.virtualFile
 import com.intellij.platform.workspace.storage.url.VirtualFileUrlManager
 import com.intellij.workspaceModel.ide.getInstance
 import com.jetbrains.rdclient.util.idea.toIOFile
-import com.jetbrains.rider.model.RdProjectDescriptor
+import com.jetbrains.rider.plugins.efcore.KnownTestData
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationDataContext
 import com.jetbrains.rider.plugins.efcore.framework.EfCoreDataContextTest
 import com.jetbrains.rider.plugins.efcore.rd.MigrationsIdentity
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.projectView.solutionDirectoryPath
-import com.jetbrains.rider.projectView.workspace.findProjects
 import com.jetbrains.rider.projectView.workspace.getContentRootUrl
-import com.jetbrains.rider.projectView.workspace.getSolutionEntity
-import com.jetbrains.rider.projectView.workspace.isProject
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.enums.PlatformType
 import com.jetbrains.rider.test.env.enums.SdkVersion
 import com.jetbrains.rider.test.framework.waitBackendAndWorkspaceModel
 import com.jetbrains.rider.test.scriptingApi.changeFileSystem2
-import com.jetbrains.rider.test.scriptingApi.refreshFileSystem
-import com.jetbrains.rider.test.scriptingApi.waitForWorkspaceModelReady
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
-import java.io.File
 import kotlin.test.assertNotNull
 
 @TestEnvironment(sdkVersion = SdkVersion.DOT_NET_6, platform = [PlatformType.ALL])
-class AddMigrationTest : EfCoreDataContextTest() {
+class AddMigrationContextTest : EfCoreDataContextTest() {
   @Suppress("HardCodedStringLiteral")
   @DataProvider
   fun validMigrationNames() = arrayOf(
@@ -57,7 +46,7 @@ class AddMigrationTest : EfCoreDataContextTest() {
     }
   }
 
-  override fun getSolutionDirectoryName() = "EFCoreSolution"
+  override fun getSolutionDirectoryName() = KnownTestData.Solutions.EFCoreSolution.NAME
 
   private fun AddMigrationDataContext.assertMigrationExist(name: String) {
     val migrationsProject = assertNotNull(migrationsProject.value, "Migrations project is null")
@@ -76,3 +65,4 @@ class AddMigrationTest : EfCoreDataContextTest() {
     assertNotNull(migration, "Migration doesn't exist")
   }
 }
+

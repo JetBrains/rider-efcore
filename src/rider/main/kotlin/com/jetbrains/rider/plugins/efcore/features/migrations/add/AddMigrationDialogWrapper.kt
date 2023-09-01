@@ -1,15 +1,13 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
-import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.jetbrains.observables.bind
 import com.jetbrains.observables.observable
 import com.jetbrains.observables.withLogger
-import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.observables.ui.dsl.bindText
@@ -17,6 +15,7 @@ import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.util.UUID
 
@@ -36,6 +35,12 @@ class AddMigrationDialogWrapper(
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
     private val userInputReceived = observable(false).withLogger("userInputReceived")
     private val migrationNameChangedListener = AnyInputDocumentListener(userInputReceived)
+
+    @TestOnly
+    internal var migrationNameComponent: JBTextField? = null
+
+    @TestOnly
+    internal var migrationsFolderComponent: TextFieldWithBrowseButton? = null
 
     //
     // Constructor
@@ -65,6 +70,7 @@ class AddMigrationDialogWrapper(
                 .validationOnApply { dataCtx.migrationNameValidation(it.text)?.forComponent(it) }
                 .focused()
                 .applyToComponent {
+                    migrationNameComponent = this
                     setupInitialMigrationNameListener(this)
                 }
         }
@@ -79,6 +85,7 @@ class AddMigrationDialogWrapper(
                     .validationOnInput { dataCtx.migrationsOutputFolderValidation(it.text)?.forComponent(it) }
                     .validationOnApply { dataCtx.migrationsOutputFolderValidation(it.text)?.forComponent(it) }
                     .applyToComponent {
+                        migrationsFolderComponent = this
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }
             }
