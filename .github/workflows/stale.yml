@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/stale@v8
         with:
-          debug-only: true
           exempt-draft-pr: true
           only-labels: 'waiting-for-info'
           stale-issue-message: 'This issue is stale because it has been open 14 days with no requested info. The issue will be automatically closed in 1 day.'
