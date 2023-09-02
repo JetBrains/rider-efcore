@@ -78,7 +78,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     protected lateinit var panel: DialogPanel
 
     @TestOnly
-    internal var migrationProjectComponent: ComboBox<MigrationsProjectItem>? = null
+    internal var migrationsProjectComponent: ComboBox<MigrationsProjectItem>? = null
 
     @TestOnly
     internal var startupProjectComponent: ComboBox<StartupProjectItem>? = null
@@ -247,8 +247,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     open fun postCommandExecute(commandResult: CliCommandResult) {}
 
     @TestOnly
-    open fun createPanel(): DialogPanel {
-        createCenterPanel()
+    internal fun requestPanel(): DialogPanel {
         return panel
     }
 
@@ -303,7 +302,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
                 .validationOnInput { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
                 .validationOnApply { dataCtx.migrationsProjectValidation(it.item?.data)?.forComponent(it) }
-                .applyToComponent { migrationProjectComponent = this }
+                .applyToComponent { migrationsProjectComponent = this }
         }
     }
 

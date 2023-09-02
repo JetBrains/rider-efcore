@@ -46,15 +46,18 @@ class AddMigrationDialogTest : EfCoreDialogTest() {
   fun createMigrationUiTest(sourceName: String, targetName: String) {
     installEfLocalTools(efToolset)
     withDialog({ AddMigrationDialogWrapper(efToolset, project, null) }) { dialog, dataCtx ->
-      assertNotNull(migrationNameComponent, "Migration name field wasn't initialized") {
-        it.text = sourceName
-      }
-      dialog.apply {
-        apply()
-        assertValid()
-        executeCommand()
-        assertMigrationExist(targetName)
-      }
+      selectMigrationsProject(KnownTestData.Solutions.EFCoreSolution.EfCoreConsoleApp_DAL)
+      selectStartupProject(KnownTestData.Solutions.EFCoreSolution.EfCoreConsoleApp)
+      setMigrationName(sourceName)
+
+      executeCommand()
+      assertMigrationExist(targetName)
+    }
+  }
+
+  private fun AddMigrationDialogWrapper.setMigrationName(name: String) {
+    assertNotNull(migrationNameComponent, "Migration name field wasn't initialized") {
+      it.text = name
     }
   }
 
