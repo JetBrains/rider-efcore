@@ -6,6 +6,7 @@
   <idea-version since-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
   <depends>com.intellij.database</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
   <resource-bundle>messages.EfCoreUiBundle</resource-bundle>
 
   <description>
@@ -38,6 +39,7 @@
     <applicationConfigurable
       parentId="tools"
       instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
+    <terminal.shellCommandHandler implementation="com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute.EFCoreShellCommandHandler"/>
   </extensions>
 
   <actions>
