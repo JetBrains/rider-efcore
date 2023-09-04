@@ -23,14 +23,17 @@ import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
 class EFCoreShellCommandHandler : TerminalShellCommandHandler {
 
     // Define dotnet ef commands
-    private fun knownEfCommands() = setOf(
-        KnownEfCommands.Migrations.add,
-        KnownEfCommands.Database.drop,
-        KnownEfCommands.Database.update,
-        KnownEfCommands.DbContext.scaffold,
-        KnownEfCommands.Migrations.remove,
-        KnownEfCommands.DbContext.script
-    )
+    companion object {
+        private val knownEfCommands = setOf(
+            KnownEfCommands.Migrations.add,
+            KnownEfCommands.Database.drop,
+            KnownEfCommands.Database.update,
+            KnownEfCommands.DbContext.scaffold,
+            KnownEfCommands.Migrations.remove,
+            KnownEfCommands.DbContext.script
+        )
+    }
+
 
     // Check if input command matches known commands
     override fun matches(project: Project, workingDirectory: String?, localSession: Boolean, command: String): Boolean {
