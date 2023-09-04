@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute
 
 import com.intellij.execution.Executor
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.project.Project
 import com.intellij.terminal.TerminalShellCommandHandler
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
@@ -15,23 +16,49 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import java.util.UUID
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
 
-private val LOG = logger<DotnetEfShellCommandHandler>()
-class DotnetEfShellCommandHandler : TerminalShellCommandHandler {
+class EFCoreShellCommandHandler : TerminalShellCommandHandler {
+
+    // Define dotnet ef commands
+    private fun knownEfCommands() = setOf(
+        KnownEfCommands.Migrations.add,
+        KnownEfCommands.Database.drop,
+        KnownEfCommands.Database.update,
+        KnownEfCommands.DbContext.scaffold,
+        KnownEfCommands.Migrations.remove,
+        KnownEfCommands.DbContext.script
+    )
+
+    // Check if input command matches known commands
     override fun matches(project: Project, workingDirectory: String?, localSession: Boolean, command: String): Boolean {
-        val match = command.trim().startsWith("dotnet ef ")
-
-        LOG.info(if(match) "Command matched" else "Command did not match")
-        return match
+        val parsedCommand = command.trim()
+        return when {
+            !parsedCommand.startsWith("dotnet ef") -> false
+            parsedCommand == "dotnet ef" -> true
+            else -> parsedCommand.removePrefix("dotnet ef ").trim() in knownEfCommands()
+        }
     }
 
+    // Execute input command
     override fun execute(project: Project, workingDirectory: String?, localSession: Boolean, command: String, executor: Executor): Boolean {
-        val parsedCommand = command.trim()
+        if (command.trim() == "dotnet ef") {
+            val dataContext = SimpleDataContext.getProjectContext(project)
+            val popup = JBPopupFactory.getInstance()
+                .createActionGroupPopup(
+                    EfCoreUiBundle.message("popup.title.ef.core.quick.actions"),
+                    QuickActionsGroup(),
+                    dataContext,
+                    JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING,
+                    false
+                )
+            popup.showCenteredInCurrentWindow(project)
+            return true
+        }
+        val parsedCommand = command.trim().substring(10)
         val dotnetProjectId = null
-
-        LOG.info("Executing command: $parsedCommand")
-
         return when {
             parsedCommand.startsWith(KnownEfCommands.Migrations.add) -> AddMigrationAction().launch(project, dotnetProjectId)
             parsedCommand.startsWith(KnownEfCommands.Database.drop) -> DropDatabaseAction().launch(project, dotnetProjectId)
@@ -46,9 +73,6 @@ class DotnetEfShellCommandHandler : TerminalShellCommandHandler {
     private fun BaseCommandAction.launch(project: Project, dotnetProjectId: UUID?): Boolean {
         val efCoreDefinition = project.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
         val toolsVersion = efCoreDefinition?.let { DotnetEfVersion.parse(it.version) }!!
-
-        LOG.info("Launching with tools version: $toolsVersion")
-
         return createDialog(project, toolsVersion, project.solution.riderEfCoreModel, dotnetProjectId).showAndGet()
     }
 }
