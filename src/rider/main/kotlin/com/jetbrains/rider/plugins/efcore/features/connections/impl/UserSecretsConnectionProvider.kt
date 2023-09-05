@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.features.connections.impl
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.intellij.ide.customize.transferSettings.db.WindowsEnvVariables
@@ -16,8 +17,8 @@ import com.jetbrains.rider.plugins.efcore.features.shared.services.JsonSerialize
 import org.jetbrains.annotations.NonNls
 import kotlin.io.path.Path
 
-@Service
-class UserSecretsConnectionProvider(intellijProject: Project) : DbConnectionProvider {
+@Service(Service.Level.PROJECT)
+class UserSecretsConnectionProvider(private val intellijProject: Project) : DbConnectionProvider {
     companion object {
         @NonNls
         private val userSecretsFolder = if (SystemInfo.isWindows)
@@ -35,11 +36,7 @@ class UserSecretsConnectionProvider(intellijProject: Project) : DbConnectionProv
             val userSecretsFile = userSecretsFolder.resolve(userSecretsId).resolve("secrets.json").toFile()
             if (!userSecretsFile.exists() || !userSecretsFile.isFile)
                 return@buildList
-            val obj = serializer.deserializeNode(userSecretsFile)?.get("ConnectionStrings") as ObjectNode? ?: return@buildList
-            obj.fieldNames().forEach { connName ->
-                val connString = (obj[connName] as TextNode?)?.textValue()
-                if (connString != null)
-                    add(DbConnectionInfo(connName, connString, EfCoreUiBundle.message("source.user.secrets"), null))
-            }
+            val userSecretsJson = serializer.deserializeNode(userSecretsFile) ?: return@buildList
+            addAll(JsonConnectionStringsManager.getInstance(intellijProject).collectConnectionStrings(EfCoreUiBundle.message("source.user.secrets"), userSecretsJson))
         }.toList()
 }
