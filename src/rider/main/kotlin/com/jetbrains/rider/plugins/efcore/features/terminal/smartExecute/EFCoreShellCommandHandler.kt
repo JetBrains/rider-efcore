@@ -22,8 +22,9 @@ import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
 
 class EFCoreShellCommandHandler : TerminalShellCommandHandler {
 
-    // Define dotnet ef commands
     companion object {
+        // Define dotnet ef constant string and commands
+        private const val DOTNET_EF = "dotnet ef"
         private val knownEfCommands = setOf(
             KnownEfCommands.Migrations.add,
             KnownEfCommands.Database.drop,
@@ -34,20 +35,19 @@ class EFCoreShellCommandHandler : TerminalShellCommandHandler {
         )
     }
 
-
     // Check if input command matches known commands
     override fun matches(project: Project, workingDirectory: String?, localSession: Boolean, command: String): Boolean {
         val parsedCommand = command.trim()
         return when {
-            !parsedCommand.startsWith("dotnet ef") -> false
-            parsedCommand == "dotnet ef" -> true
-            else -> parsedCommand.removePrefix("dotnet ef ").trim() in knownEfCommands()
+            !parsedCommand.startsWith(DOTNET_EF) -> false
+            parsedCommand == DOTNET_EF -> true
+            else -> parsedCommand.removePrefix(DOTNET_EF).trim() in knownEfCommands
         }
     }
 
     // Execute input command
     override fun execute(project: Project, workingDirectory: String?, localSession: Boolean, command: String, executor: Executor): Boolean {
-        if (command.trim() == "dotnet ef") {
+        if (command.trim() == DOTNET_EF) {
             val dataContext = SimpleDataContext.getProjectContext(project)
             val popup = JBPopupFactory.getInstance()
                 .createActionGroupPopup(
@@ -60,21 +60,23 @@ class EFCoreShellCommandHandler : TerminalShellCommandHandler {
             popup.showCenteredInCurrentWindow(project)
             return true
         }
-        val parsedCommand = command.trim().substring(10)
         val dotnetProjectId = null
-        return when {
-            parsedCommand.startsWith(KnownEfCommands.Migrations.add) -> AddMigrationAction().launch(project, dotnetProjectId)
-            parsedCommand.startsWith(KnownEfCommands.Database.drop) -> DropDatabaseAction().launch(project, dotnetProjectId)
-            parsedCommand.startsWith(KnownEfCommands.Database.update) -> UpdateDatabaseAction().launch(project, dotnetProjectId)
-            parsedCommand.startsWith(KnownEfCommands.DbContext.scaffold) -> ScaffoldDbContextAction().launch(project, dotnetProjectId)
-            parsedCommand.startsWith(KnownEfCommands.Migrations.remove) -> RemoveLastMigrationAction().launch(project, dotnetProjectId)
-            parsedCommand.startsWith(KnownEfCommands.DbContext.script) -> GenerateScriptAction().launch(project, dotnetProjectId)
-            else -> false
+        return with(command.trim().removePrefix(DOTNET_EF).trim()) {
+            when {
+                startsWith(KnownEfCommands.Migrations.add) -> AddMigrationAction().launch(project, dotnetProjectId)
+                startsWith(KnownEfCommands.Database.drop) -> DropDatabaseAction().launch(project, dotnetProjectId)
+                startsWith(KnownEfCommands.Database.update) -> UpdateDatabaseAction().launch(project, dotnetProjectId)
+                startsWith(KnownEfCommands.DbContext.scaffold) -> ScaffoldDbContextAction().launch(project, dotnetProjectId)
+                startsWith(KnownEfCommands.Migrations.remove) -> RemoveLastMigrationAction().launch(project, dotnetProjectId)
+                startsWith(KnownEfCommands.DbContext.script) -> GenerateScriptAction().launch(project, dotnetProjectId)
+                else -> false
+            }
         }
     }
+
     private fun BaseCommandAction.launch(project: Project, dotnetProjectId: UUID?): Boolean {
-        val efCoreDefinition = project.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
-        val toolsVersion = efCoreDefinition?.let { DotnetEfVersion.parse(it.version) }!!
+        val efCoreDefinition = project.solution.riderEfCoreModel.efToolsDefinition.valueOrNull ?: return false
+        val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version) ?: return false
         return createDialog(project, toolsVersion, project.solution.riderEfCoreModel, dotnetProjectId).showAndGet()
     }
 }
