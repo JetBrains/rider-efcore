@@ -62,9 +62,9 @@ abstract class BaseCommandAction(
         currentDotnetProjectId: UUID?): BaseDialogWrapper
 
     private fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
-        val intellijProject = actionEvent.project!!
-        val model = getEfCoreRiderModel(actionEvent)
-        val currentDotnetProjectName = actionEvent.getDotnetProjectId()
+        val intellijProject = actionEvent.project ?: return
+        val model = actionEvent.project?.solution?.riderEfCoreModel ?: return
+        val currentDotnetProjectName = actionEvent.actionDotnetProjectId
         val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
 
         if (dialog.showAndGet()) {
@@ -80,12 +80,6 @@ abstract class BaseCommandAction(
 
             executor.execute(command, processor)
         }
-    }
-
-    private fun getEfCoreRiderModel(actionEvent: AnActionEvent): RiderEfCoreModel {
-        // TODO: Validate
-
-        return actionEvent.project?.solution?.riderEfCoreModel!!
     }
 
     private fun notifyEfIsNotInstalled(intellijProject: Project) {
