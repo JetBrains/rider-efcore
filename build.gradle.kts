@@ -111,7 +111,8 @@ intellij {
     version.set(productVersion)
     downloadSources.set(false)
     plugins.set(listOf(
-        "com.intellij.database"
+        "com.intellij.database",
+        "terminal"
     ))
 }
 
