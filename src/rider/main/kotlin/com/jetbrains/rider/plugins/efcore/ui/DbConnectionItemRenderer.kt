@@ -4,6 +4,7 @@ import com.intellij.execution.runToolbar.components.TrimmedMiddleLabel
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBInsets
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
 import java.awt.Component
@@ -66,6 +67,7 @@ class DbConnectionItemRenderer : ListCellRenderer<DbConnectionItem> {
 
     private fun createRowComponent() =
         JPanel(GridBagLayout()).apply {
+            preferredSize = JBUI.size(0, 20)
             border = IdeBorderFactory.createEmptyBorder(insets)
         }
 
