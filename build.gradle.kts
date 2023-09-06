@@ -8,7 +8,7 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:2023.2.2")
+        classpath("com.jetbrains.rd:rd-gen:2023.3.0")
     }
 }
 
@@ -20,7 +20,7 @@ repositories {
 plugins {
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.changelog
-    id("org.jetbrains.changelog") version "2.1.2"
+    id("org.jetbrains.changelog") version "2.2.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.intellij
     id("org.jetbrains.intellij") version "1.15.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
@@ -226,8 +226,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("232.0")
-        untilBuild.set("232.*")
+        sinceBuild.set("233.0")
+        untilBuild.set("233.*")
         val latestChangelog = try {
             changelog.getUnreleased()
         } catch (_: MissingVersionException) {
