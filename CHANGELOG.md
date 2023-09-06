@@ -3,6 +3,16 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Terminal: "Execute in IDE" suggestion for known commands when executing `dotnet ef` from terminal (#188 by @alls-cpp)
+- Common: Enable `Tools | Entity Framework Core` action group for solution's context menu 
+
+### Fixed
+- Scaffold/Update: Inline connection strings definitions are not listed in autocompletion (#182)
+- Scaffold/Update: Long connection strings from autocompleted items shrink dialog window (#183)
+- Cosmetics: Old UI icons are used when New UI is enabled (#181 by @alls-cpp)
+
 ## [232.1.0] - 2023-08-03
 ### Added
 - Enable support for Rider 2023.2
