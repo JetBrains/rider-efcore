@@ -188,53 +188,14 @@ tasks {
         }
     }
 
-    val generateSdkPackagesVersionsLock by registering {
-        doLast {
-            val excludedNuGets = setOf(
-                "NETStandard.Library"
-            )
-            val sdkPropsFolder = riderSdkPath.resolve("Build")
-            val packageRefRegex = "PackageReference\\.(.+).Props".toRegex()
-            val versionRegex = "<Version>(.+)</Version>".toRegex()
-            val packagesWithVersions = sdkPropsFolder.listFiles()
-                ?.mapNotNull { file ->
-                    val packageId = packageRefRegex.matchEntire(file.name)?.groupValues?.get(1) ?: return@mapNotNull null
-                    val version = versionRegex.find(file.readText())?.groupValues?.get(1) ?: return@mapNotNull null
-
-                    packageId to version
-                }
-                ?.filter { (packageId, _) -> !excludedNuGets.contains(packageId) } ?: emptyList()
-
-            val directoryPackagesFileContents = buildString {
-                appendLine("""
-                <!-- Auto-generated from 'generateSdkPackagesVersionsLock' task of old.build_gradle.kts -->
-                <!-- Run `gradlew :prepare` to regenerate -->
-                <Project>
-                <ItemGroup>
-                """.trimIndent())
-                for ((packageId, version) in packagesWithVersions) {
-                    appendLine(
-                        "    <PackageVersion Include=\"${packageId}\" Version=\"${version}\" />"
-                    )
-                }
-                appendLine("""
-                </ItemGroup>
-                </Project>
-                """.trimIndent())
-            }
-
-            nuGetSdkPackagesVersionsFile.writeTextIfChanged(directoryPackagesFileContents)
-        }
-    }
-
     val rdgen by existing
 
     register("prepare") {
-        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps, generateSdkPackagesVersionsLock)
+        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps)
     }
 
     val compileDotNet by registering {
-        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps, generateSdkPackagesVersionsLock)
+        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps)
         doLast {
             exec {
                 workingDir(dotNetSrcDir)

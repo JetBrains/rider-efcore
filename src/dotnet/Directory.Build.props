@@ -30,4 +30,5 @@
     <EmbeddedResource Include="*.DotSettings" />
   </ItemGroup>
 
+  <Import Project="$(MSBuildThisFileDirectory)..\..\build\DotNetSdkPath.generated.props" Condition="True"/>
 </Project>
