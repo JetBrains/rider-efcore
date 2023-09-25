@@ -20,6 +20,13 @@
     <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Lifetimes" />
+    <PackageReference Include="JetBrains.RdFramework" />
+    <PackageReference Include="JetBrains.NuGet.Packaging" />
+    <PackageReference Include="JetBrains.NuGet.Versioning" />
+  </ItemGroup>
+
   <!-- Rider SDK Imports -->
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Core_Ide.Props" Condition="!$(InternalBuild)" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="!$(InternalBuild)" />
