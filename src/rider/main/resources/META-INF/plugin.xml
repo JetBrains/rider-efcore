@@ -35,7 +35,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="EfCore.Groups.Notifications" displayType="BALLOON"/>
-    <postStartupActivity implementation="com.jetbrains.rider.plugins.efcore.startup.EfCoreStartupActivity" />
+    <rd.solutionExtListener endpoint="IDE Frontend" listener="com.jetbrains.rider.plugins.efcore.startup.EfCoreStartupListener"/>
     <applicationConfigurable
       parentId="tools"
       instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
