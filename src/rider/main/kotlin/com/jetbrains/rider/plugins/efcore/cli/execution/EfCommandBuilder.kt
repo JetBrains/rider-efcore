@@ -20,6 +20,7 @@ class EfCommandBuilder(
         addNamed("--configuration", commonOptions.buildConfiguration)
         addNamedNullable("--framework", commonOptions.targetFramework)
         addIf("--no-build", commonOptions.noBuild)
+        addIf("--verbose", commonOptions.enableDiagnosticLogging)
     }
 
     override fun build(): GeneralCommandLine {

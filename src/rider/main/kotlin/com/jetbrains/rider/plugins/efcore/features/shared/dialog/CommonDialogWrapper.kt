@@ -340,6 +340,10 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             } else EfCoreUiBundle.message("label.none")
 
         groupRowsRange(EfCoreUiBundle.message("section.execution")) {
+            row {
+                checkBox(EfCoreUiBundle.message("checkbox.enable.diagnostic.logging"))
+                    .bindSelected(dataCtx.enableDiagnosticLogging)
+            }
             if (efCoreVersion.major >= 5) {
                 row(EfCoreUiBundle.message("additional.arguments")) {
                     simpleExpandableTextField(dataCtx.additionalArguments)
@@ -361,6 +365,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
         dataCtx.buildConfiguration.value!!,
         dataCtx.targetFramework.value,
         dataCtx.noBuild.value,
+        dataCtx.enableDiagnosticLogging.value,
         dataCtx.additionalArguments.value
     )
 

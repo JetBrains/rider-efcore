@@ -7,5 +7,6 @@ data class CommonOptions(
     val buildConfiguration: String,
     val targetFramework: String?,
     val noBuild: Boolean = false,
+    val enableDiagnosticLogging: Boolean = false,
     val additionalArguments: String = ""
 )
