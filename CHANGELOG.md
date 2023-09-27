@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [233.0.0-eap01]
 ### Added
 - Terminal: "Execute in IDE" suggestion for known commands when executing `dotnet ef` from terminal (#188 by @alls-cpp)
 - Common: Enable `Tools | Entity Framework Core` action group for solution's context menu 
@@ -218,7 +218,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Suggesting installing dotnet `ef command` line tools if not installed (when opening solution that contains EF Core related projects)
 - Deleting used database
 
-[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v232.1.0...HEAD
+[Unreleased]: https://github.com/seclerp/rider-efcore/compare/v233.0.0-eap01...HEAD
+[233.0.0-eap01]: https://github.com/seclerp/rider-efcore/compare/v232.1.0...v233.0.0-eap01
 [232.1.0]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-rc1...v232.1.0
 [232.0.0-rc1]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap07...v232.0.0-rc1
 [232.0.0-eap07]: https://github.com/seclerp/rider-efcore/compare/v232.0.0-eap02...v232.0.0-eap07
