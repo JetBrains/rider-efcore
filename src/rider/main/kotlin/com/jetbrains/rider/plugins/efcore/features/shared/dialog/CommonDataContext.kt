@@ -29,6 +29,7 @@ open class CommonDataContext(
     val targetFramework = observable<String?>(null).withLogger("targetFramework")
     val buildConfiguration = observable<String?>(null).withLogger("buildConfiguration")
     val noBuild = observable(false).withLogger("noBuild")
+    val enableDiagnosticLogging = observable(false).withLogger("enableDiagnosticLogging")
     val additionalArguments = observable("").withLogger("additionalArguments")
 
     override fun initBindings() {
@@ -124,6 +125,10 @@ open class CommonDataContext(
             noBuild.value = this
         }
 
+        commonDialogState.getBool(KnownStateKeys.ENABLE_DIAGNOSTIC_LOGGING)?.apply {
+            enableDiagnosticLogging.value = this
+        }
+
         if (pluginSettings.storeSensitiveData) {
             commonDialogState.getSensitive(KnownStateKeys.ADDITIONAL_ARGUMENTS)?.apply {
                 additionalArguments.value = this
@@ -147,6 +152,7 @@ open class CommonDataContext(
         }
 
         commonDialogState.set(KnownStateKeys.NO_BUILD, noBuild.value)
+        commonDialogState.set(KnownStateKeys.ENABLE_DIAGNOSTIC_LOGGING, enableDiagnosticLogging.value)
 
         if (pluginSettings.storeSensitiveData) {
             commonDialogState.setSensitive(KnownStateKeys.ADDITIONAL_ARGUMENTS, additionalArguments.value)
@@ -158,6 +164,7 @@ open class CommonDataContext(
         const val BUILD_CONFIGURATION = "buildConfiguration"
         const val TARGET_FRAMEWORK = "targetFramework"
         const val NO_BUILD = "noBuild"
+        const val ENABLE_DIAGNOSTIC_LOGGING = "enableDiagnosticLogging"
         const val ADDITIONAL_ARGUMENTS = "additionalArguments"
     }
 }
