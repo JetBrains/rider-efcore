@@ -13,7 +13,7 @@ public class EfCoreInRiderProduct
   public static readonly SubplatformName ThisSubplatformName =
     new((RelativePath)"Plugins" / "rider-efcore" / "src" / "dotnet" / "Rider.Plugins.EfCore");
 
-  public static readonly RelativePath DotFilesFolder = @"plugins\rider-plugins-efcore\dotnet";
+  public static readonly RelativePath DotFilesFolder = @"plugins\rider-efcore\dotnet";
 
   public const string ProductTechnicalName = "EfCore";
 
