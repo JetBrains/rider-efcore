@@ -59,6 +59,8 @@ val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resol
 val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
 val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
 
+extra["productMonorepoDir"] = productMonorepoDir
+
 version = pluginVersion
 
 fun File.writeTextIfChanged(content: String) {
