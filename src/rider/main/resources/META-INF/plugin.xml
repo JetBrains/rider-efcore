@@ -36,9 +36,9 @@
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="EfCore.Groups.Notifications" displayType="BALLOON"/>
     <rd.solutionExtListener endpoint="IDE Frontend" listener="com.jetbrains.rider.plugins.efcore.startup.EfCoreStartupListener"/>
-    <applicationConfigurable
-      parentId="tools"
-      instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable" />
+    <applicationConfigurable parentId="tools"
+                             instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable"
+                             key="configurable.name.ef.core.ui"/>
     <terminal.shellCommandHandler implementation="com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute.EFCoreShellCommandHandler"/>
   </extensions>
 
