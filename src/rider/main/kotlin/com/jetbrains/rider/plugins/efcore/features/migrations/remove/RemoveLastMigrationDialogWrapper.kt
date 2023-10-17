@@ -1,12 +1,12 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.remove
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import java.util.*
 
@@ -22,24 +22,21 @@ class RemoveLastMigrationDialogWrapper(
     selectedProjectId,
     true
 ) {
-    private val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
+    private val migrationsCommandFactory by lazy { MigrationsCommandFactory.getInstance(intellijProject) }
 
-    //
-    // Constructor
     init {
         initUi()
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val commonOptions = getCommonOptions()
 
         return migrationsCommandFactory.removeLast(commonOptions)
     }
 
     override fun postCommandExecute(commandResult: CliCommandResult) {
-        if (!commandResult.succeeded) {
+        if (!commandResult.succeeded)
             return
-        }
 
         val folderService = intellijProject.service<RemoveLastMigrationFolderService>()
         folderService.deleteMigrationsFolderIfEmpty(dataCtx.availableMigrations.value.firstOrNull())

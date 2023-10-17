@@ -20,6 +20,7 @@ import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.ui.dsl.editableComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
 import com.jetbrains.rider.plugins.efcore.rd.DbProviderInfo
 import com.jetbrains.rider.plugins.efcore.ui.DbConnectionItemRenderer
@@ -43,7 +44,7 @@ class ScaffoldDbContextDialogWrapper(
     selectedProjectId,
     requireMigrationsInProject = false
 ) {
-    val dbContextCommandFactory = intellijProject.service<DbContextCommandFactory>()
+    private val dbContextCommandFactory by lazy { DbContextCommandFactory.getInstance(intellijProject) }
 
     //
     // Internal data
@@ -88,7 +89,7 @@ class ScaffoldDbContextDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val commonOptions = getCommonOptions()
 
         return dbContextCommandFactory.scaffold(

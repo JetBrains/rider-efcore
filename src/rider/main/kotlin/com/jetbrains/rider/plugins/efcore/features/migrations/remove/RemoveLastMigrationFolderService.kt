@@ -4,7 +4,7 @@ import com.intellij.openapi.components.Service
 import com.jetbrains.rider.plugins.efcore.rd.MigrationInfo
 import java.io.File
 
-@Service
+@Service(Service.Level.PROJECT)
 class RemoveLastMigrationFolderService {
     fun deleteMigrationsFolderIfEmpty(migration: MigrationInfo?) {
         val folder = migration?.migrationFolderAbsolutePath ?: return

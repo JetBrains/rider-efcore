@@ -1,0 +1,35 @@
+package com.jetbrains.rider.plugins.efcore.cli.execution
+
+import com.intellij.execution.ui.ConsoleView
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.wm.ToolWindowAnchor
+import com.intellij.openapi.wm.ToolWindowManager
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+
+@Service(Service.Level.PROJECT)
+class EfCoreConsoleToolWindowProvider(intellijProject: Project) {
+    companion object {
+        private val TOOL_WINDOW_TASK_ID = EfCoreUiBundle.message("tab.task.ef.core")
+
+        fun getInstance(project: Project) = project.service<EfCoreConsoleToolWindowProvider>()
+    }
+
+    private val toolWindow by lazy {
+        ToolWindowManager.getInstance(intellijProject).registerToolWindow(TOOL_WINDOW_TASK_ID) {
+            anchor = ToolWindowAnchor.BOTTOM
+            canCloseContent = true
+        }
+    }
+
+    fun createTab(command: DotnetCommand, console: ConsoleView) {
+        val contentManager = toolWindow.contentManager
+        val factory = contentManager.factory
+        val content = factory.createContent(console.component, command.presentableName, true)
+        contentManager.addContent(content)
+        toolWindow.activate {
+            contentManager.setSelectedContent(content)
+        }
+    }
+}
