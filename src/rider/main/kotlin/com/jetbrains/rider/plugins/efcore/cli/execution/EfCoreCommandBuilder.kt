@@ -1,15 +1,16 @@
 package com.jetbrains.rider.plugins.efcore.cli.execution
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.run.withRawParameters
 import java.nio.file.Paths
 
-class EfCommandBuilder(
+class EfCoreCommandBuilder(
     intellijProject: Project,
     baseCommand: String,
-    private val commonOptions: CommonOptions
+    private val commonOptions: CommonOptions,
+    presentableName: String
 ) : DotnetCommandBuilder(
+    presentableName,
     intellijProject,
     KnownEfCommands.ef, baseCommand
 ) {
@@ -23,14 +24,15 @@ class EfCommandBuilder(
         addIf("--verbose", commonOptions.enableDiagnosticLogging)
     }
 
-    override fun build(): GeneralCommandLine {
-        var command = super.build()
+    override fun build(): DotnetCommand {
+        val command = super.build()
+        var commandLine = command.commandLine
         if (commonOptions.additionalArguments.isNotEmpty()) {
             add("--")
-            command = command.withRawParameters(commonOptions.additionalArguments)
+            commandLine = commandLine.withRawParameters(commonOptions.additionalArguments)
         }
 
-        return command
+        return DotnetCommand(command.dotnetPath, commandLine, command.presentableName)
     }
 
     private fun makeRelativeProjectPath(projectDirectory: String): String {

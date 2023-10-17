@@ -16,6 +16,7 @@ import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.DbConnectionItemRenderer
@@ -36,7 +37,7 @@ class UpdateDatabaseDialogWrapper(
     true
 ) {
 
-    val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
+    private val databaseCommandFactory by lazy { DatabaseCommandFactory.getInstance(intellijProject) }
 
     //
     // Internal data
@@ -72,7 +73,7 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val commonOptions = getCommonOptions()
         val targetMigration = dataCtx.targetMigration.value!!.trim()
         val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
