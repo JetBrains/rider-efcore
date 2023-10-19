@@ -84,7 +84,10 @@ abstract class BaseCommandAction(
 
     private fun notifyEfIsNotInstalled(intellijProject: Project) {
         NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
-            .createNotification(EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"), NotificationType.ERROR)
+            .createNotification(
+                EfCoreUiBundle.message("notification.title.ef.core.tools.required"),
+                EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
+                NotificationType.ERROR)
             .addAction(InstallDotnetEfAction())
             .notify(intellijProject)
     }

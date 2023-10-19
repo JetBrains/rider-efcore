@@ -11,6 +11,7 @@ import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 
+@Suppress("UnstableApiUsage")
 class EfCoreStartupListener : SolutionExtListener<RiderEfCoreModel> {
   override fun extensionCreated(lifetime: Lifetime, session: ClientProjectSession, model: RiderEfCoreModel) {
     model.onMissingEfCoreToolsDetected.set { _, unit ->
@@ -18,7 +19,7 @@ class EfCoreStartupListener : SolutionExtListener<RiderEfCoreModel> {
         .getInstance()
         .getNotificationGroup(KnownNotificationGroups.efCore)
         .createNotification(
-          EfCoreUiBundle.message("notification.title.ef.core.tools.are.not.installed"),
+          EfCoreUiBundle.message("notification.title.ef.core.tools.required"),
           EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
           NotificationType.WARNING
         )

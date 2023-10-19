@@ -7,7 +7,7 @@ import com.jetbrains.rider.plugins.efcore.cli.api.ManagementCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.execution.NotificationCommandResultProcessor
 import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 
-class InstallDotnetEfAction : AnAction(EfCoreUiBundle.message("action.fix.text")) {
+class InstallDotnetEfAction : AnAction(EfCoreUiBundle.message("action.install.text")) {
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val project = actionEvent.project!!
         val executor = PreferredCommandExecutorProvider.getInstance(project).getExecutor()
