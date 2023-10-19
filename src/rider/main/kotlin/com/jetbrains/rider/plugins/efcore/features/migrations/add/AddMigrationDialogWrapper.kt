@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
@@ -12,7 +11,7 @@ import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
@@ -60,7 +59,7 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    override fun generateCommand(): DotnetCommand {
+    override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
         val migrationName = dataCtx.migrationName.value.trim()
         val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value

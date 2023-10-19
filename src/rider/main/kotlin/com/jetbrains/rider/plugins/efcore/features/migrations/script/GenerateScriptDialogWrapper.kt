@@ -12,7 +12,7 @@ import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
@@ -72,7 +72,7 @@ class GenerateScriptDialogWrapper(
             mappings.migration.fromItem)
     }
 
-    override fun generateCommand(): DotnetCommand {
+    override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
         val fromMigration = dataCtx.fromMigration.value!!.trim()
         val toMigration = dataCtx.toMigration.value?.trim()
