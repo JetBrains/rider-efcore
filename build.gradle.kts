@@ -22,7 +22,7 @@ plugins {
     // https://plugins.gradle.org/plugin/org.jetbrains.changelog
     id("org.jetbrains.changelog") version "2.2.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.intellij
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij") version "1.16.0"
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
 }
 
@@ -98,19 +98,17 @@ configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
 
     verbose = true
     if (inMonorepo) {
-        sources(
-            listOf(
-                File("$productMonorepoDir/Rider/Frontend/rider/model/sources"),
-                File("$productMonorepoDir/Rider/ultimate/remote-dev/rd-ide-model-sources"),
-                File("$modelDir/rider")
-            )
-        )
+        classpath({
+            val riderModelClassPathFile: String by project
+            File(riderModelClassPathFile).readLines()
+        })
     } else {
         classpath({
             "${rdLibDirectory()}/rider-model.jar"
         })
-        sources("$modelDir/rider")
     }
+    sources("$modelDir/rider")
+
     hashFolder = "$buildDir"
     packages = "model.rider"
 

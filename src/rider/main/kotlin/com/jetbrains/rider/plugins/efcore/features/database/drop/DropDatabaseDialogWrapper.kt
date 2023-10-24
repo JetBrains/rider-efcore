@@ -1,14 +1,14 @@
 package com.jetbrains.rider.plugins.efcore.features.database.drop
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import java.util.*
 
 class DropDatabaseDialogWrapper(
@@ -23,7 +23,7 @@ class DropDatabaseDialogWrapper(
     selectedProjectId,
     false
 ) {
-    private val databaseCommandFactory = intellijProject.service<DatabaseCommandFactory>()
+    private val databaseCommandFactory by lazy { DatabaseCommandFactory.getInstance(intellijProject) }
 
     //
     // Constructor
@@ -45,7 +45,7 @@ class DropDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val options = getCommonOptions()
         return databaseCommandFactory.drop(options)
     }

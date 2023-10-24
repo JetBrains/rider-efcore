@@ -11,21 +11,21 @@ class EfCoreUiConfigurable : BoundConfigurable(EfCoreUiBundle.message("configura
     private val settingsStateService = EfCoreUiSettingsStateService.getInstance()
 
     override fun createPanel() = panel {
-        group(EfCoreUiBundle.message("section.dialogs.data")) {
+        group(EfCoreUiBundle.message("section.autofill")) {
             row {
-                checkBox(EfCoreUiBundle.message("checkbox.use.previously.selected.options.in.dialogs"))
+                checkBox(EfCoreUiBundle.message("checkbox.autofill.general.options"))
                     .bindSelected(settingsStateService::usePreviouslySelectedOptionsInDialogs)
                     .align(AlignX.FILL)
-                    .comment(EfCoreUiBundle.message("reuse.data.comment"))
+                    .comment(EfCoreUiBundle.message("checkbox.autofill.general.options.comment"))
             }
             row {
-                checkBox(EfCoreUiBundle.message("checkbox.store.sensitive.data.in.secure.store"))
+                checkBox(EfCoreUiBundle.message("checkbox.autofill.additional.options"))
                     .bindSelected(settingsStateService::storeSensitiveData)
                     .align(AlignX.FILL)
-                    .comment(EfCoreUiBundle.message("sensitive.reuse.comment"))
+                    .comment(EfCoreUiBundle.message("checkbox.autofill.additional.options.comment"))
             }
             row {
-                button(EfCoreUiBundle.message("button.clear.stored.data")) {
+                button(EfCoreUiBundle.message("button.clear.stored.options")) {
                     DialogsStateService.getInstance().clearState()
                 }
             }

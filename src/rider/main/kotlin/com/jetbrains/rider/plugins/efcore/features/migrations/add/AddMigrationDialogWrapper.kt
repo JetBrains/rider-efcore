@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
@@ -8,17 +7,18 @@ import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.jetbrains.observables.bind
 import com.jetbrains.observables.observable
+import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.withLogger
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
-import com.jetbrains.observables.ui.dsl.bindText
-import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 class AddMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
@@ -31,7 +31,7 @@ class AddMigrationDialogWrapper(
     intellijProject,
     selectedProjectId
 ) {
-    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
+    private val migrationsCommandFactory by lazy { MigrationsCommandFactory.getInstance(intellijProject) }
 
     //
     // Internal data
@@ -60,7 +60,7 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val commonOptions = getCommonOptions()
         val migrationName = dataCtx.migrationName.value.trim()
         val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value

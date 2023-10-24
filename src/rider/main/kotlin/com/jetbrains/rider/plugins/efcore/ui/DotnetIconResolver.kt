@@ -24,7 +24,6 @@ object DotnetIconResolver {
     fun resolveForType(type: DotnetIconType): Icon {
         return when(type) {
             DotnetIconType.BUILD_CONFIGURATION -> ReSharperIcons.ProjectModel.ProjectProperties
-            DotnetIconType.TARGET_FRAMEWORK -> RiderIcons.RunConfigurations.Application
             DotnetIconType.CSHARP_CLASS -> ReSharperIcons.PsiCSharp.Csharp
         }
     }
@@ -32,6 +31,5 @@ object DotnetIconResolver {
 
 enum class DotnetIconType {
     BUILD_CONFIGURATION,
-    TARGET_FRAMEWORK,
     CSHARP_CLASS,
 }

@@ -19,11 +19,14 @@ class IconComboBoxRendererAdapter<T : IconItem<*>>: ListCellRenderer<T?> {
     ): Component {
         delegatingRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
 
-        if (value != null) {
-            delegatingRenderer.text = value.displayName
-            delegatingRenderer.icon = value.icon
-        } else {
-            delegatingRenderer.text = EfCoreUiBundle.message("none")
+        when (value) {
+            null -> {
+                delegatingRenderer.text = EfCoreUiBundle.message("none")
+            }
+            else -> {
+                delegatingRenderer.text = value.displayName
+                delegatingRenderer.icon = value.icon
+            }
         }
 
         return delegatingRenderer

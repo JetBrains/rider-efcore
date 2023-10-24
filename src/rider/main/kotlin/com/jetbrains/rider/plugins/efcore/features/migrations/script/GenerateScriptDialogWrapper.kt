@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.script
 
-import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.dsl.builder.*
@@ -13,6 +12,7 @@ import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
@@ -24,12 +24,12 @@ class GenerateScriptDialogWrapper(
 ) : CommonDialogWrapper<GenerateScriptDataContext>(
     GenerateScriptDataContext(intellijProject),
     toolsVersion,
-    EfCoreUiBundle.message("generate.sql.script"),
+    EfCoreUiBundle.message("generate.sql.script.presentable.name"),
     intellijProject,
     selectedProjectId,
     requireMigrationsInProject = true
 ) {
-    val migrationsCommandFactory = intellijProject.service<MigrationsCommandFactory>()
+    private val migrationsCommandFactory by lazy { intellijProject.service<MigrationsCommandFactory>() }
 
     //
     // Internal data
@@ -72,7 +72,7 @@ class GenerateScriptDialogWrapper(
             mappings.migration.fromItem)
     }
 
-    override fun generateCommand(): GeneralCommandLine {
+    override fun generateCommand(): DotnetCommand {
         val commonOptions = getCommonOptions()
         val fromMigration = dataCtx.fromMigration.value!!.trim()
         val toMigration = dataCtx.toMigration.value?.trim()
