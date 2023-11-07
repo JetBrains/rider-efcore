@@ -1,12 +1,11 @@
 package com.jetbrains.rider.plugins.efcore.features.database.drop
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import java.util.*
@@ -45,7 +44,7 @@ class DropDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): DotnetCommand {
+    override fun generateCommand(): CliCommand {
         val options = getCommonOptions()
         return databaseCommandFactory.drop(options)
     }
