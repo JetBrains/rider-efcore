@@ -23,10 +23,10 @@ class EfCoreConsoleToolWindowProvider(intellijProject: Project) {
         }
     }
 
-    fun createTab(command: DotnetCommand, console: ConsoleView) {
+    fun createTab(command: CliCommand, console: ConsoleView) {
         val contentManager = toolWindow.contentManager
         val factory = contentManager.factory
-        val content = factory.createContent(console.component, command.presentableName, true)
+        val content = factory.createContent(console.component, command.presentationInfo.name, true)
         contentManager.addContent(content)
         toolWindow.activate {
             contentManager.setSelectedContent(content)

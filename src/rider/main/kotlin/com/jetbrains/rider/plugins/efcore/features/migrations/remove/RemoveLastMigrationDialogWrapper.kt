@@ -6,7 +6,7 @@ import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import java.util.*
 
@@ -28,7 +28,7 @@ class RemoveLastMigrationDialogWrapper(
         initUi()
     }
 
-    override fun generateCommand(): DotnetCommand {
+    override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
 
         return migrationsCommandFactory.removeLast(commonOptions)

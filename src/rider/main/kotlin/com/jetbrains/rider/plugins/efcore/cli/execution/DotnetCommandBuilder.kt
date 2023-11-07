@@ -12,7 +12,7 @@ import java.io.File
 import java.nio.charset.Charset
 
 open class DotnetCommandBuilder(
-    private val presentableName: String,
+    private val presentation: CliCommandPresentationInfo,
     private val intellijProject: Project,
     vararg baseCommands: @NonNls String
 ) {
@@ -58,7 +58,7 @@ open class DotnetCommandBuilder(
             generalCommandLine = generalCommandLine.withParameters(name, value)
     }
 
-    open fun build() = DotnetCommand(generalCommandLine.exePath, generalCommandLine, presentableName)
+    open fun build() = CliCommand(generalCommandLine.exePath, generalCommandLine, presentation)
 
     private fun getDotnetExePath() =
         activeRuntime?.dotNetCliExePath

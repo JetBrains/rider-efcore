@@ -5,12 +5,10 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.util.launchOnUi
+import com.intellij.openapi.rd.util.lifetime
+import com.intellij.openapi.rd.util.withBackgroundContext
 import com.jetbrains.rider.model.dotNetActiveRuntimeModel
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
@@ -18,39 +16,23 @@ import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.NotificationCommandResultProcessor
 import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
 import java.util.UUID
 
-abstract class BaseCommandAction(
-    private val actionPerformedText: String
-) : AnAction() {
+abstract class BaseCommandAction : AnAction() {
     override fun update(actionEvent: AnActionEvent) {
         actionEvent.presentation.isVisible = actionEvent.isEfCoreActionContext()
     }
 
     override fun actionPerformed(actionEvent: AnActionEvent) {
-        val intellijProject = actionEvent.project!!
-        ProgressManager.getInstance().run(object : Task.Backgroundable(actionEvent.project, EfCoreUiBundle.message("progress.title.getting.dotnet.ef.version"), false) {
-            override fun run(progress: ProgressIndicator) {
-                val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
-                val dotnetCliPath = intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull?.dotNetCliExePath
-
-                if (dotnetCliPath == null) {
-                    notifyDotnetIsNotInstalled(intellijProject)
-                } else if (efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None) {
-                    notifyEfIsNotInstalled(intellijProject)
-                } else {
-                    val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version)!!
-                    ApplicationManager.getApplication().invokeLater {
-                        openDialog(actionEvent, toolsVersion)
-                    }
-                }
-            }
-        })
+        val intellijProject = actionEvent.project ?: return
+        intellijProject.lifetime.launchOnUi {
+            val version = fetchEfCoreVersion(intellijProject) ?: return@launchOnUi
+            openDialog(actionEvent, version)
+        }
     }
 
     override fun getActionUpdateThread() = ActionUpdateThread.EDT
@@ -61,24 +43,42 @@ abstract class BaseCommandAction(
         model: RiderEfCoreModel,
         currentDotnetProjectId: UUID?): BaseDialogWrapper
 
-    private fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
+    private fun fetchEfCoreVersion(intellijProject: Project): DotnetEfVersion? {
+        val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
+        val dotnetCliPath = intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull?.dotNetCliExePath
+        val dotnetEfVersion = efCoreDefinition?.let { DotnetEfVersion.parse(it.version) }
+
+        return when {
+            dotnetCliPath == null -> {
+                notifyDotnetIsNotInstalled(intellijProject)
+                null
+            }
+            efCoreDefinition == null || efCoreDefinition.toolKind == ToolKind.None -> {
+                notifyEfIsNotInstalled(intellijProject)
+                null
+            }
+            dotnetEfVersion == null ->  {
+                notifyUnknownEfIsInstalled(intellijProject, efCoreDefinition.version)
+                null
+            }
+            else -> dotnetEfVersion
+        }
+    }
+
+    private suspend fun openDialog(actionEvent: AnActionEvent, efCoreVersion: DotnetEfVersion) {
         val intellijProject = actionEvent.project ?: return
         val model = actionEvent.project?.solution?.riderEfCoreModel ?: return
         val currentDotnetProjectName = actionEvent.actionDotnetProjectId
         val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
 
         if (dialog.showAndGet()) {
-            val executor = intellijProject.service<PreferredCommandExecutorProvider>().getExecutor()
+            val executor = PreferredCommandExecutorProvider.getInstance(intellijProject).getExecutor()
             val command = dialog.generateCommand()
-            val processor = NotificationCommandResultProcessor(
-                intellijProject,
-                actionPerformedText,
-                true
-            ).withPostExecuted {
-                dialog.postCommandExecute(it)
+            withBackgroundContext {
+                executor.execute(command)?.apply {
+                    dialog.postCommandExecute(this)
+                }
             }
-
-            executor.execute(command, processor)
         }
     }
 
@@ -88,6 +88,13 @@ abstract class BaseCommandAction(
                 EfCoreUiBundle.message("notification.title.ef.core.tools.required"),
                 EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
                 NotificationType.ERROR)
+            .addAction(InstallDotnetEfAction())
+            .notify(intellijProject)
+    }
+
+    private fun notifyUnknownEfIsInstalled(intellijProject: Project, version: String) {
+        NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
+            .createNotification(EfCoreUiBundle.message("notification.content.invalid.ef.core.tools.version", version), NotificationType.ERROR)
             .addAction(InstallDotnetEfAction())
             .notify(intellijProject)
     }

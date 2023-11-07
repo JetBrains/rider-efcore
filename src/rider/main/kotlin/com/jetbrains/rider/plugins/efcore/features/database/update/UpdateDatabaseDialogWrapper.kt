@@ -1,7 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.database.update
 
-import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
@@ -16,7 +14,7 @@ import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.DbConnectionItemRenderer
@@ -73,7 +71,7 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): DotnetCommand {
+    override fun generateCommand(): CliCommand {
         val commonOptions = getCommonOptions()
         val targetMigration = dataCtx.targetMigration.value!!.trim()
         val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
