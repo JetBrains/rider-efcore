@@ -3,16 +3,15 @@ package com.jetbrains.rider.plugins.efcore.cli.execution
 import com.intellij.execution.util.ExecUtil
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.progress.withBackgroundProgress
+import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.intellij.openapi.project.Project
 import com.intellij.platform.util.progress.indeterminateStep
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.features.shared.TryCommandAgainAction
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 
-@Suppress("UnstableApiUsage", "OPT_IN_USAGE")
+@Suppress("UnstableApiUsage")
 class SilentCommandExecutor(
     intellijProject: Project
 ) : CliCommandExecutor(intellijProject) {
