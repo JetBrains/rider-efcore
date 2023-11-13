@@ -27,6 +27,7 @@ namespace Rider.Plugins.EfCore
   {
     private readonly Lifetime _lifetime;
     private readonly ISolution _solution;
+    private readonly SolutionTracker _solutionTracker;
     private readonly ShellRdDispatcher _shellRdDispatcher;
     private readonly SupportedMigrationsProjectsProvider _supportedMigrationsProjectsProvider;
     private readonly SupportedStartupProjectsProvider _supportedStartupProjectsProvider;
@@ -53,6 +54,7 @@ namespace Rider.Plugins.EfCore
     {
       _lifetime = lifetime;
       _solution = solution;
+      _solutionTracker = solutionTracker;
       _shellRdDispatcher = shellRdDispatcher;
       _supportedMigrationsProjectsProvider = supportedMigrationsProjectsProvider;
       _supportedStartupProjectsProvider = supportedStartupProjectsProvider;
@@ -67,13 +69,14 @@ namespace Rider.Plugins.EfCore
       _efCoreModel.GetAvailableMigrations.SetSync(GetAvailableMigrations);
       _efCoreModel.GetAvailableDbContexts.SetSync(GetAvailableDbContexts);
       _efCoreModel.GetAvailableDbProviders.SetSync(GetAvailableDbProviders);
+      _efCoreModel.RefreshDotNetToolsCache.SetVoid(RefreshDotNetToolsCache);
 
-      solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
-      solutionTracker.OnAfterToolsCacheUpdate += InvalidateEfToolsDefinition;
-      solutionTracker.OnAfterNuGetUpdate += InvalidateProjects;
-      solutionTracker.OnAfterSolutionLoad += OnSolutionLoaded;
+      _solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
+      _solutionTracker.OnAfterToolsCacheUpdate += InvalidateEfToolsDefinition;
+      _solutionTracker.OnAfterNuGetUpdate += InvalidateProjects;
+      _solutionTracker.OnAfterSolutionLoad += OnSolutionLoaded;
 
-      solutionTracker.Setup();
+      _solutionTracker.Setup();
     }
 
     //
@@ -232,5 +235,7 @@ namespace Rider.Plugins.EfCore
 
       return project;
     }
+
+    private void RefreshDotNetToolsCache(Unit _) => _solutionTracker.RefreshDotNetToolsCache();
   }
 }
