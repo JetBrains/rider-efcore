@@ -5,10 +5,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.CommonOptions
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommand
-import com.jetbrains.rider.plugins.efcore.cli.execution.EfCoreCommandBuilder
-import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
+import com.jetbrains.rider.plugins.efcore.cli.execution.*
 
 @Service(Service.Level.PROJECT)
 class DbContextCommandFactory(private val intellijProject: Project) {
@@ -19,8 +16,12 @@ class DbContextCommandFactory(private val intellijProject: Project) {
     fun scaffold(efCoreVersion: DotnetEfVersion, options: CommonOptions, connection: String, provider: String,
                  outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
                  usePluralizer: Boolean, dbContextName: String, dbContextFolder: String, scaffoldAllTables: Boolean,
-                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): DotnetCommand =
-        EfCoreCommandBuilder(intellijProject, KnownEfCommands.DbContext.scaffold, options, EfCoreUiBundle.message("scaffold.dbcontext.presentable.name")).apply {
+                 tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommand {
+        val presentation = CliCommandPresentationInfo(
+            EfCoreUiBundle.message("scaffold.dbcontext.presentable.name"),
+            EfCoreUiBundle.message("dbcontext.has.been.scaffolded"))
+
+        return EfCoreCommandBuilder(intellijProject, KnownEfCommands.DbContext.scaffold, options, presentation).apply {
             add(connection)
             add(provider)
 
@@ -49,4 +50,5 @@ class DbContextCommandFactory(private val intellijProject: Project) {
                 addIf("--no-pluralize", !usePluralizer)
             }
         }.build()
+    }
 }

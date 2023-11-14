@@ -8,9 +8,9 @@ class EfCoreCommandBuilder(
     intellijProject: Project,
     baseCommand: String,
     private val commonOptions: CommonOptions,
-    presentableName: String
+    presentation: CliCommandPresentationInfo
 ) : DotnetCommandBuilder(
-    presentableName,
+    presentation,
     intellijProject,
     KnownEfCommands.ef, baseCommand
 ) {
@@ -24,7 +24,7 @@ class EfCoreCommandBuilder(
         addIf("--verbose", commonOptions.enableDiagnosticLogging)
     }
 
-    override fun build(): DotnetCommand {
+    override fun build(): CliCommand {
         val command = super.build()
         var commandLine = command.commandLine
         if (commonOptions.additionalArguments.isNotEmpty()) {
@@ -32,7 +32,7 @@ class EfCoreCommandBuilder(
             commandLine = commandLine.withRawParameters(commonOptions.additionalArguments)
         }
 
-        return DotnetCommand(command.dotnetPath, commandLine, command.presentableName)
+        return CliCommand(command.dotnetPath, commandLine, command.presentationInfo)
     }
 
     private fun makeRelativeProjectPath(projectDirectory: String): String {
