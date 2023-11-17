@@ -1,19 +1,14 @@
 package com.jetbrains.rider.plugins.efcore.features.connections.impl
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
-import com.intellij.ide.customize.transferSettings.db.WindowsEnvVariables
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.jetbrains.rider.model.RdProjectDescriptor
-import com.jetbrains.rider.projectView.nodes.getUserData
-import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
-import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionProvider
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.shared.services.JsonSerializer
+import com.jetbrains.rider.projectView.nodes.getUserData
 import org.jetbrains.annotations.NonNls
 import kotlin.io.path.Path
 
@@ -22,7 +17,7 @@ class UserSecretsConnectionProvider(private val intellijProject: Project) : DbCo
     companion object {
         @NonNls
         private val userSecretsFolder = if (SystemInfo.isWindows)
-            Path(WindowsEnvVariables.applicationData, "Microsoft", "UserSecrets")
+            Path(System.getenv("APPDATA"), "Microsoft", "UserSecrets")
         else
             Path(System.getenv("HOME"), ".microsoft", "usersecrets")
         fun getInstance(intellijProject: Project) = intellijProject.service<UserSecretsConnectionProvider>()
