@@ -30,11 +30,14 @@ fun AnActionEvent.isProjectsModeContext(): Boolean {
     return true
 }
 
-fun AnActionEvent.isSolutionModeContext() = when {
+fun AnActionEvent.isSolutionModeContext(): Boolean {
+  val extension = getData(PlatformDataKeys.VIRTUAL_FILE)?.extension
+  return when {
     ActionPlaces.isMainMenuOrActionSearch(place) -> true
     ActionPlaces.isMainToolbar(place) -> true
-    ActionPlaces.isPopupPlace(place) -> true
+    ActionPlaces.isPopupPlace(place) && extension == "sln" || extension == "slnf" -> true
     else -> false
+  }
 }
 
 val AnActionEvent.actionDotnetProjectFile: ProjectModelEntity? get() {
