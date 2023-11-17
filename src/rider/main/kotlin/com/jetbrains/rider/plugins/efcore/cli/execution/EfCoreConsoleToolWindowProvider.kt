@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowAnchor
 import com.intellij.openapi.wm.ToolWindowManager
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import icons.RiderIcons
 
 @Service(Service.Level.PROJECT)
 class EfCoreConsoleToolWindowProvider(intellijProject: Project) {
@@ -20,6 +21,7 @@ class EfCoreConsoleToolWindowProvider(intellijProject: Project) {
         ToolWindowManager.getInstance(intellijProject).registerToolWindow(TOOL_WINDOW_TASK_ID) {
             anchor = ToolWindowAnchor.BOTTOM
             canCloseContent = true
+            icon = RiderIcons.Toolwindows.ToolwindowEFCore
         }
     }
 
