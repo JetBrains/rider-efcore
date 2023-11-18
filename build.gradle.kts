@@ -54,7 +54,7 @@ val nuGetConfigFile = File(dotNetSrcDir, "nuget.config")
 val ktOutputRelativePath = "src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd"
 
 val productMonorepoDir = getProductMonorepoRoot()
-val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("Plugins/_RiderEfCore.Pregenerated") ?: error("Building not in monorepo") }
+val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("dotnet/Plugins/_RiderEfCore.Pregenerated") ?: error("Building not in monorepo") }
 val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
 val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
 val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
@@ -303,7 +303,7 @@ fun getProductMonorepoRoot(): File? {
     var currentDir = projectDir
 
     while (currentDir.parent != null) {
-        if (currentDir.listFiles()?.any { it.name == ".dotnet-products.root.marker" } == true) {
+        if (currentDir.resolve(".ultimate.root.marker").exists()) {
             return currentDir
         }
         currentDir = currentDir.parentFile
