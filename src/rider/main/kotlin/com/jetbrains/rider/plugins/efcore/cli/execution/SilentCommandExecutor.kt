@@ -9,9 +9,10 @@ import com.intellij.platform.util.progress.indeterminateStep
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.features.shared.TryCommandAgainAction
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 
-@Suppress("UnstableApiUsage")
+@Suppress("UnstableApiUsage", "OPT_IN_USAGE")
 class SilentCommandExecutor(
     intellijProject: Project
 ) : CliCommandExecutor(intellijProject) {

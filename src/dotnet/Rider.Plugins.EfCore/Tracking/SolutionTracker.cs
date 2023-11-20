@@ -87,5 +87,7 @@ namespace Rider.Plugins.EfCore.Tracking
         )
       );
     }
+
+    public void RefreshDotNetToolsCache() => _dotnetToolsTracker.QueueManifestUpdate();
   }
 }
