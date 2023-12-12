@@ -67,7 +67,7 @@ namespace Rider.Plugins.EfCore.Tracking
 
       _solutionLoadScheduler.EnqueueTask(
         new SolutionLoadTask(
-          $"{nameof(SolutionTracker)}.SolutionLoaded",
+          GetType(),
           SolutionLoadTaskKinds.AfterDone,
           () =>
           {
