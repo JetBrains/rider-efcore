@@ -11,8 +11,8 @@ using JetBrains.ReSharper.Feature.Services.Protocol;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using Rider.Plugins.EfCore.Compatibility;
-using Rider.Plugins.EfCore.Connection;
 using Rider.Plugins.EfCore.DbContext;
+using Rider.Plugins.EfCore.Dependencies;
 using Rider.Plugins.EfCore.Exceptions;
 using Rider.Plugins.EfCore.Logging;
 using Rider.Plugins.EfCore.Mapping;
@@ -33,7 +33,7 @@ namespace Rider.Plugins.EfCore
     private readonly SupportedStartupProjectsProvider _supportedStartupProjectsProvider;
     private readonly MigrationsProvider _migrationsProvider;
     private readonly DbContextProvider _dbContextProvider;
-    private readonly DbProviderService _dbProviderService;
+    private readonly EfCorePackagesProvider _packagesProvider;
     private readonly ILogger _logger;
 
     private readonly RiderEfCoreModel _efCoreModel;
@@ -49,7 +49,7 @@ namespace Rider.Plugins.EfCore
       SupportedStartupProjectsProvider supportedStartupProjectsProvider,
       MigrationsProvider migrationsProvider,
       DbContextProvider dbContextProvider,
-      DbProviderService dbProviderService,
+      EfCorePackagesProvider packagesProvider,
       ILogger logger)
     {
       _lifetime = lifetime;
@@ -60,7 +60,7 @@ namespace Rider.Plugins.EfCore
       _supportedStartupProjectsProvider = supportedStartupProjectsProvider;
       _migrationsProvider = migrationsProvider;
       _dbContextProvider = dbContextProvider;
-      _dbProviderService = dbProviderService;
+      _packagesProvider = packagesProvider;
       _logger = logger;
 
       _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
@@ -69,6 +69,7 @@ namespace Rider.Plugins.EfCore
       _efCoreModel.GetAvailableMigrations.SetSync(GetAvailableMigrations);
       _efCoreModel.GetAvailableDbContexts.SetSync(GetAvailableDbContexts);
       _efCoreModel.GetAvailableDbProviders.SetSync(GetAvailableDbProviders);
+      _efCoreModel.GetAvailableToolPackages.SetSync(GetAvailableToolsPackages);
       _efCoreModel.RefreshDotNetToolsCache.SetVoid(RefreshDotNetToolsCache);
 
       _solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
@@ -86,19 +87,19 @@ namespace Rider.Plugins.EfCore
     {
       InvalidateProjects();
 
-      if (_efCoreModel.EfToolsDefinition.Maybe.HasValue)
+      if (_efCoreModel.CliToolsDefinition.Maybe.HasValue)
       {
-        var efToolsDefinitionValue = _efCoreModel.EfToolsDefinition.Value;
+        var efToolsDefinitionValue = _efCoreModel.CliToolsDefinition.Value;
         if (efToolsDefinitionValue != null)
         {
           CheckToolsInstalled(efToolsDefinitionValue);
         }
       }
 
-      _efCoreModel.EfToolsDefinition.Advise(_lifetime, CheckToolsInstalled);
+      _efCoreModel.CliToolsDefinition.Advise(_lifetime, CheckToolsInstalled);
     }
 
-    private void CheckToolsInstalled(EfToolDefinition efToolsDefinition)
+    private void CheckToolsInstalled(CliToolDefinition efToolsDefinition)
     {
       _shellRdDispatcher.Queue(() =>
       {
@@ -123,7 +124,7 @@ namespace Rider.Plugins.EfCore
       var toolKind = ToolKind.None;
       var version = string.Empty;
 
-      if (dotnetEfLocalTool is { })
+      if (dotnetEfLocalTool is not null)
       {
         toolKind = ToolKind.Local;
         version = dotnetEfLocalTool.Version;
@@ -139,7 +140,7 @@ namespace Rider.Plugins.EfCore
         }
       }
 
-      _efCoreModel.EfToolsDefinition.Value = new EfToolDefinition(version, toolKind);
+      _efCoreModel.CliToolsDefinition.Value = new CliToolDefinition(version, toolKind);
     }
 
     private void InvalidateProjects()
@@ -221,7 +222,16 @@ namespace Rider.Plugins.EfCore
       using (ReadLockCookie.Create())
       {
         var project = GetProjectById(projectId);
-        return _dbProviderService.GetDbProviders(project).ToList();
+        return _packagesProvider.GetDbProviders(project).ToList();
+      }
+    }
+
+    private List<ToolsPackageInfo> GetAvailableToolsPackages(Lifetime lifetime, Guid projectId)
+    {
+      using (ReadLockCookie.Create())
+      {
+        var project = GetProjectById(projectId);
+        return _packagesProvider.GetToolsPackages(project).ToList();
       }
     }
 
