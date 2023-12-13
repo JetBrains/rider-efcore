@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
-import com.jetbrains.rider.plugins.efcore.cli.execution.DotnetCommandBuilder
 
 @Service(Service.Level.PROJECT)
 class ManagementCommandFactory(private val intellijProject: Project) {
@@ -19,7 +18,7 @@ class ManagementCommandFactory(private val intellijProject: Project) {
             EfCoreUiBundle.message("install.dotnet.tool.presentable.name"),
             EfCoreUiBundle.message("ef.core.global.tools.have.been.successfully.installed"))
 
-        return DotnetCommandBuilder(presentation, intellijProject, "tool", "install").apply {
+        return DotnetCliCommandBuilder(presentation, intellijProject, "tool", "install").apply {
             add("--ignore-failed-sources")
             addNamed("--add-source", "https://api.nuget.org/v3/index.json")
             add("--global")

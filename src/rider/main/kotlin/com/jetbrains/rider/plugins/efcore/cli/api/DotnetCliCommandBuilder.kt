@@ -1,8 +1,10 @@
-package com.jetbrains.rider.plugins.efcore.cli.execution
+package com.jetbrains.rider.plugins.efcore.cli.api
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.dotNetActiveRuntimeModel
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.run.FormatPreservingPtyCommandLine
@@ -11,7 +13,7 @@ import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.nio.charset.Charset
 
-open class DotnetCommandBuilder(
+open class DotnetCliCommandBuilder(
     private val presentation: CliCommandPresentationInfo,
     private val intellijProject: Project,
     vararg baseCommands: @NonNls String

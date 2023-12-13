@@ -1,11 +1,20 @@
 package com.jetbrains.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
+import com.intellij.openapi.project.Project
+import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import java.util.*
 
 @Service
 @State(name = "EfCoreCommonOptions", storages = [Storage("efCoreCommonOptions.xml")])
 class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
+    companion object {
+        private const val MIGRATIONS_PROJECT_KEY = "migrationsProject"
+        private const val STARTUP_PROJECT_KEY = "startupProject"
+
+        fun getInstance(): CommonOptionsStateService = service()
+    }
+
     private var myState = CommonOptionsState()
 
     override fun getState(): CommonOptionsState = myState
@@ -49,10 +58,5 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
     fun setGlobalProjectIdsPair(migrationsProjectId: UUID, startupProjectId: UUID) {
         myState.solutionLevelOptions[MIGRATIONS_PROJECT_KEY] = migrationsProjectId.toString()
         myState.solutionLevelOptions[STARTUP_PROJECT_KEY] = startupProjectId.toString()
-    }
-
-    companion object {
-        private const val MIGRATIONS_PROJECT_KEY = "migrationsProject"
-        private const val STARTUP_PROJECT_KEY = "startupProject"
     }
 }
