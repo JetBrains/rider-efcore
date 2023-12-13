@@ -8,14 +8,15 @@ import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import java.util.*
 
 class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedProjectId: UUID?,
-) : CommonDialogWrapper<CommonDataContext>(
-    CommonDataContext(intellijProject, true),
+) : CommonDialogWrapper<DropDatabaseDataContext>(
+    DropDatabaseDataContext(intellijProject, true),
     toolsVersion,
     EfCoreUiBundle.message("action.EfCore.Features.Database.DropDatabaseAction.text"),
     intellijProject,
@@ -44,8 +45,8 @@ class DropDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): DialogCommand {
         val options = getCommonOptions()
-        return databaseCommandFactory.drop(options)
+        return DropDatabaseCommand(options)
     }
 }

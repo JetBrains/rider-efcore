@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.*
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOptions
 import org.jetbrains.annotations.NonNls
 
 @Service(Service.Level.PROJECT)
@@ -15,12 +16,12 @@ class DatabaseCommandFactory(private val intellijProject: Project) {
         fun getInstance(project: Project) = project.service<DatabaseCommandFactory>()
     }
 
-    fun update(efCoreVersion: DotnetEfVersion, options: CommonOptions, targetMigration: String, connectionString: String? = null): CliCommand {
+    fun update(efCoreVersion: DotnetEfVersion, options: DialogCommonOptions, targetMigration: String, connectionString: String? = null): CliCommand {
         val presentation = CliCommandPresentationInfo(
             EfCoreUiBundle.message("update.database.presentable.name"),
             EfCoreUiBundle.message("database.has.been.updated"))
 
-        return EfCoreCommandBuilder(intellijProject, KnownEfCommands.Database.update, options, presentation).apply {
+        return EfCoreCliCommandBuilder(intellijProject, KnownEfCommands.Database.update, options, presentation).apply {
             add(targetMigration)
 
             if (efCoreVersion.major >= 5 && connectionString != null) {
@@ -29,12 +30,12 @@ class DatabaseCommandFactory(private val intellijProject: Project) {
         }.build()
     }
 
-    fun drop(options: CommonOptions): CliCommand {
+    fun drop(options: DialogCommonOptions): CliCommand {
         val presentation = CliCommandPresentationInfo(
             EfCoreUiBundle.message("drop.database.presentable.name"),
             EfCoreUiBundle.message("database.has.been.deleted"))
 
-        return EfCoreCommandBuilder(intellijProject, KnownEfCommands.Database.drop, options, presentation).apply {
+        return EfCoreCliCommandBuilder(intellijProject, KnownEfCommands.Database.drop, options, presentation).apply {
             add("--force")
         }.build()
     }

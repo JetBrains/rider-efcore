@@ -75,7 +75,7 @@ class EFCoreShellCommandHandler : TerminalShellCommandHandler {
     }
 
     private fun BaseCommandAction.launch(project: Project, dotnetProjectId: UUID?): Boolean {
-        val efCoreDefinition = project.solution.riderEfCoreModel.efToolsDefinition.valueOrNull ?: return false
+        val efCoreDefinition = project.solution.riderEfCoreModel.cliToolsDefinition.valueOrNull ?: return false
         val toolsVersion = DotnetEfVersion.parse(efCoreDefinition.version) ?: return false
         return createDialog(project, toolsVersion, project.solution.riderEfCoreModel, dotnetProjectId).showAndGet()
     }
