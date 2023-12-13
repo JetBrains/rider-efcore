@@ -6,24 +6,30 @@ import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTabbedPane
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
 import com.jetbrains.observables.*
-import com.jetbrains.rider.plugins.efcore.cli.api.DbContextCommandFactory
-import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.ui.dsl.editableComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
+import com.jetbrains.rider.plugins.efcore.cli.api.DbContextCommandFactory
+import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.rd.DbProviderInfo
 import com.jetbrains.rider.plugins.efcore.ui.DbConnectionItemRenderer
 import com.jetbrains.rider.plugins.efcore.ui.DbProviderItemRenderer
-import com.jetbrains.rider.plugins.efcore.ui.items.*
+import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
+import com.jetbrains.rider.plugins.efcore.ui.items.DbProviderItem
+import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
+import com.jetbrains.rider.plugins.efcore.ui.items.SimpleListTableModel
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
 import java.util.*
@@ -87,11 +93,11 @@ class ScaffoldDbContextDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
 
-        return dbContextCommandFactory.scaffold(
-            efCoreVersion, commonOptions,
+        return ScaffoldDbContextCommand(
+            commonOptions,
             dataCtx.connection.value,
             dataCtx.provider.value,
             dataCtx.outputFolder.value,
@@ -101,10 +107,10 @@ class ScaffoldDbContextDialogWrapper(
             dataCtx.usePluralizer.value,
             dataCtx.dbContextName.value,
             dataCtx.dbContextFolder.value,
-            dataCtx.scaffoldAllTables.value,
             dataCtx.tablesList.map { it.data },
-            dataCtx.scaffoldAllSchemas.value,
-            dataCtx.schemasList.map { it.data })
+            dataCtx.schemasList.map { it.data },
+            dataCtx.scaffoldAllTables.value,
+            dataCtx.scaffoldAllSchemas.value)
     }
 
     //
