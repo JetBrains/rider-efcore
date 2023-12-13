@@ -14,6 +14,7 @@ import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.ui.items.MigrationItem
 import java.util.*
 
@@ -72,7 +73,7 @@ class GenerateScriptDialogWrapper(
             mappings.migration.fromItem)
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
         val fromMigration = dataCtx.fromMigration.value!!.trim()
         val toMigration = dataCtx.toMigration.value?.trim()
@@ -80,8 +81,7 @@ class GenerateScriptDialogWrapper(
         val idempotent = dataCtx.idempotent.value
         val noTransactions = dataCtx.noTransactions.value
 
-        return migrationsCommandFactory.generateScript(
-            efCoreVersion, commonOptions, fromMigration, toMigration, outputFile, idempotent, noTransactions)
+        return GenerateScriptCommand(commonOptions, fromMigration, toMigration, outputFile, idempotent, noTransactions)
     }
 
     //

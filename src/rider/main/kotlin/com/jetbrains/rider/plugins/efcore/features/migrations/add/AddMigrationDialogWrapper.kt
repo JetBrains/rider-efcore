@@ -13,6 +13,7 @@ import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
@@ -59,12 +60,12 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
         val migrationName = dataCtx.migrationName.value.trim()
         val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value
 
-        return migrationsCommandFactory.add(commonOptions, migrationName, migrationsOutputFolder)
+        return AddMigrationCommand(commonOptions, migrationName, migrationsOutputFolder)
     }
 
     //
