@@ -4,24 +4,17 @@ package com.jetbrains.rider.plugins.efcore.features.shared.statistics
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.*
 import com.intellij.internal.statistic.service.fus.collectors.CounterUsagesCollector
-import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
-import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
-import com.jetbrains.rider.projectView.solution
 import com.intellij.openapi.util.Version
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.features.database.drop.DropDatabaseCommand
-import com.jetbrains.rider.plugins.efcore.features.database.drop.DropDatabaseDataContext
 import com.jetbrains.rider.plugins.efcore.features.database.update.UpdateDatabaseCommand
-import com.jetbrains.rider.plugins.efcore.features.database.update.UpdateDatabaseDataContext
 import com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextCommand
-import com.jetbrains.rider.plugins.efcore.features.dbcontext.scaffold.ScaffoldDbContextDataContext
 import com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationCommand
-import com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationDataContext
 import com.jetbrains.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationCommand
-import com.jetbrains.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationDataContext
 import com.jetbrains.rider.plugins.efcore.features.migrations.script.GenerateScriptCommand
-import com.jetbrains.rider.plugins.efcore.features.migrations.script.GenerateScriptDataContext
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.rd.*
+import com.jetbrains.rider.projectView.solution
 
 @Suppress("UnstableApiUsage", "HardCodedStringLiteral")
 class CommandUsageCollector : CounterUsagesCollector() {
@@ -30,14 +23,16 @@ class CommandUsageCollector : CounterUsagesCollector() {
         val GROUP = EventLogGroup("rider.efcore.command", 1)
 
         private val COMMAND = EventFields.Enum<FusCommandType>("command")
-        private val STARTUP_PROJECT = ObjectEventField("startupProject", FusStartupProject())
-        private val MIGRATIONS_PROJECT = ObjectEventField("migrationsProject", FusMigrationsProject())
+        private val STARTUP_PROJECT = ObjectEventField("startupProject", *FusProject.fields)
+        private val MIGRATIONS_PROJECT = ObjectEventField("migrationsProject", *FusProject.fields)
         private val TARGET_FRAMEWORK = ObjectEventField("targetFramework", FusTargetFramework())
         private val BUILD_CONFIGURATION = EventFields.Enum<FusBuildConfiguration>("buildConfiguration")
         private val NO_BUILD = EventFields.Boolean("noBuild")
         private val ENABLE_DIAGNOSTIC_LOGGING = EventFields.Boolean("enableDiagnosticLogging")
         private val ADDITIONAL_ARGUMENTS_PASSED = EventFields.Boolean("additionalArgumentsPassed")
         private val CLI_TOOLS = ObjectEventField("cliTools", FusCliTools())
+        private val NUGET_TOOLS = ObjectListEventField("nugetTools", *FusToolsPackage.fields)
+        private val DB_PROVIDERS = ObjectListEventField("dbProviders", *FusProviderPackage.fields)
 
         @JvmStatic
         private val startedFields = arrayOf<EventField<*>>(
@@ -49,7 +44,9 @@ class CommandUsageCollector : CounterUsagesCollector() {
             NO_BUILD,
             ENABLE_DIAGNOSTIC_LOGGING,
             ADDITIONAL_ARGUMENTS_PASSED,
-            CLI_TOOLS
+            CLI_TOOLS,
+            NUGET_TOOLS,
+            DB_PROVIDERS
         )
 
         private val EXIT_CODE = EventFields.Int("exitCode")
@@ -100,8 +97,12 @@ class CommandUsageCollector : CounterUsagesCollector() {
 
             val startupProject = command.common.startupProject
             val migrationsProject = command.common.migrationsProject
-            val tfm = FusTargetFramework.create(command.common.targetFramework?.let { Version.parseVersion(it) })
+            val tfm = FusTargetFramework.create(command.common.targetFramework?.version)
             val cliTools = FusCliTools.create(model.cliToolsDefinition.valueOrNull)
+            val toolsPackages = model.getAvailableToolPackages.startSuspending(startupProject.id)
+                .map { FusToolsPackage.create(it) }
+            val providersPackages = model.getAvailableDbProviders.startSuspending(migrationsProject.id)
+                .map { FusProviderPackage.create(it) }
 
             fun createCommandType(): FusCommandType {
                 return when (command) {
@@ -115,20 +116,6 @@ class CommandUsageCollector : CounterUsagesCollector() {
                 }
             }
 
-            suspend fun createStartupProjectData(): ObjectEventData {
-                val toolsPackages = model.getAvailableToolPackages.startSuspending(startupProject.id)
-                    .map { FusToolsPackage.create(it) }
-
-                return FusStartupProject.create(tfm, toolsPackages)
-            }
-
-            suspend fun createMigrationsProjectData(): ObjectEventData {
-                val providersPackages = model.getAvailableDbProviders.startSuspending(migrationsProject.id)
-                    .map { FusProviderPackage.create(it) }
-
-                return FusMigrationsProject.create(tfm, providersPackages)
-            }
-
             fun createBuildConfigurationData(): FusBuildConfiguration {
                 return when (command.common.buildConfiguration.lowercase()) {
                     "debug" -> FusBuildConfiguration.DEBUG
@@ -137,20 +124,19 @@ class CommandUsageCollector : CounterUsagesCollector() {
                 }
             }
 
-            val startupProjectData = createStartupProjectData()
-            val migrationsProjectData = createMigrationsProjectData()
-
             val activity = COMMAND_ACTIVITY.started(project) {
                 listOf<EventPair<*>>(
                     COMMAND.with(createCommandType()),
-                    STARTUP_PROJECT.with(startupProjectData),
-                    MIGRATIONS_PROJECT.with(migrationsProjectData),
+                    STARTUP_PROJECT.with(FusProject.create(startupProject)),
+                    MIGRATIONS_PROJECT.with(FusProject.create(migrationsProject)),
                     TARGET_FRAMEWORK.with(tfm),
                     BUILD_CONFIGURATION.with(createBuildConfigurationData()),
                     NO_BUILD.with(command.common.noBuild),
                     ENABLE_DIAGNOSTIC_LOGGING.with(command.common.enableDiagnosticLogging),
                     ADDITIONAL_ARGUMENTS_PASSED.with(command.common.additionalArguments.trim().isNotEmpty()),
-                    CLI_TOOLS.with(cliTools)
+                    CLI_TOOLS.with(cliTools),
+                    NUGET_TOOLS.with(toolsPackages),
+                    DB_PROVIDERS.with(providersPackages)
                 )
             }
 
@@ -166,20 +152,15 @@ class CommandUsageCollector : CounterUsagesCollector() {
 
     override fun getGroup() = GROUP
 
-    private abstract class FusProject : ObjectDescription() {
-        var tfm by field(ObjectEventField("tfm", FusTargetFramework()))
-    }
-
-    private class FusStartupProject : FusProject() {
-        var tools by field(ObjectListEventField("tools", FusToolsPackage()))
-
-        companion object {
-            fun create(tfmData: ObjectEventData, toolsData: List<ObjectEventData>): ObjectEventData {
-                return build(::FusStartupProject) {
-                    tfm = tfmData
-                    tools = toolsData
-                }
-            }
+    private object FusProject {
+        private val TARGET_FRAMEWORKS = ObjectListEventField("targetFrameworks", FusTargetFramework())
+        val fields = arrayOf(
+            TARGET_FRAMEWORKS
+        )
+        fun create(projectData: ProjectInfo): ObjectEventData {
+            return ObjectEventData(
+                TARGET_FRAMEWORKS.with(projectData.targetFrameworks.map { FusTargetFramework.create(it.version) })
+            )
         }
     }
 
@@ -194,48 +175,38 @@ class CommandUsageCollector : CounterUsagesCollector() {
         OTHER
     }
 
-    private class FusMigrationsProject : FusProject() {
-        var providers by field(ObjectListEventField("providers", FusProviderPackage()))
-
-        companion object {
-            fun create(tfmData: ObjectEventData, providersData: List<ObjectEventData>): ObjectEventData {
-                return build(::FusMigrationsProject) {
-                    tfm = tfmData
-                    providers = providersData
-                }
-            }
+    private object FusToolsPackage {
+        private val VERSION = EventFields.VersionByObject
+        private val KIND = EventFields.Enum<FusToolsPackageKind>("kind")
+        val fields = arrayOf(
+            VERSION,
+            KIND
+        )
+        fun create(toolsPackageInfo: ToolsPackageInfo): ObjectEventData {
+            return ObjectEventData(
+                VERSION.with(Version.parseVersion(toolsPackageInfo.version)),
+                KIND.with(knownToolsPackages[toolsPackageInfo.id] ?: FusToolsPackageKind.OTHER)
+            )
         }
     }
 
-    private class FusToolsPackage : ObjectDescription() {
-        var version by field(EventFields.VersionByObject)
-        var kind by field(EventFields.Enum<FusToolsPackageKind>("kind"))
-
-        companion object {
-            fun create(toolsPackageInfo: ToolsPackageInfo): ObjectEventData {
-                return build(::FusToolsPackage) {
-                    version = Version.parseVersion(toolsPackageInfo.version)
-                    kind = knownToolsPackages[toolsPackageInfo.id]
-                }
-            }
-        }
-    }
-
-    private class FusProviderPackage : ObjectDescription() {
-        var version by field(EventFields.VersionByObject)
-        var database by field(EventFields.Enum<FusProviderDatabase>("database"))
-        var vendor by field(EventFields.Enum<FusProviderVendor>("vendor"))
-
-        companion object {
-            fun create(toolsPackageInfo: DbProviderInfo): ObjectEventData {
-                return build(::FusProviderPackage) {
-                    val (databaseData, providerData) = knownPackagesProviders[toolsPackageInfo.id]
-                        ?: Pair(FusProviderDatabase.OTHER, FusProviderVendor.OTHER)
-                    version = Version.parseVersion(toolsPackageInfo.version)
-                    database = databaseData
-                    vendor = providerData
-                }
-            }
+    private object FusProviderPackage {
+        private val VERSION = EventFields.VersionByObject
+        private val DATABASE = EventFields.Enum<FusProviderDatabase>("database")
+        private val VENDOR = EventFields.Enum<FusProviderVendor>("vendor")
+        val fields = arrayOf(
+            VERSION,
+            DATABASE,
+            VENDOR
+        )
+        fun create(toolsPackageInfo: DbProviderInfo): ObjectEventData {
+            val (databaseData, vendorData) = knownPackagesProviders[toolsPackageInfo.id]
+                ?: Pair(FusProviderDatabase.OTHER, FusProviderVendor.OTHER)
+            return ObjectEventData(
+                VERSION.with(Version.parseVersion(toolsPackageInfo.version)),
+                DATABASE.with(databaseData),
+                VENDOR.with(vendorData)
+            )
         }
     }
 
@@ -246,6 +217,12 @@ class CommandUsageCollector : CounterUsagesCollector() {
             fun create(versionData: Version?): ObjectEventData {
                 return build(::FusTargetFramework) {
                     version = versionData
+                }
+            }
+
+            fun create(versionData: TargetFrameworkVersion?): ObjectEventData {
+                return build(::FusTargetFramework) {
+                    version = versionData?.let { Version(it.major, it.minor, it.patch) }
                 }
             }
         }
@@ -275,7 +252,9 @@ class CommandUsageCollector : CounterUsagesCollector() {
 
     private enum class FusToolsPackageKind {
         EFCORE_TOOLS,
-        EFCORE_DESIGN
+        EFCORE_DESIGN,
+
+        OTHER
     }
 
     private enum class FusProviderDatabase {
