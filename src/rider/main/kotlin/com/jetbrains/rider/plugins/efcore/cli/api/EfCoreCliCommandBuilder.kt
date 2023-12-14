@@ -23,7 +23,7 @@ class EfCoreCliCommandBuilder(
         addNamed("--startup-project", makeRelativeProjectPath(commonOptions.startupProject.fullPath))
         addNamedNullable("--context", commonOptions.dbContext?.fullName)
         addNamed("--configuration", commonOptions.buildConfiguration)
-        addNamedNullable("--framework", commonOptions.targetFramework)
+        addNamedNullable("--framework", commonOptions.targetFramework?.presentableName)
         addIf("--no-build", commonOptions.noBuild)
         addIf("--verbose", commonOptions.enableDiagnosticLogging)
     }
