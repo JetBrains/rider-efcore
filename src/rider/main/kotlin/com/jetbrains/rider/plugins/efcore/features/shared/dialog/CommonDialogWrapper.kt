@@ -406,10 +406,10 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
 
             object targetFramework {
-                val toItem: (String?) -> BaseTargetFrameworkItem?
+                val toItem: (TargetFrameworkId?) -> BaseTargetFrameworkItem?
                     get() = { it.toTargetFrameworkViewItem() }
 
-                val fromItem: (BaseTargetFrameworkItem?) -> String?
+                val fromItem: (BaseTargetFrameworkItem?) -> TargetFrameworkId?
                     get() = { it?.data }
             }
 
@@ -424,9 +424,9 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
         }
 
-        private fun String?.toTargetFrameworkViewItem() =
+        private fun TargetFrameworkId?.toTargetFrameworkViewItem() =
             if (this != null)
-                TargetFrameworkItem(this, this)
+                TargetFrameworkItem(presentableName, this)
             else
                 DefaultTargetFrameworkItem()
     }
