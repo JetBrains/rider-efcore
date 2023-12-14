@@ -9,20 +9,23 @@ namespace Rider.Plugins.EfCore.Mapping
   {
     public static StartupProjectInfo ToStartupProjectInfo(this IProject project) =>
       new StartupProjectInfo(
-        project.TargetFrameworkIds
-          .Where(frameworkId => !frameworkId.IsNetStandard)
-          .Select(frameworkId => frameworkId.ToTargetFrameworkString())
-          .ToList(),
         project.Guid,
         project.Name,
         project.ProjectFileLocation.FullPath,
-        project.GetDefaultNamespace() ?? string.Empty);
+        project.GetDefaultNamespace() ?? string.Empty,
+        project.TargetFrameworkIds
+          .Where(frameworkId => !frameworkId.IsNetStandard)
+          .Select(frameworkId => frameworkId.ToRdTargetFramework())
+          .ToList());
 
     public static MigrationsProjectInfo ToMigrationsProjectInfo(this IProject project) =>
       new MigrationsProjectInfo(
         project.Guid,
         project.Name,
         project.ProjectFileLocation.FullPath,
-        project.GetDefaultNamespace() ?? string.Empty);
+        project.GetDefaultNamespace() ?? string.Empty,
+        project.TargetFrameworkIds
+          .Select(frameworkId => frameworkId.ToRdTargetFramework())
+          .ToList());
   }
 }

@@ -20,13 +20,13 @@ open class CommonDataContext(
     val availableStartupProjects = observableList<StartupProjectInfo>().withLogger("availableStartupProjects")
     val availableMigrationsProjects = observableList<MigrationsProjectInfo>().withLogger("availableMigrationsProjects")
     val availableDbContexts = observableList<DbContextInfo>().withLogger("availableDbContexts")
-    val availableTargetFrameworks = observableList<String?>().withLogger("availableTargetFrameworks")
+    val availableTargetFrameworks = observableList<TargetFrameworkId?>().withLogger("availableTargetFrameworks")
     val availableBuildConfigurations = observableList<String>().withLogger("availableBuildConfigurations")
 
     val migrationsProject = observable<MigrationsProjectInfo?>(null).withLogger("migrationsProject")
     val startupProject = observable<StartupProjectInfo?>(null).withLogger("startupProject")
     val dbContext = observable<DbContextInfo?>(null).withLogger("dbContext")
-    val targetFramework = observable<String?>(null).withLogger("targetFramework")
+    val targetFramework = observable<TargetFrameworkId?>(null).withLogger("targetFramework")
     val buildConfiguration = observable<String?>(null).withLogger("buildConfiguration")
     val noBuild = observable(false).withLogger("noBuild")
     val enableDiagnosticLogging = observable(false).withLogger("enableDiagnosticLogging")
@@ -117,7 +117,7 @@ open class CommonDataContext(
         }
 
         val targetFrameworkName = commonDialogState.get("${startupProjectId}:${KnownStateKeys.TARGET_FRAMEWORK}")
-        availableTargetFrameworks.value.firstOrNull { it == targetFrameworkName }?.apply {
+        availableTargetFrameworks.value.firstOrNull { it?.presentableName == targetFrameworkName }?.apply {
             targetFramework.value = this
         }
 
@@ -148,7 +148,7 @@ open class CommonDataContext(
         }
 
         if (targetFramework.value != null) {
-            commonDialogState.set(KnownStateKeys.TARGET_FRAMEWORK, targetFramework.value!!)
+            commonDialogState.set(KnownStateKeys.TARGET_FRAMEWORK, targetFramework.value!!.presentableName)
         }
 
         commonDialogState.set(KnownStateKeys.NO_BUILD, noBuild.value)

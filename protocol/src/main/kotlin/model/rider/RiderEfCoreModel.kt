@@ -13,12 +13,10 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("name", string)
         field("fullPath", string)
         field("namespace", string)
+        field("targetFrameworks", immutableList(TargetFrameworkId))
     }
 
-    private val StartupProjectInfo = structdef extends ProjectInfo {
-        field("targetFrameworks", immutableList(string))
-    }
-
+    private val StartupProjectInfo = structdef extends ProjectInfo
     private val MigrationsProjectInfo = structdef extends ProjectInfo
 
     private val MigrationsIdentity = structdef {
@@ -53,6 +51,17 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
             +"Local"
             +"Global"
         })
+    }
+
+    private val TargetFrameworkId = structdef {
+        field("version", TargetFrameworkVersion)
+        field("presentableName", string)
+    }
+
+    private val TargetFrameworkVersion = structdef {
+        field("major", int)
+        field("minor", int)
+        field("patch", int)
     }
 
     init {
