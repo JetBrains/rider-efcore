@@ -25,12 +25,12 @@ class CommandUsageCollector : CounterUsagesCollector() {
         private val COMMAND = EventFields.Enum<FusCommandType>("command")
         private val STARTUP_PROJECT = ObjectEventField("startupProject", *FusProject.fields)
         private val MIGRATIONS_PROJECT = ObjectEventField("migrationsProject", *FusProject.fields)
-        private val TARGET_FRAMEWORK = ObjectEventField("targetFramework", FusTargetFramework())
+        private val TARGET_FRAMEWORK = ObjectEventField("targetFramework", *FusTargetFramework.fields)
         private val BUILD_CONFIGURATION = EventFields.Enum<FusBuildConfiguration>("buildConfiguration")
         private val NO_BUILD = EventFields.Boolean("noBuild")
         private val ENABLE_DIAGNOSTIC_LOGGING = EventFields.Boolean("enableDiagnosticLogging")
         private val ADDITIONAL_ARGUMENTS_PASSED = EventFields.Boolean("additionalArgumentsPassed")
-        private val CLI_TOOLS = ObjectEventField("cliTools", FusCliTools())
+        private val CLI_TOOLS = ObjectEventField("cliTools", *FusCliTools.fields)
         private val NUGET_TOOLS = ObjectListEventField("nugetTools", *FusToolsPackage.fields)
         private val DB_PROVIDERS = ObjectListEventField("dbProviders", *FusProviderPackage.fields)
 
@@ -56,7 +56,7 @@ class CommandUsageCollector : CounterUsagesCollector() {
             EXIT_CODE
         )
 
-        private val COMMAND_ACTIVITY = GROUP.registerIdeActivity("execute",
+        private val COMMAND_ACTIVITY = GROUP.registerIdeActivity("execution",
             startEventAdditionalFields = startedFields,
             finishEventAdditionalFields = finishedFields)
 
@@ -153,7 +153,7 @@ class CommandUsageCollector : CounterUsagesCollector() {
     override fun getGroup() = GROUP
 
     private object FusProject {
-        private val TARGET_FRAMEWORKS = ObjectListEventField("targetFrameworks", FusTargetFramework())
+        private val TARGET_FRAMEWORKS = ObjectListEventField("targetFrameworks", *FusTargetFramework.fields)
         val fields = arrayOf(
             TARGET_FRAMEWORKS
         )
@@ -210,42 +210,45 @@ class CommandUsageCollector : CounterUsagesCollector() {
         }
     }
 
-    private class FusTargetFramework : ObjectDescription() {
-        var version by field(EventFields.VersionByObject)
+    private object FusTargetFramework : ObjectDescription() {
+        val VERSION = EventFields.VersionByObject
+        val fields = arrayOf(
+            VERSION,
+        )
 
-        companion object {
-            fun create(versionData: Version?): ObjectEventData {
-                return build(::FusTargetFramework) {
-                    version = versionData
-                }
-            }
+        fun create(versionData: Version?): ObjectEventData {
+            return ObjectEventData(
+                VERSION.with(versionData)
+            )
+        }
 
-            fun create(versionData: TargetFrameworkVersion?): ObjectEventData {
-                return build(::FusTargetFramework) {
-                    version = versionData?.let { Version(it.major, it.minor, it.patch) }
-                }
-            }
+        fun create(versionData: TargetFrameworkVersion?): ObjectEventData {
+            return ObjectEventData(
+                VERSION.with(versionData?.let { Version(it.major, it.minor, it.patch) })
+            )
         }
     }
 
-    private class FusCliTools : ObjectDescription() {
-        var version by field(EventFields.VersionByObject)
-        var kind by field(EventFields.Enum<FusCliToolsKind>("kind"))
+    private object FusCliTools {
+        val VERSION = EventFields.VersionByObject
+        val KIND = EventFields.Enum<FusCliToolsKind>("kind")
+        val fields = arrayOf(
+            VERSION,
+            KIND,
+        )
 
-        companion object {
-            fun create(cliTools: CliToolDefinition?): ObjectEventData {
-                return build(::FusCliTools) {
-                    version = cliTools?.version?.let(Version::parseVersion)
-                    kind = cliTools?.toolKind?.let(::mapKind)
-                }
-            }
+        fun create(cliTools: CliToolDefinition?): ObjectEventData {
+            return ObjectEventData(
+                VERSION.with(cliTools?.version?.let(Version::parseVersion)),
+                KIND.with(cliTools?.toolKind?.let(::mapKind) ?: FusCliToolsKind.NONE)
+            )
+        }
 
-            private fun mapKind(rdKind: ToolKind): FusCliToolsKind {
-                return when (rdKind) {
-                    ToolKind.Local -> FusCliToolsKind.LOCAL
-                    ToolKind.Global -> FusCliToolsKind.GLOBAL
-                    ToolKind.None -> FusCliToolsKind.NONE
-                }
+        private fun mapKind(rdKind: ToolKind): FusCliToolsKind {
+            return when (rdKind) {
+                ToolKind.Local -> FusCliToolsKind.LOCAL
+                ToolKind.Global -> FusCliToolsKind.GLOBAL
+                ToolKind.None -> FusCliToolsKind.NONE
             }
         }
     }
