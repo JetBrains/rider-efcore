@@ -17,6 +17,7 @@ import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.ui.DbConnectionItemRenderer
 import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
 import com.jetbrains.rider.plugins.efcore.ui.items.MigrationItem
@@ -71,12 +72,12 @@ class UpdateDatabaseDialogWrapper(
         }
     }
 
-    override fun generateCommand(): CliCommand {
+    override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
         val targetMigration = dataCtx.targetMigration.value!!.trim()
         val connection = if (dataCtx.useDefaultConnection.value) null else dataCtx.connection.value
 
-        return databaseCommandFactory.update(efCoreVersion, commonOptions, targetMigration, connection)
+        return UpdateDatabaseCommand(commonOptions, targetMigration, connection)
     }
 
     //

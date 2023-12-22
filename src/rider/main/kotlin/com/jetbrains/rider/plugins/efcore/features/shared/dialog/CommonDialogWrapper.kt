@@ -16,7 +16,6 @@ import com.jetbrains.observables.observable
 import com.jetbrains.observables.observableList
 import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.CommonOptions
 import com.jetbrains.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import com.jetbrains.rider.plugins.efcore.rd.*
@@ -25,6 +24,7 @@ import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
 import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.cli.api.EfCoreCliCommandFactory
 import com.jetbrains.rider.plugins.efcore.ui.items.*
 import com.jetbrains.rider.plugins.efcore.ui.localize
 import com.jetbrains.rider.plugins.efcore.ui.simpleExpandableTextField
@@ -71,9 +71,9 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
     //
     // Preferences
-    private val preferredProjectsManager = intellijProject.service<PreferredProjectsManager>()
+    private val preferredProjectsManager = PreferredProjectsManager.getInstance()
     private val settingsStateService = EfCoreUiSettingsStateService.getInstance()
-    private val dialogsStateService = intellijProject.service<DialogsStateService>()
+    private val dialogsStateService = DialogsStateService.getInstance()
 
     //
     // UI
@@ -244,7 +244,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             override fun actionPerformed(e: ActionEvent?) {
                 applyFields()
                 if (panel.validateAll().isEmpty()) {
-                    val dialog = CommandPreviewDialogWrapper(generateCommand())
+                    val cliCommand = EfCoreCliCommandFactory.getInstance(intellijProject).create(generateCommand(), efCoreVersion)
+                    val dialog = CommandPreviewDialogWrapper(cliCommand)
                     dialog.show()
                 }
             }
@@ -331,8 +332,8 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
     protected fun Panel.createExecutionRow() {
         val toolLabel =
-            if (beModel.efToolsDefinition.hasValue) {
-                val efToolsDefinition = beModel.efToolsDefinition.valueOrNull!!
+            if (beModel.cliToolsDefinition.hasValue) {
+                val efToolsDefinition = beModel.cliToolsDefinition.valueOrNull!!
                 when (efToolsDefinition.toolKind) {
                     ToolKind.None -> EfCoreUiBundle.message("tool.kind.none")
                     else -> "${efToolsDefinition.toolKind.localize()}, ${efToolsDefinition.version}"
@@ -358,12 +359,12 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
 
     //
     // Helpers
-    protected fun getCommonOptions(): CommonOptions = CommonOptions(
-        dataCtx.migrationsProject.value!!.fullPath,
-        dataCtx.startupProject.value!!.fullPath,
-        dataCtx.dbContext.value?.fullName,
-        dataCtx.buildConfiguration.value!!,
+    protected fun getCommonOptions() = DialogCommonOptions(
+        dataCtx.migrationsProject.value!!,
+        dataCtx.startupProject.value!!,
+        dataCtx.dbContext.value,
         dataCtx.targetFramework.value,
+        dataCtx.buildConfiguration.value!!,
         dataCtx.noBuild.value,
         dataCtx.enableDiagnosticLogging.value,
         dataCtx.additionalArguments.value
@@ -405,10 +406,10 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
 
             object targetFramework {
-                val toItem: (String?) -> BaseTargetFrameworkItem?
+                val toItem: (TargetFrameworkId?) -> BaseTargetFrameworkItem?
                     get() = { it.toTargetFrameworkViewItem() }
 
-                val fromItem: (BaseTargetFrameworkItem?) -> String?
+                val fromItem: (BaseTargetFrameworkItem?) -> TargetFrameworkId?
                     get() = { it?.data }
             }
 
@@ -423,9 +424,9 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             }
         }
 
-        private fun String?.toTargetFrameworkViewItem() =
+        private fun TargetFrameworkId?.toTargetFrameworkViewItem() =
             if (this != null)
-                TargetFrameworkItem(this, this)
+                TargetFrameworkItem(presentableName, this)
             else
                 DefaultTargetFrameworkItem()
     }

@@ -6,13 +6,16 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.rd.MigrationsProjectInfo
 import com.jetbrains.rider.plugins.efcore.rd.StartupProjectInfo
 import com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService
+import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
 import java.util.*
 
-@Service(Service.Level.PROJECT)
-class PreferredProjectsManager(
-    intellijProject: Project
-) {
-    private val commonOptionsStateService = intellijProject.service<CommonOptionsStateService>()
+@Service(Service.Level.APP)
+class PreferredProjectsManager {
+    companion object {
+        fun getInstance() = service<PreferredProjectsManager>()
+    }
+
+    private val commonOptionsStateService by lazy { CommonOptionsStateService.getInstance() }
     private var prevPreferredMigrationsProjectId: UUID? = null
     private var prevPreferredStartupProjectId: UUID? = null
 

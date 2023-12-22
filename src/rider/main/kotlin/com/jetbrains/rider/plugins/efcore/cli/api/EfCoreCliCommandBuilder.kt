@@ -1,25 +1,29 @@
-package com.jetbrains.rider.plugins.efcore.cli.execution
+package com.jetbrains.rider.plugins.efcore.cli.api
 
 import com.intellij.openapi.project.Project
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
+import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOptions
 import com.jetbrains.rider.run.withRawParameters
 import java.nio.file.Paths
 
-class EfCoreCommandBuilder(
+class EfCoreCliCommandBuilder(
     intellijProject: Project,
     baseCommand: String,
-    private val commonOptions: CommonOptions,
+    private val commonOptions: DialogCommonOptions,
     presentation: CliCommandPresentationInfo
-) : DotnetCommandBuilder(
+) : DotnetCliCommandBuilder(
     presentation,
     intellijProject,
     KnownEfCommands.ef, baseCommand
 ) {
     init {
-        addNamed("--project", makeRelativeProjectPath(commonOptions.migrationsProject))
-        addNamed("--startup-project", makeRelativeProjectPath(commonOptions.startupProject))
-        addNamedNullable("--context", commonOptions.dbContext)
+        addNamed("--project", makeRelativeProjectPath(commonOptions.migrationsProject.fullPath))
+        addNamed("--startup-project", makeRelativeProjectPath(commonOptions.startupProject.fullPath))
+        addNamedNullable("--context", commonOptions.dbContext?.fullName)
         addNamed("--configuration", commonOptions.buildConfiguration)
-        addNamedNullable("--framework", commonOptions.targetFramework)
+        addNamedNullable("--framework", commonOptions.targetFramework?.presentableName)
         addIf("--no-build", commonOptions.noBuild)
         addIf("--verbose", commonOptions.enableDiagnosticLogging)
     }

@@ -40,6 +40,7 @@
                              instance="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiConfigurable"
                              key="configurable.name.ef.core.ui"/>
     <terminal.shellCommandHandler implementation="com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute.EFCoreShellCommandHandler"/>
+    <statistics.counterUsagesCollector implementationClass="com.jetbrains.rider.plugins.efcore.features.shared.statistics.CommandUsageCollector"/>
   </extensions>
 
   <actions>

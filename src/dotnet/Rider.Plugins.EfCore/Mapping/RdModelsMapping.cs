@@ -12,17 +12,20 @@ namespace Rider.Plugins.EfCore.Mapping
         project.Guid,
         project.Name,
         project.ProjectFileLocation.FullPath,
+        project.GetDefaultNamespace() ?? string.Empty,
         project.TargetFrameworkIds
           .Where(frameworkId => !frameworkId.IsNetStandard)
-          .Select(frameworkId => frameworkId.ToTargetFrameworkString())
-          .ToList(),
-        project.GetDefaultNamespace() ?? string.Empty);
+          .Select(frameworkId => frameworkId.ToRdTargetFramework())
+          .ToList());
 
     public static MigrationsProjectInfo ToMigrationsProjectInfo(this IProject project) =>
       new MigrationsProjectInfo(
         project.Guid,
         project.Name,
         project.ProjectFileLocation.FullPath,
-        project.GetDefaultNamespace() ?? string.Empty);
+        project.GetDefaultNamespace() ?? string.Empty,
+        project.TargetFrameworkIds
+          .Select(frameworkId => frameworkId.ToRdTargetFramework())
+          .ToList());
   }
 }

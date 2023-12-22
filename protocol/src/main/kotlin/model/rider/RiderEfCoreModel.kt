@@ -6,22 +6,18 @@ import com.jetbrains.rd.generator.nova.PredefinedType.*
 import com.jetbrains.rd.generator.nova.csharp.CSharp50Generator
 import com.jetbrains.rd.generator.nova.kotlin.Kotlin11Generator
 
-@Suppress("unused")
+@Suppress("unused", "HardCodedStringLiteral")
 object RiderEfCoreModel : Ext(SolutionModel.Solution) {
-    private val StartupProjectInfo = structdef {
+    private val ProjectInfo = basestruct {
         field("id", guid)
         field("name", string)
         field("fullPath", string)
-        field("targetFrameworks", immutableList(string))
         field("namespace", string)
+        field("targetFrameworks", immutableList(TargetFrameworkId))
     }
 
-    private val MigrationsProjectInfo = structdef {
-        field("id", guid)
-        field("name", string)
-        field("fullPath", string)
-        field("namespace", string)
-    }
+    private val StartupProjectInfo = structdef extends ProjectInfo
+    private val MigrationsProjectInfo = structdef extends ProjectInfo
 
     private val MigrationsIdentity = structdef {
         field("projectId", guid)
@@ -40,12 +36,15 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("fullName", string)
     }
 
-    private val DbProviderInfo = structdef {
+    private val EfCorePackage = basestruct {
         field("id", string)
         field("version", string)
     }
 
-    private val EfToolDefinition = structdef {
+    private val ToolsPackageInfo = structdef extends EfCorePackage
+    private val DbProviderInfo = structdef extends EfCorePackage
+
+    private val CliToolDefinition = structdef {
         field("version", string)
         field("toolKind", enum {
             +"None"
@@ -54,11 +53,22 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         })
     }
 
+    private val TargetFrameworkId = structdef {
+        field("version", TargetFrameworkVersion)
+        field("presentableName", string)
+    }
+
+    private val TargetFrameworkVersion = structdef {
+        field("major", int)
+        field("minor", int)
+        field("patch", int)
+    }
+
     init {
         setting(CSharp50Generator.Namespace, "Rider.Plugins.EfCore.Rd")
         setting(Kotlin11Generator.Namespace, "com.jetbrains.rider.plugins.efcore.rd")
 
-        property("efToolsDefinition", EfToolDefinition)
+        property("cliToolsDefinition", CliToolDefinition)
         property("availableStartupProjects", immutableList(StartupProjectInfo))
         property("availableMigrationProjects", immutableList(MigrationsProjectInfo))
 
@@ -66,6 +76,7 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
         call("getAvailableDbContexts", guid, immutableList(DbContextInfo))
         call("getAvailableDbProviders", guid, immutableList(DbProviderInfo))
+        call("getAvailableToolPackages", guid, immutableList(ToolsPackageInfo))
         call("refreshDotNetToolsCache", void, void)
 
         callback("onMissingEfCoreToolsDetected", void, void)

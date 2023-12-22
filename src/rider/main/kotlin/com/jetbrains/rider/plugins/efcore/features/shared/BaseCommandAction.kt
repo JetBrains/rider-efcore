@@ -15,10 +15,12 @@ import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
+import com.jetbrains.rider.plugins.efcore.cli.api.EfCoreCliCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.statistics.CommandUsageCollector
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
 import java.util.UUID
 
@@ -44,7 +46,7 @@ abstract class BaseCommandAction : AnAction() {
         currentDotnetProjectId: UUID?): BaseDialogWrapper
 
     private fun fetchEfCoreVersion(intellijProject: Project): DotnetEfVersion? {
-        val efCoreDefinition = intellijProject.solution.riderEfCoreModel.efToolsDefinition.valueOrNull
+        val efCoreDefinition = intellijProject.solution.riderEfCoreModel.cliToolsDefinition.valueOrNull
         val dotnetCliPath = intellijProject.solution.dotNetActiveRuntimeModel.activeRuntime.valueOrNull?.dotNetCliExePath
         val dotnetEfVersion = efCoreDefinition?.let { DotnetEfVersion.parse(it.version) }
 
@@ -74,9 +76,12 @@ abstract class BaseCommandAction : AnAction() {
         if (dialog.showAndGet()) {
             val executor = PreferredCommandExecutorProvider.getInstance(intellijProject).getExecutor()
             val command = dialog.generateCommand()
-            withBackgroundContext {
-                executor.execute(command)?.apply {
-                    dialog.postCommandExecute(this)
+            val cliCommand = EfCoreCliCommandFactory.getInstance(intellijProject).create(command, efCoreVersion)
+            CommandUsageCollector.withCommandActivity(intellijProject, command) {
+                withBackgroundContext {
+                    executor.execute(cliCommand)?.apply {
+                        dialog.postCommandExecute(this)
+                    }
                 }
             }
         }
