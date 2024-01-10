@@ -7,9 +7,6 @@ buildscript {
     repositories {
         maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
     }
-    dependencies {
-        classpath("com.jetbrains.rd:rd-gen:2023.3.0")
-    }
 }
 
 repositories {
@@ -18,6 +15,8 @@ repositories {
 }
 
 plugins {
+    // Version is configured in gradle.properties
+    id("com.jetbrains.rdgen")
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.changelog
     id("org.jetbrains.changelog") version "2.2.0"
