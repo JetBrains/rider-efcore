@@ -26,40 +26,27 @@ There are a couple of UI stuff for:
 
 ### How to install
 
-**Starting from Rider 2023.3, the plugin will be bundled into main Rider distribution. No additional actions will be required.**
-
-#### Using marketplace
-
-1. Go to `Settings` / `Plugins` / `Marketplace`
-1. Search for "Entity Framework Core UI"
-1. Click `Install`, then `Save`
-1. After saving restart Rider
-
-#### Using `.zip` file
-1. Go to [**Releases**](https://github.com/seclerp/rider-efcore/releases)
-2. Download the latest release of plugin for your edition of JetBrains Rider (Stable or EAP)
-3. Proceed to `Settings` / `Plugins` / `⚙` / `Install plugin from disk`
-4. Click `Save`
-5. After saving restart Rider
+**Starting from Rider 2023.3, the plugin is bundled into the main Rider distribution. No additional actions required.**
 
 ### How to use
 
 1. Open solution that contains EF Core related projects (migrations and startup projects)
-2. Navigate to <kbd>Tools</kbd>/<kbd>Entity Framework Core</kbd> under project context menu:
+2. Navigate to <kbd>Entity Framework Core</kbd> under project or solution context menu:
 
-   ![How to use 1](img/how-to-use-1.png)
+   ![image](https://github.com/JetBrains/rider-efcore/assets/20597871/6356b447-b84d-45fb-b6a3-7babd9f95280)
 
-   You could use context menu of either your migrations or startup project.
-3. Clicking action will show appropriate dialog:
+   You could use the context menu of either your migrations or startup projects.
+3. Clicking action will show the appropriate dialog:
 
-   ![How to use 2](img/how-to-use-2.png)
-4. After you press <kbd>Ok</kbd>, selected action will be executed in console-like window (by default):
+   ![image](https://github.com/JetBrains/rider-efcore/assets/20597871/17d98128-f347-48e8-b30b-fb3d6c2fbb3a)
 
-   ![How to use 3](img/how-to-use-3.png)
+4. After you press <kbd>Ok</kbd>, the selected action will be executed in a console-like window (by default):
 
-5. You could also configure dialog's behavior in Settings, under <kbd>Tools</kbd>/<kbd>EF Core UI</kbd> section:
+   ![image](https://github.com/JetBrains/rider-efcore/assets/20597871/e520fa69-3565-4487-9872-e19df9979b48)
 
-   ![How to use 4](img/how-to-use-4.png)
+5. You could also configure the dialog's behavior in Settings, under <kbd>Tools</kbd>/<kbd>EF Core UI</kbd> section:
+
+   ![image](https://github.com/JetBrains/rider-efcore/assets/20597871/31a23fd1-c0ad-404d-9a58-4b839bbabe87)
 
 More about features and available dialogs you could read in [**the blog post**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/).
 
@@ -72,7 +59,7 @@ More about features and available dialogs you could read in [**the blog post**](
 Before opening the issue, please make sure that your projects and development environment completely satisfies these requirements:
 
 - IDE
-  - JetBrains Rider **2023.1+ or latest EAP**
+  - JetBrains Rider **2023.3+ or latest EAP**
 
 - Target frameworks
   - `net8.0` (preview)
@@ -114,14 +101,6 @@ Next command will start instance of JetBrains Rider with plugin attached to it:
 Contributions are welcome! 🎉
 
 It's better to create an issue with description of your bug/feature before creating pull requests.
-
-#### About branching
-
-This project uses customized git strategy.
-
-Each `release/*` branch plays main development branch role for specific release.
-
-For example, `release/222` means that branch is related to `222.*` release cycle for `2022.2` Rider version.
 
 ### See also
 
