@@ -7,7 +7,7 @@ namespace Rider.Plugins.EfCore.Logging
   {
     public static void LogFlow(this ILogger logger, string source, string message)
     {
-      logger.Log(LoggingLevel.INFO, $"[EF Core]: {source} - {message}");
+      logger.Log(LoggingLevel.VERBOSE, $"[EF Core]: {source} - {message}");
     }
   }
 }
