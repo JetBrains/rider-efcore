@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
@@ -17,6 +18,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.util.*
 
@@ -31,8 +33,6 @@ class AddMigrationDialogWrapper(
     intellijProject,
     selectedProjectId
 ) {
-    private val migrationsCommandFactory by lazy { MigrationsCommandFactory.getInstance(intellijProject) }
-
     //
     // Internal data
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
@@ -42,6 +42,12 @@ class AddMigrationDialogWrapper(
     //
     // Validation
     private val validator = AddMigrationValidator(dataCtx)
+
+    @TestOnly
+    internal var migrationNameComponent: JBTextField? = null
+
+    @TestOnly
+    internal var migrationsFolderComponent: TextFieldWithBrowseButton? = null
 
     //
     // Constructor
@@ -80,6 +86,7 @@ class AddMigrationDialogWrapper(
                 .focused()
                 .applyToComponent {
                     setupInitialMigrationNameListener(this)
+                    migrationNameComponent = this
                 }
         }
     }
@@ -93,6 +100,7 @@ class AddMigrationDialogWrapper(
                     .validationOnInput(validator.migrationsOutputFolderValidation())
                     .validationOnApply(validator.migrationsOutputFolderValidation())
                     .applyToComponent {
+                        migrationsFolderComponent = this
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }
             }

@@ -29,10 +29,6 @@ apply {
     plugin("com.jetbrains.rdgen")
 }
 
-dependencies {
-    testImplementation("org.testng:testng:7.7.0")
-}
-
 val riderPluginId: String by project
 val dotnetPluginId: String by project
 val productVersion: String by project

@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.AlignX
@@ -29,6 +30,7 @@ import com.jetbrains.rider.plugins.efcore.ui.items.*
 import com.jetbrains.rider.plugins.efcore.ui.localize
 import com.jetbrains.rider.plugins.efcore.ui.simpleExpandableTextField
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.AbstractAction
@@ -37,8 +39,8 @@ import javax.swing.JComponent
 
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class CommonDialogWrapper<TContext : CommonDataContext>(
-    protected val dataCtx: TContext,
-    protected val efCoreVersion: DotnetEfVersion,
+    val dataCtx: TContext,
+    val efCoreVersion: DotnetEfVersion,
     dialogTitle: String,
     protected val intellijProject: Project,
     private val selectedProjectId: UUID?,
@@ -78,6 +80,22 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     //
     // UI
     protected lateinit var panel: DialogPanel
+
+    @TestOnly
+    internal var migrationsProjectComponent: ComboBox<MigrationsProjectItem>? = null
+
+    @TestOnly
+    internal var startupProjectComponent: ComboBox<StartupProjectItem>? = null
+
+    @TestOnly
+    internal var dbContextComponent: ComboBox<DbContextItem>? = null
+
+    @TestOnly
+    internal var targetFrameworkComponent: ComboBox<BaseTargetFrameworkItem>? = null
+
+    @TestOnly
+    internal var buildConfigurationComponent: ComboBox<BuildConfigurationItem>? = null
+
 
     //
     // Constructor
@@ -231,6 +249,11 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
         }
     }
 
+    @TestOnly
+    internal fun requestPanel(): DialogPanel {
+        return panel
+    }
+
     //
     // UI
     override fun createCenterPanel(): JComponent =
@@ -283,6 +306,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(migrationsProjectView, availableMigrationsProjectsView)
                 .validationOnInput(validator.migrationsProjectValidation())
                 .validationOnApply(validator.migrationsProjectValidation())
+                .applyToComponent { migrationsProjectComponent = this }
         }
     }
 
@@ -292,6 +316,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
                 .validationOnInput(validator.startupProjectValidation())
                 .validationOnApply(validator.startupProjectValidation())
                 .comment(EfCoreUiBundle.message("startup.project.missing.comment"))
+                .applyToComponent { startupProjectComponent = this }
         }
     }
 
@@ -300,6 +325,7 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
             iconComboBox(dbContextView, availableDbContextsView)
                 .validationOnInput(validator.dbContextValidation())
                 .validationOnApply(validator.dbContextValidation())
+                .applyToComponent { dbContextComponent = this }
         }
     }
 
@@ -320,12 +346,14 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
                 iconComboBox(buildConfigurationView, availableBuildConfigurationView)
                     .validationOnInput(validator.buildConfigurationValidation())
                     .validationOnApply(validator.buildConfigurationValidation())
+                    .applyToComponent { buildConfigurationComponent = this }
             }.enabledIf(noBuildCheck!!.selected.not())
 
             row(EfCoreUiBundle.message("target.framework")) {
                 iconComboBox(targetFrameworksView, availableTargetFrameworksView)
                     .validationOnInput(validator.targetFrameworkValidation())
                     .validationOnInput(validator.targetFrameworkValidation())
+                    .applyToComponent { targetFrameworkComponent = this }
             }.enabledIf(noBuildCheck!!.selected.not())
         }
     }

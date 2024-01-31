@@ -12,7 +12,7 @@ class InstallDotnetEfAction : AnAction(EfCoreUiBundle.message("action.install.te
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val project = actionEvent.project ?: return
         val executor = PreferredCommandExecutorProvider.getInstance(project).getExecutor()
-        val command = ManagementCommandFactory.getInstance(project).installEfCoreTools()
+        val command = ManagementCommandFactory.getInstance(project).installGlobalTools()
         project.lifetime.launchBackground {
             executor.execute(command)
         }
