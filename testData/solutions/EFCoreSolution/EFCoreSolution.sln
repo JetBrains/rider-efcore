@@ -18,8 +18,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreConsoleApp2", "EFCore
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreConsoleApp2.DAL", "EFCoreConsoleApp2.DAL\EFCoreConsoleApp2.DAL.csproj", "{FEA06BC8-186B-4F95-A116-4D9E7C08F3BC}"
 EndProject
-Project("{Any GUID}") = "docker-compose", "docker-compose.dcproj", "{9c31f76d-0249-4004-9b65-d5fa07cf95f8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

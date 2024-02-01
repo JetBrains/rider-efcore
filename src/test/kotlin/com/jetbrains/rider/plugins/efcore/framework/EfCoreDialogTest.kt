@@ -6,6 +6,7 @@ import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.ui.elements
+import com.jetbrains.rider.plugins.efcore.ui.items.DbContextItem
 import com.jetbrains.rider.plugins.efcore.ui.items.MigrationsProjectItem
 import com.jetbrains.rider.plugins.efcore.ui.items.StartupProjectItem
 import kotlin.test.assertNotNull
@@ -16,6 +17,7 @@ abstract class EfCoreDialogTest : EfCoreTest() {
         val dialog = dialogFactory()
         val panel = dialog.requestPanel()
         dialog.action(panel, dialog.dataCtx)
+        dialog.disposeIfNeeded()
     }
 
     fun <TContext : CommonDataContext, TDialog : CommonDialogWrapper<TContext>> TDialog.selectMigrationsProject(name: String): MigrationsProjectItem {
@@ -32,6 +34,14 @@ abstract class EfCoreDialogTest : EfCoreTest() {
             "Startup project with name $name wasn't found in component's available items")
         startupProjectComponent?.model?.selectedItem = startupProjectItem
         return startupProjectItem
+    }
+
+    fun <TContext : CommonDataContext, TDialog : CommonDialogWrapper<TContext>> TDialog.selectDbContext(name: String): DbContextItem {
+        val dbContextItem = assertNotNull(
+            dbContextComponent?.model?.elements?.firstOrNull { it.data.name == name },
+            "DbContext with name $name wasn't found in component's available items")
+        dbContextComponent?.model?.selectedItem = dbContextItem
+        return dbContextItem
     }
 
     fun <TContext : CommonDataContext, TDialog : CommonDialogWrapper<TContext>> TDialog.assertValid() {

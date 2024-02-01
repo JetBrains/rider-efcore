@@ -41,9 +41,7 @@ abstract class EfCoreTest : BaseTestWithSolution() {
         val patchedCommand = command.copy(
             commandLine = command.commandLine.withEnvironment("DOTNET_ROLL_FORWARD", "LatestMajor"))
 
-        val executionLifetime = project.lifetime.createNested()
         val commandResult = TestCommandExecutor(project).execute(patchedCommand)
-        executionLifetime.waitTermination()
         return commandResult ?: throw NotImplementedError()
     }
 }
