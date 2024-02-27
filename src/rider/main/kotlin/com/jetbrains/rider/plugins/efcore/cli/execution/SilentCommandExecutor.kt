@@ -9,7 +9,6 @@ import com.intellij.platform.util.progress.indeterminateStep
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.features.shared.TryCommandAgainAction
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 
 @Suppress("UnstableApiUsage", "OPT_IN_USAGE")
@@ -20,7 +19,8 @@ class SilentCommandExecutor(
         return withBackgroundProgress(intellijProject, EfCoreUiBundle.message("progress.title.executing.ef.core.command"), false) {
             indeterminateStep {
                 try {
-                    val executionResult = ExecUtil.execAndGetOutput(command.commandLine)
+                    val commandLine = wrapWithShell(command.commandLine)
+                    val executionResult = ExecUtil.execAndGetOutput(commandLine)
                     val output = executionResult.stdout
                     val error = executionResult.stderr
                     val exitCode = executionResult.exitCode

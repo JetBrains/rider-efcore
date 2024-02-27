@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.cli.execution
 
+import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.*
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
@@ -16,12 +17,13 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
     override suspend fun doExecute(command: CliCommand): CliCommandResult? {
         return try {
             val processCompletion = CompletableDeferred<CliCommandResult>()
-            val processHandler = createProcessHandler(command, processCompletion)
+            val commandLine = wrapWithShell(command.commandLine)
+            val processHandler = createProcessHandler(commandLine, command.presentationInfo, processCompletion)
             withUiContext {
                 val consoleView = TerminalExecutionConsole(intellijProject, processHandler)
-                toolWindowProvider.createTab(command, consoleView)
+                toolWindowProvider.createTab(command.presentationInfo, consoleView)
             }
-            logger.info("Starting process '${command.commandLine.commandLineString}'")
+            logger.info("Starting process '${commandLine.commandLineString}'")
             processHandler.startNotify()
             processCompletion.await()
         } catch (cancellation: CancellationException) {
@@ -29,9 +31,10 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
         }
     }
 
-    private fun createProcessHandler(command: CliCommand,
+    private fun createProcessHandler(command: GeneralCommandLine,
+                                     presentationInfo: CliCommandPresentationInfo,
                                      completion: CompletableDeferred<CliCommandResult>): TerminalProcessHandler =
-        TerminalProcessHandler(intellijProject, command.commandLine, command.commandLine.commandLineString).apply {
+        TerminalProcessHandler(intellijProject, command, command.commandLineString).apply {
             addProcessListener(object : ProcessAdapter() {
                 private val ansiDecoder = AnsiEscapeDecoder()
                 private val outputBuilder = StringBuilder()
@@ -43,7 +46,7 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
                     ansiDecoder.escapeText(text, outputType) { chunk, _ ->
                         val trimmed = chunk.trim()
                         if (trimmed.isNotEmpty()) {
-                            logger.info("${command.presentationInfo.name} [$outputType]: $trimmed")
+                            logger.info("${presentationInfo.name} [$outputType]: $trimmed")
                             when (outputType) {
                                 ProcessOutputTypes.STDOUT -> outputBuilder.append(trimmed)
                                 ProcessOutputTypes.STDERR -> errorBuilder.append(trimmed)
@@ -54,7 +57,7 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
 
                 override fun processTerminated(event: ProcessEvent) {
                     val result = CliCommandResult(
-                        command.commandLine.commandLineString,
+                        command.commandLineString,
                         event.exitCode,
                         outputBuilder.toString(),
                         exitCode == 0,
