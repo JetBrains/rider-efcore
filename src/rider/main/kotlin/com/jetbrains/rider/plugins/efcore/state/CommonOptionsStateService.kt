@@ -1,8 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
-import com.intellij.openapi.project.Project
-import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import java.util.*
 
 @Service
@@ -66,4 +64,9 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
     fun getProjectToolsInstallationSupressed() : Boolean {
         return myState.toolsInstallationSupressed
     }
+    var ProjectToolsInstallationSupressed : Boolean
+        get() = myState.toolsInstallationSupressed
+        set(value : Boolean){
+            myState.toolsInstallationSupressed = value
+        }
 }
