@@ -20,18 +20,18 @@ class EfCoreStartupListener : SolutionExtListener<RiderEfCoreModel> {
     if(!commonOptionsStateService.getProjectToolsInstallationSupressed()) {
       model.onMissingEfCoreToolsDetected.set { _, unit ->
         NotificationGroupManager
-                .getInstance()
-                .getNotificationGroup(KnownNotificationGroups.efCore)
-                .createNotification(
-                        EfCoreUiBundle.message("notification.title.ef.core.tools.required"),
-                        EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
-                        NotificationType.WARNING
-                )
-                .addAction(InstallDotnetEfAction())
-                .apply{
-                  addAction(SuppressEfCoreToolsInstallation(this))
-                }
-                .notify(session.project)
+          .getInstance()
+          .getNotificationGroup(KnownNotificationGroups.efCore)
+          .createNotification(
+            EfCoreUiBundle.message("notification.title.ef.core.tools.required"),
+            EfCoreUiBundle.message("notification.content.ef.core.tools.are.required.to.execute.this.action"),
+            NotificationType.WARNING
+          )
+          .addAction(InstallDotnetEfAction())
+          .apply{
+            addAction(SuppressEfCoreToolsInstallation(this))
+          }
+          .notify(session.project)
 
         RdTask.fromResult(unit)
       }
