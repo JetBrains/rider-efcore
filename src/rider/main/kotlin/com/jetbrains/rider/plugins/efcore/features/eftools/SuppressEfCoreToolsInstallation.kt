@@ -9,7 +9,7 @@ import com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService
 class SuppressEfCoreToolsInstallation(private val notification : Notification) : AnAction(EfCoreUiBundle.message("action.install.ignore")) {
     private val commonOptionsStateService by lazy { CommonOptionsStateService.getInstance() }
     override fun actionPerformed(actionEvent: AnActionEvent) {
-        commonOptionsStateService.setProjectToolsInstallationSupressed(true)
+        commonOptionsStateService.ProjectToolsInstallationSupressed = true
         notification.hideBalloon()
     }
 }
