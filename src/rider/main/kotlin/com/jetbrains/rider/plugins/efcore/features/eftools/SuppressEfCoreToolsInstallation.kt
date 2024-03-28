@@ -10,6 +10,6 @@ class SuppressEfCoreToolsInstallation(private val notification : Notification) :
     private val commonOptionsStateService by lazy { CommonOptionsStateService.getInstance() }
     override fun actionPerformed(actionEvent: AnActionEvent) {
         commonOptionsStateService.setProjectToolsInstallationSupressed(true)
-        this.notification.hideBalloon()
+        notification.hideBalloon()
     }
 }
