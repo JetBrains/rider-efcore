@@ -58,12 +58,6 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         myState.solutionLevelOptions[STARTUP_PROJECT_KEY] = startupProjectId.toString()
     }
 
-    fun setProjectToolsInstallationSupressed(newState : Boolean) {
-        myState.toolsInstallationSupressed = newState
-    }
-    fun getProjectToolsInstallationSupressed() : Boolean {
-        return myState.toolsInstallationSupressed
-    }
     var ProjectToolsInstallationSupressed : Boolean
         get() = myState.toolsInstallationSupressed
         set(value : Boolean){
