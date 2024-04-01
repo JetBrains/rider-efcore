@@ -17,7 +17,7 @@ import com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService
 class EfCoreStartupListener : SolutionExtListener<RiderEfCoreModel> {
   private val commonOptionsStateService by lazy { CommonOptionsStateService.getInstance() }
   override fun extensionCreated(lifetime: Lifetime, session: ClientProjectSession, model: RiderEfCoreModel) {
-    if(!commonOptionsStateService.ProjectToolsInstallationSupressed) {
+    if(!commonOptionsStateService.toolsInstallationSupressed) {
       model.onMissingEfCoreToolsDetected.set { _, unit ->
         NotificationGroupManager
           .getInstance()
