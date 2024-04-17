@@ -37,7 +37,7 @@ abstract class BaseCommandAction : AnAction() {
         }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.EDT
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     abstract fun createDialog(
         intellijProject: Project,
