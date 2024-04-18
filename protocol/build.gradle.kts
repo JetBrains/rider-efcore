@@ -42,7 +42,7 @@ val efCoreGeneratorSettings = if (isMonorepo) {
 
 rdgen {
     verbose = true
-    packages = "model.rider"
+    packages = "model"
 
     generator {
         language = "kotlin"
