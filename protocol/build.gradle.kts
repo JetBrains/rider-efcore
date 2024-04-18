@@ -42,7 +42,6 @@ val efCoreGeneratorSettings = if (isMonorepo) {
 
 rdgen {
     verbose = true
-
     packages = "model.rider"
 
     generator {
