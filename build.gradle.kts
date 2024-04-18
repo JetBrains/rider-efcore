@@ -15,25 +15,18 @@ repositories {
 }
 
 plugins {
-    // Version is configured in gradle.properties
-    id("com.jetbrains.rdgen")
     id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.changelog
     id("org.jetbrains.changelog") version "2.2.0"
     // https://plugins.gradle.org/plugin/org.jetbrains.intellij
-    id("org.jetbrains.intellij") version "1.16.0"
-    id("org.jetbrains.kotlin.jvm") version "1.8.20"
-}
-
-apply {
-    plugin("com.jetbrains.rdgen")
+    id("org.jetbrains.intellij") version "1.17.3"
+    id("org.jetbrains.kotlin.jvm")
 }
 
 dependencies {
     testImplementation("org.testng:testng:7.7.0")
 }
 
-val riderPluginId: String by project
 val dotnetPluginId: String by project
 val productVersion: String by project
 val pluginVersion: String by project
@@ -42,23 +35,10 @@ val buildConfiguration = ext.properties["buildConfiguration"] ?: "Debug"
 val publishToken: String by project
 val publishChannel: String by project
 
-val rdLibDirectory: () -> File = { file("${tasks.setupDependencies.get().idea.get().classes}/lib/rd") }
-extra["rdLibDirectory"] = rdLibDirectory
-
 val dotNetSrcDir = File(projectDir, "src/dotnet")
 
 val nuGetSdkPackagesVersionsFile = File(dotNetSrcDir, "RiderSdk.PackageVersions.Generated.props")
 val nuGetConfigFile = File(dotNetSrcDir, "nuget.config")
-
-val ktOutputRelativePath = "src/rider/main/kotlin/${riderPluginId.replace('.','/').lowercase()}/rd"
-
-val productMonorepoDir = getProductMonorepoRoot()
-val monorepoPreGeneratedRootDir by lazy { productMonorepoDir?.resolve("dotnet/Plugins/_RiderEfCore.Pregenerated") ?: error("Building not in monorepo") }
-val monorepoPreGeneratedFrontendDir by lazy {  monorepoPreGeneratedRootDir.resolve("Frontend") }
-val monorepoPreGeneratedBackendDir by lazy {  monorepoPreGeneratedRootDir.resolve("BackendModel") }
-val ktOutputMonorepoRoot by lazy { monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath) }
-
-extra["productMonorepoDir"] = productMonorepoDir
 
 version = pluginVersion
 
@@ -83,53 +63,6 @@ sourceSets {
     }
 }
 
-apply(plugin = "com.jetbrains.rdgen")
-
-configure<com.jetbrains.rd.generator.gradle.RdGenExtension> {
-    val inMonorepo = productMonorepoDir != null
-    val modelDir = file("$projectDir/protocol/src/main/kotlin/model")
-    val csOutput =
-        if (inMonorepo) monorepoPreGeneratedBackendDir
-        else file("$projectDir/src/dotnet/$dotnetPluginId/Rd")
-    val ktOutput =
-        if (inMonorepo) ktOutputMonorepoRoot
-        else file("$projectDir/$ktOutputRelativePath")
-
-    verbose = true
-    if (inMonorepo) {
-        classpath({
-            val riderModelClassPathFile: String by project
-            File(riderModelClassPathFile).readLines()
-        })
-    } else {
-        classpath({
-            "${rdLibDirectory()}/rider-model.jar"
-        })
-    }
-    sources("$modelDir/rider")
-
-    hashFolder = "$buildDir"
-    packages = "model.rider"
-
-    generator {
-        language = "kotlin"
-        transform = "asis"
-        root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "com.jetbrains.rider.plugins.efcore.model"
-        directory = "$ktOutput"
-        if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-
-    generator {
-        language = "csharp"
-        transform = "reversed"
-        root = "com.jetbrains.rider.model.nova.ide.IdeRoot"
-        namespace = "Rider.Plugins.EfCore"
-        directory = "$csOutput"
-        if (inMonorepo) generatedFileSuffix = ".Pregenerated"
-    }
-}
-
 intellij {
     type.set("RD")
     version.set(productVersion)
@@ -140,10 +73,28 @@ intellij {
     ))
 }
 
+
+val riderModel: Configuration by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+}
+
+artifacts {
+    add(riderModel.name, provider {
+        val sdkRoot = tasks.setupDependencies.get().idea.get().classes
+        sdkRoot.resolve("lib/rd/rider-model.jar").also {
+            check(it.isFile) {
+                "rider-model.jar is not found at $riderModel"
+            }
+        }
+    }) {
+        builtBy(tasks.setupDependencies)
+    }
+}
+
 tasks {
     wrapper {
-        gradleVersion = "8.2.1"
-        distributionType = Wrapper.DistributionType.ALL
+        gradleVersion = "8.7"
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
 
@@ -187,14 +138,12 @@ tasks {
         }
     }
 
-    val rdgen by existing
-
     register("prepare") {
-        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps)
+        dependsOn(":protocol:rdgen", generateNuGetConfig, prepareRiderBuildProps)
     }
 
     val compileDotNet by registering {
-        dependsOn(rdgen, generateNuGetConfig, prepareRiderBuildProps)
+        dependsOn(":protocol:rdgen", generateNuGetConfig, prepareRiderBuildProps)
         doLast {
             exec {
                 workingDir(dotNetSrcDir)
@@ -220,7 +169,7 @@ tasks {
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        dependsOn(rdgen)
+        dependsOn(":protocol:rdgen")
         kotlinOptions {
             jvmTarget = "17"
             freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
