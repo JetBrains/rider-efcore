@@ -3,23 +3,17 @@
 import org.jetbrains.changelog.exceptions.MissingVersionException
 import kotlin.collections.*
 
-buildscript {
-    repositories {
-        maven { setUrl("https://cache-redirector.jetbrains.com/maven-central") }
-    }
-}
-
 repositories {
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
     maven("https://cache-redirector.jetbrains.com/maven-central")
 }
 
 plugins {
-    id("me.filippov.gradle.jvm.wrapper") version "0.14.0"
-    // https://plugins.gradle.org/plugin/org.jetbrains.changelog
+    id("me.filippov.gradle.jvm.wrapper")
     id("org.jetbrains.changelog") version "2.2.0"
-    // https://plugins.gradle.org/plugin/org.jetbrains.intellij
-    id("org.jetbrains.intellij") version "1.17.3"
+    id("org.jetbrains.intellij")
     id("org.jetbrains.kotlin.jvm")
 }
 
@@ -244,6 +238,11 @@ tasks {
     publishPlugin {
         token.set(publishToken)
         channels.set(listOf(publishChannel))
+    }
+
+    wrapper {
+        gradleVersion = "8.7"
+        distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
     }
 }
 
