@@ -52,6 +52,7 @@ repositories {
 
 sourceSets {
     main {
+        kotlin.srcDir("src/rider/generated/kotlin")
         kotlin.srcDir("src/rider/main/kotlin")
         resources.srcDir("src/rider/main/resources")
     }

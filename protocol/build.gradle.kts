@@ -12,7 +12,7 @@ repositories {
 }
 
 val isMonorepo = rootProject.projectDir != projectDir.parentFile
-val efCoreRepoRoot: File = projectDir.parentFile.parentFile
+val efCoreRepoRoot: File = projectDir.parentFile
 
 sourceSets {
     main {
@@ -24,7 +24,7 @@ sourceSets {
 
 data class EfCoreGeneratorSettings(val csOutput: File, val ktOutput: File, val suffix: String)
 
-val ktOutputRelativePath = "src/rider/main/kotlin/com/jetbrains/rider/plugins/efcore/rd"
+val ktOutputRelativePath = "src/rider/generated/kotlin/com/jetbrains/rider/plugins/efcore/rd"
 val efCoreGeneratorSettings = if (isMonorepo) {
     val monorepoRoot =
         buildscript.sourceFile?.parentFile?.parentFile?.parentFile?.parentFile?.parentFile ?: error("Cannot find products home")
@@ -37,7 +37,7 @@ val efCoreGeneratorSettings = if (isMonorepo) {
     val ktOutputMonorepoRoot = monorepoPreGeneratedFrontendDir.resolve(ktOutputRelativePath)
     EfCoreGeneratorSettings(monorepoPreGeneratedBackendDir, ktOutputMonorepoRoot, ".Pregenerated")
 } else {
-    EfCoreGeneratorSettings(efCoreRepoRoot.resolve("src/dotnet/Rider.Plugins.EfCore/Rd"), efCoreRepoRoot.resolve(ktOutputRelativePath), "")
+    EfCoreGeneratorSettings(efCoreRepoRoot.resolve("src/dotnet/Rider.Plugins.EfCore/Rd"), efCoreRepoRoot.resolve(ktOutputRelativePath), ".Generated")
 }
 
 rdgen {
