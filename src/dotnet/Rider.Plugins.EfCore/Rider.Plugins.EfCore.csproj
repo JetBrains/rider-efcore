@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <InternalBuild Condition="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'Product.Root')) != ''">True</InternalBuild>
+    <InternalBuild Condition="'$(SolutionFileName)' != 'Rider.Plugins.EfCore.sln'">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
 
