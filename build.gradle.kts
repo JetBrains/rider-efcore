@@ -29,10 +29,6 @@ apply {
     plugin("com.jetbrains.rdgen")
 }
 
-dependencies {
-    testImplementation("org.testng:testng:7.7.0")
-}
-
 val riderPluginId: String by project
 val dotnetPluginId: String by project
 val productVersion: String by project
@@ -142,7 +138,7 @@ intellij {
 
 tasks {
     wrapper {
-        gradleVersion = "8.2.1"
+        gradleVersion = "8.3"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
@@ -228,8 +224,6 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("233.0")
-        untilBuild.set("233.*")
         val latestChangelog = try {
             changelog.getUnreleased()
         } catch (_: MissingVersionException) {
@@ -256,8 +250,8 @@ tasks {
 
     runIde {
         // For statistics:
-         jvmArgs("-Xmx1500m", "-Didea.is.internal=true", "-Dfus.internal.test.mode=true")
-//        jvmArgs("-Xmx1500m")
+        // jvmArgs("-Xmx1500m", "-Didea.is.internal=true", "-Dfus.internal.test.mode=true")
+        jvmArgs("-Xmx1500m")
     }
 
     test {
