@@ -1,19 +1,27 @@
 @file:Suppress("HardCodedStringLiteral")
 
+import com.jetbrains.plugin.structure.base.utils.isFile
 import org.jetbrains.changelog.exceptions.MissingVersionException
+import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import kotlin.collections.*
+import kotlin.io.path.absolute
+import kotlin.io.path.isDirectory
 
 repositories {
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     maven("https://cache-redirector.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-repository/snapshots")
     maven("https://cache-redirector.jetbrains.com/maven-central")
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 plugins {
     id("me.filippov.gradle.jvm.wrapper")
     id("org.jetbrains.changelog") version "2.2.0"
-    id("org.jetbrains.intellij")
+    id("org.jetbrains.intellij.platform")
     id("org.jetbrains.kotlin.jvm")
 }
 
@@ -25,6 +33,10 @@ val dotnetPluginId: String by project
 val productVersion: String by project
 val pluginVersion: String by project
 val buildConfiguration = ext.properties["buildConfiguration"] ?: "Debug"
+
+intellijPlatform {
+    buildSearchableOptions = buildConfiguration == "Release"
+}
 
 val publishToken: String by project
 val publishChannel: String by project
@@ -58,16 +70,16 @@ sourceSets {
     }
 }
 
-intellij {
-    type.set("RD")
-    version.set(productVersion)
-    downloadSources.set(false)
-    plugins.set(listOf(
-        "com.intellij.database",
-        "terminal"
-    ))
-}
+dependencies {
+    intellijPlatform {
+        rider(productVersion)
 
+        instrumentationTools()
+
+        bundledPlugin("com.intellij.database")
+        bundledPlugin("org.jetbrains.plugins.terminal")
+    }
+}
 
 val riderModel: Configuration by configurations.creating {
     isCanBeConsumed = true
@@ -76,14 +88,13 @@ val riderModel: Configuration by configurations.creating {
 
 artifacts {
     add(riderModel.name, provider {
-        val sdkRoot = tasks.setupDependencies.get().idea.get().classes
-        sdkRoot.resolve("lib/rd/rider-model.jar").also {
+        intellijPlatform.platformPath.resolve("lib/rd/rider-model.jar").also {
             check(it.isFile) {
                 "rider-model.jar is not found at $riderModel"
             }
         }
     }) {
-        builtBy(tasks.setupDependencies)
+        builtBy(Constants.Tasks.INITIALIZE_INTELLIJ_PLATFORM_PLUGIN)
     }
 }
 
@@ -94,8 +105,8 @@ tasks {
     }
 
     val riderSdkPath by lazy {
-        val path = setupDependencies.get().idea.get().classes.resolve("lib/DotNetSdkForRdPlugins")
-        if (!path.isDirectory) error("$path does not exist or not a directory")
+        val path = intellijPlatform.platformPath.resolve("lib/DotNetSdkForRdPlugins").absolute()
+        if (!path.isDirectory()) error("$path does not exist or not a directory")
 
         println("Rider SDK path: $path")
         return@lazy path
@@ -104,7 +115,7 @@ tasks {
     val prepareRiderBuildProps by registering {
         val generatedFile = project.buildDir.resolve("DotNetSdkPath.generated.props")
 
-        inputs.property("dotNetSdkFile", { riderSdkPath })
+        inputs.property("dotNetSdkFile", { riderSdkPath.toString() })
         outputs.file(generatedFile)
 
         doLast {
@@ -213,7 +224,7 @@ tasks {
         environment["LOCAL_ENV_RUN"] = "true"
     }
 
-    withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
+    withType<PrepareSandboxTask> {
         dependsOn(compileDotNet)
 
         val outputFolder = file("$dotNetSrcDir/$dotnetPluginId/bin/$dotnetPluginId/$buildConfiguration")
