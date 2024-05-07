@@ -39,4 +39,6 @@ class EfCoreUiConfigurable : BoundConfigurable(EfCoreUiBundle.message("configura
             }
         }
     }
+  
+  override fun getHelpTopic(): String = "Settings_EF_Core"
 }
