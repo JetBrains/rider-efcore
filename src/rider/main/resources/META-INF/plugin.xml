@@ -1,7 +1,7 @@
 <idea-plugin require-restart="true">
   <id>me.seclerp.rider.plugins.efcore</id>
   <name>Entity Framework Core UI</name>
-  <vendor url="http://jetbrains.com">JetBrains</vendor>
+  <vendor>JetBrains</vendor>
   <depends>com.intellij.modules.rider</depends>
   <depends>com.intellij.database</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
