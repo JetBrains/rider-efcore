@@ -28,9 +28,7 @@ class EfCoreStartupListener : SolutionExtListener<RiderEfCoreModel> {
             NotificationType.WARNING
           )
           .addAction(InstallDotnetEfAction())
-          .apply{
-            addAction(SuppressEfCoreToolsInstallation(this))
-          }
+          .addAction(SuppressEfCoreToolsInstallation(this))
           .notify(session.project)
 
         RdTask.fromResult(unit)
