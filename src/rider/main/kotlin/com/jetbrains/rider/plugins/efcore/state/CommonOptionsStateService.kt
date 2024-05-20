@@ -1,8 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.state
 
 import com.intellij.openapi.components.*
-import com.intellij.openapi.project.Project
-import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import java.util.*
 
 @Service
@@ -59,4 +57,10 @@ class CommonOptionsStateService : PersistentStateComponent<CommonOptionsState> {
         myState.solutionLevelOptions[MIGRATIONS_PROJECT_KEY] = migrationsProjectId.toString()
         myState.solutionLevelOptions[STARTUP_PROJECT_KEY] = startupProjectId.toString()
     }
+
+    var toolsInstallationSupressed : Boolean
+        get() = myState.toolsInstallationSupressed
+        set(value : Boolean){
+            myState.toolsInstallationSupressed = value
+        }
 }
