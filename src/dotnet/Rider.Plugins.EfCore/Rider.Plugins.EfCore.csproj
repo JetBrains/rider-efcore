@@ -1,16 +1,14 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <InternalBuild Condition="'$(SolutionFileName)' != 'Rider.Plugins.EfCore.sln'">True</InternalBuild>
     <InternalBuild Condition="$(InternalBuild) == ''">False</InternalBuild>
   </PropertyGroup>
-
   <PropertyGroup>
     <LanguageTargets>$(MSBuildToolsPath)\Microsoft.CSharp.targets</LanguageTargets>
   </PropertyGroup>
-
   <Import Project="Sdk.props" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
-
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>Rider.Plugins.EfCore</AssemblyName>
@@ -19,19 +17,16 @@
     <DefineConstants>$(DefineConstants);RIDER</DefineConstants>
     <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="JetBrains.Lifetimes" />
     <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.NuGet.Packaging" />
     <PackageReference Include="JetBrains.NuGet.Versioning" />
   </ItemGroup>
-
   <!-- Rider SDK Imports -->
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Core_Ide.Props" Condition="!$(InternalBuild)" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_RdBackend.Common.Props" Condition="!$(InternalBuild)" />
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Rider_Rider.Backend.Props" Condition="!$(InternalBuild)" />
-
   <!-- .NET SDK and internal targets imports -->
   <Import Project="ManagedProject.Generated.Targets" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
