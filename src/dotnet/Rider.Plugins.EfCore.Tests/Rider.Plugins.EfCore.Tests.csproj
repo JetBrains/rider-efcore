@@ -12,7 +12,7 @@
     <AssemblyName>Rider.Plugins.EfCore.Tests</AssemblyName>
     <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="ProjectReference">
     <ProjectReference Include="..\Rider.Plugins.EfCore\Rider.Plugins.EfCore.csproj" />
   </ItemGroup>
   <ItemGroup>
