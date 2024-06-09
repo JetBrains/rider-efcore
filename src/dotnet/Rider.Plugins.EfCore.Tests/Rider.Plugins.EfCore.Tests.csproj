@@ -24,4 +24,3 @@
   <Import Project="Sdk.targets" Sdk="JetBrains.Toolset.MainSolution.Sdk" Version="20200625.1.1.2" Condition="$(InternalBuild)" />
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" Condition="!$(InternalBuild)" />
 </Project>
-
