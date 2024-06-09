@@ -17,11 +17,11 @@
     <DefineConstants>$(DefineConstants);RIDER</DefineConstants>
     <PackageLockFilePath>$(MSBuildThisFileDirectory)PackagesLock.targets</PackageLockFilePath>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Label="PackageReference">
     <PackageReference Include="JetBrains.Lifetimes" />
-    <PackageReference Include="JetBrains.RdFramework" />
     <PackageReference Include="JetBrains.NuGet.Packaging" />
     <PackageReference Include="JetBrains.NuGet.Versioning" />
+    <PackageReference Include="JetBrains.RdFramework" />
   </ItemGroup>
   <!-- Rider SDK Imports -->
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Core_Ide.Props" Condition="!$(InternalBuild)" />
