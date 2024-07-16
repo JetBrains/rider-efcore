@@ -27,10 +27,6 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
 }
 
-dependencies {
-    testImplementation("org.testng:testng:7.7.0")
-}
-
 val dotnetPluginId: String by project
 val productVersion: String by project
 val pluginVersion: String by project
@@ -126,7 +122,7 @@ tasks {
     }
 
     val prepareRiderBuildProps by registering {
-        val generatedFile = project.buildDir.resolve("DotNetSdkPath.generated.props")
+        val generatedFile = layout.buildDirectory.file("DotNetSdkPath.generated.props")
 
         inputs.property("dotNetSdkFile", { riderSdkPath.toString() })
         outputs.file(generatedFile)
@@ -216,7 +212,7 @@ tasks {
         dependsOn(compileDotNet)
 
         copy {
-            from("${buildDir}/distributions/${rootProject.name}-${version}.zip")
+            from(layout.buildDirectory.file("distributions/${rootProject.name}-${version}.zip"))
             into("${rootDir}/output")
         }
     }
