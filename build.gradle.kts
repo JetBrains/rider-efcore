@@ -3,6 +3,7 @@
 import com.jetbrains.plugin.structure.base.utils.isFile
 import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.intellij.platform.gradle.Constants
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import kotlin.collections.*
 import kotlin.io.path.absolute
@@ -34,6 +35,14 @@ val dotnetPluginId: String by project
 val productVersion: String by project
 val pluginVersion: String by project
 val buildConfiguration = ext.properties["buildConfiguration"] ?: "Debug"
+val sinceProductVersion = run {
+    val yearWithMajor = productVersion.substringBefore("-")
+    val year = yearWithMajor.substringBefore(".")
+    val major = yearWithMajor.substringAfter(".")
+    "${year.substring(2)}$major.0".also {
+        logger.info("Using since build version: $it")
+    }
+}
 
 intellijPlatform {
     buildSearchableOptions = buildConfiguration == "Release"
@@ -80,6 +89,8 @@ dependencies {
 
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
+
+        testFramework(TestFrameworkType.Bundled)
     }
 }
 
@@ -185,7 +196,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("242.0")
+        sinceBuild.set(sinceProductVersion)
         val latestChangelog = try {
             changelog.getUnreleased()
         } catch (_: MissingVersionException) {
