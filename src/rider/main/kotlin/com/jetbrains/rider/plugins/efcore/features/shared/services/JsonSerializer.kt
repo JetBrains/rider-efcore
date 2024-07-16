@@ -7,12 +7,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.project.Project
-import com.jetbrains.rider.plugins.efcore.features.connections.impl.AppSettingsConnectionProvider
 import org.jetbrains.annotations.NonNls
 import java.io.File
 
-@Service
+@Service(Service.Level.APP)
 class JsonSerializer {
     companion object {
         private val json =
@@ -20,7 +18,7 @@ class JsonSerializer {
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
                 .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
 
-        fun getInstance(intellijProject: Project) = intellijProject.service<AppSettingsConnectionProvider>()
+        fun getInstance() = service<JsonSerializer>()
     }
 
     private val logger = logger<JsonSerializer>()

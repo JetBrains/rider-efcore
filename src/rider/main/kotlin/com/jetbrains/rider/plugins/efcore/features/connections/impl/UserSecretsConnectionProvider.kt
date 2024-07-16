@@ -23,7 +23,7 @@ class UserSecretsConnectionProvider(private val intellijProject: Project) : DbCo
         fun getInstance(intellijProject: Project) = intellijProject.service<UserSecretsConnectionProvider>()
     }
 
-    private val serializer = intellijProject.service<JsonSerializer>()
+    private val serializer = JsonSerializer.getInstance()
 
     override fun getAvailableConnections(project: RdProjectDescriptor) =
         buildList {
