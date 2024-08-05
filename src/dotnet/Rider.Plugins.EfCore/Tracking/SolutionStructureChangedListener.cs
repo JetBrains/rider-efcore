@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.ProjectsHost.Impl;
 using JetBrains.ProjectModel.ProjectsHost.SolutionHost;
@@ -7,7 +8,7 @@ using Rider.Plugins.EfCore.Logging;
 
 namespace Rider.Plugins.EfCore.Tracking
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class SolutionStructureChangedListener : SolutionHostSyncListener
   {
     private readonly ILogger _logger;

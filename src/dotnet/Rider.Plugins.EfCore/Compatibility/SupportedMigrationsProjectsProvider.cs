@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.Util.Dotnet.TargetFrameworkIds;
 
 namespace Rider.Plugins.EfCore.Compatibility
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class SupportedMigrationsProjectsProvider
   {
     private readonly ISolution _solution;
