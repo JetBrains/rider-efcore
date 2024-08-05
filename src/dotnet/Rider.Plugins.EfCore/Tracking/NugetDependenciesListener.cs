@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Application.Parts;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;
@@ -7,7 +8,7 @@ using Rider.Plugins.EfCore.Logging;
 
 namespace Rider.Plugins.EfCore.Tracking
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class NugetDependenciesListener
   {
     private readonly NuGetPackageReferenceTracker _nuGetPackageReferenceTracker;

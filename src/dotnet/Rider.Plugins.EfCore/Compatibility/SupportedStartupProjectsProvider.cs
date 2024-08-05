@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Packaging;
 using JetBrains.Util;
@@ -9,7 +10,7 @@ using Rider.Plugins.EfCore.Tracking;
 
 namespace Rider.Plugins.EfCore.Compatibility
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class SupportedStartupProjectsProvider
   {
     private readonly ISolution _solution;

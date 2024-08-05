@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.NuGet.Operations;
 using JetBrains.ProjectModel.NuGet.Packaging;
@@ -8,7 +9,7 @@ using Rider.Plugins.EfCore.Rd;
 
 namespace Rider.Plugins.EfCore.Dependencies;
 
-[SolutionComponent]
+[SolutionComponent(InstantiationEx.LegacyDefault)]
 public class EfCorePackagesProvider
 {
   // Since it's hard to detect provider by NuGet package dependencies and structure, we will rely on a well-known list.

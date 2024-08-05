@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.Impl;
@@ -22,7 +23,7 @@ using Rider.Plugins.EfCore.Tracking;
 
 namespace Rider.Plugins.EfCore
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class EntityFrameworkCoreHost
   {
     private readonly Lifetime _lifetime;

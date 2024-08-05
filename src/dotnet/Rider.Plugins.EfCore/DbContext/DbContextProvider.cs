@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
@@ -9,7 +10,7 @@ using Rider.Plugins.EfCore.Rd;
 
 namespace Rider.Plugins.EfCore.DbContext
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class DbContextProvider
   {
     public IEnumerable<DbContextInfo> GetDbContexts(IProject project)
