@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
@@ -8,7 +9,7 @@ using Rider.Plugins.EfCore.Rd;
 
 namespace Rider.Plugins.EfCore.Migrations
 {
-  [SolutionComponent]
+  [SolutionComponent(InstantiationEx.LegacyDefault)]
   public class MigrationsProvider
   {
     public bool HasMigrations(IProject project, string dbContextFullName)
