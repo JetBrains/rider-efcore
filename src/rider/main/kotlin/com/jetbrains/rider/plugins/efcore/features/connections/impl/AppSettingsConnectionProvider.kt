@@ -23,7 +23,7 @@ class AppSettingsConnectionProvider(private val intellijProject: Project) : DbCo
 
     override fun getAvailableConnections(project: RdProjectDescriptor) =
         buildList {
-            val directory = (project.location as RdCustomLocation?)?.customLocation?.let(::Path)?.parent ?: return@buildList
+            val directory = (project.location as? RdCustomLocation)?.customLocation?.let(::Path)?.parent ?: return@buildList
             @NonNls
             val connectionStrings = directory.listDirectoryEntries("appsettings*.json")
                 .filter { it.isRegularFile() }

@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.efcore.features.shared.services
 
 import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.json.JsonReadFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.openapi.components.Service
@@ -17,6 +18,7 @@ class JsonSerializer {
             jacksonObjectMapper()
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
                 .enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+                .enable(JsonReadFeature.ALLOW_TRAILING_COMMA.mappedFeature())
 
         fun getInstance() = service<JsonSerializer>()
     }

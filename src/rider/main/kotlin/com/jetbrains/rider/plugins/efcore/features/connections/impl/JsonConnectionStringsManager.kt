@@ -32,9 +32,9 @@ class JsonConnectionStringsManager(intellijProject: Project) {
      * }
      */
     private fun getConnectionsFromObject(fileName: String, jsonFile: JsonNode): List<DbConnectionInfo> = buildList {
-        val obj = jsonFile.get("ConnectionStrings") as ObjectNode? ?: return emptyList()
+        val obj = jsonFile.get("ConnectionStrings") as? ObjectNode ?: return emptyList()
         obj.fieldNames().forEach { connName ->
-            val connString = (obj[connName] as TextNode?)?.textValue()
+            val connString = (obj[connName] as? TextNode)?.textValue()
             if (connString != null)
                 add(DbConnectionInfo(connName, connString, fileName, null))
         }
@@ -53,7 +53,7 @@ class JsonConnectionStringsManager(intellijProject: Project) {
                 null -> return@forEach
                 else -> {
                     val name = match.groups["name"]?.value ?: return@forEach
-                    val connection = (jsonFile[settingsField] as TextNode?)?.textValue() ?: return@forEach
+                    val connection = (jsonFile[settingsField] as? TextNode)?.textValue() ?: return@forEach
                     add(DbConnectionInfo(name, connection, fileName, null))
                 }
             }
