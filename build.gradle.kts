@@ -85,6 +85,7 @@ dependencies {
 
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
+        bundledPlugin("com.intellij.ml.llm")
 
         testFramework(TestFrameworkType.Bundled)
     }
