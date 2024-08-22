@@ -35,7 +35,7 @@ fun AnActionEvent.isSolutionModeContext(): Boolean {
   return when {
     ActionPlaces.isMainMenuOrActionSearch(place) -> true
     ActionPlaces.isMainToolbar(place) -> true
-    ActionPlaces.isPopupPlace(place) && extension == "sln" || extension == "slnf" -> true
+    isFromContextMenu && extension == "sln" || extension == "slnf" -> true
     else -> false
   }
 }
