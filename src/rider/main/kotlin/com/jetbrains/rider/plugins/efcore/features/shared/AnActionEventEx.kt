@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.efcore.features.shared
 
 import com.intellij.openapi.actionSystem.ActionPlaces
+import com.intellij.openapi.actionSystem.ActionPlaces.MAIN_TOOLBAR
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.platform.backend.workspace.WorkspaceModel
@@ -34,7 +35,7 @@ fun AnActionEvent.isSolutionModeContext(): Boolean {
   val extension = getData(PlatformDataKeys.VIRTUAL_FILE)?.extension
   return when {
     ActionPlaces.isMainMenuOrActionSearch(place) -> true
-    ActionPlaces.isMainToolbar(place) -> true
+    place == MAIN_TOOLBAR -> true
     isFromContextMenu && extension == "sln" || extension == "slnf" -> true
     else -> false
   }
