@@ -5,12 +5,13 @@ import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.util.NlsContexts
 import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindText
-import com.jetbrains.rdclient.util.idea.toIOFile
 import com.jetbrains.observables.ObservableProperty
+import com.jetbrains.rdclient.util.idea.toIOFile
 import java.io.File
 import javax.swing.JComponent
 
@@ -25,13 +26,12 @@ fun JComponent.monospaced(): JComponent =
     }
 
 fun Row.textFieldForRelativeFolder(
-    basePathGetter: () -> String,
-    project: Project? = null,
-    browseDialogTitle: String? = null,
+  basePathGetter: () -> String,
+  project: Project? = null,
+  browseDialogTitle: @NlsContexts.DialogTitle String? = null,
 ): Cell<TextFieldWithBrowseButton> {
-
-    val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
-    val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(browseDialogTitle, project, fileChooserDescriptor) {
+    val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle(browseDialogTitle)
+    val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(fileChooserDescriptor, project) {
         val pathRelativeToAsFile = File(basePathGetter()).path
         it.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
     }
