@@ -3,7 +3,9 @@ package com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute
 import com.intellij.execution.Executor
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.terminal.TerminalShellCommandHandler
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
 import com.jetbrains.rider.plugins.efcore.features.database.drop.DropDatabaseAction
@@ -13,15 +15,12 @@ import com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationAc
 import com.jetbrains.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationAction
 import com.jetbrains.rider.plugins.efcore.features.migrations.script.GenerateScriptAction
 import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
+import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
-import java.util.UUID
-import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
+import java.util.*
 
-class EFCoreShellCommandHandler : TerminalShellCommandHandler {
-
+private class EFCoreShellCommandHandler : TerminalShellCommandHandler {
     companion object {
         // Define dotnet ef constant string and commands
         private const val DOTNET_EF = "dotnet ef"
