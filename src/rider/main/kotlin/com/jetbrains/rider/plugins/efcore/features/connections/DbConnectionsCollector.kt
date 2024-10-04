@@ -5,15 +5,15 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rider.model.RdProjectDescriptor
-import com.jetbrains.rider.projectView.workspace.findProjects
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.AppSettingsConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.DataGripConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.UserSecretsConnectionProvider
+import com.jetbrains.rider.projectView.workspace.findProjects
 import java.util.*
 
 @Service(Service.Level.PROJECT)
 @Suppress("UnstableApiUsage")
-class DbConnectionsCollector(private val intellijProject: Project) {
+internal class DbConnectionsCollector(private val intellijProject: Project) {
     companion object {
         fun getInstance(intellijProject: Project) = intellijProject.service<DbConnectionsCollector>()
     }
