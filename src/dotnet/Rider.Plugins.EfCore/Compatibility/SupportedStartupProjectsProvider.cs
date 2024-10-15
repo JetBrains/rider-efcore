@@ -59,6 +59,7 @@ namespace Rider.Plugins.EfCore.Compatibility
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net6)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net7)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net8)
+      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net9)
       || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.NetCore31);
   }
 }
