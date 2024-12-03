@@ -50,6 +50,8 @@ class GenerateScriptDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.GenerateScript"
+
     override fun initBindings() {
         super.initBindings()
 

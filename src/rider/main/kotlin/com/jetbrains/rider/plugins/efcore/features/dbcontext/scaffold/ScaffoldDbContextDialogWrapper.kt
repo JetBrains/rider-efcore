@@ -74,6 +74,8 @@ class ScaffoldDbContextDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.ScaffoldDbContext"
+
     override fun initBindings() {
         super.initBindings()
 
