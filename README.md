@@ -47,7 +47,7 @@ There are a couple of UI stuff for:
 
    ![image](https://github.com/JetBrains/rider-efcore/assets/20597871/31a23fd1-c0ad-404d-9a58-4b839bbabe87)
 
-More about features and available dialogs you could read in [**the blog post**](https://blog.seclerp.me/general/working-with-ef-core-inside-jetbrains-rider/).
+More about features and available dialogs you could read on [**the documentation page**](https://www.jetbrains.com/help/rider/Visual_interface_for_EF_Core_commands.html).
 
 ### Requirements
 
