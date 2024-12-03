@@ -7,6 +7,7 @@ import com.intellij.platform.backend.workspace.WorkspaceModel
 import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.AppSettingsConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.DataGripConnectionProvider
+import com.jetbrains.rider.plugins.efcore.features.connections.impl.LocalSettingsConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.UserSecretsConnectionProvider
 import com.jetbrains.rider.projectView.workspace.findProjects
 import java.util.*
@@ -21,6 +22,7 @@ internal class DbConnectionsCollector(private val intellijProject: Project) {
     private val providers = listOf(
         AppSettingsConnectionProvider.getInstance(intellijProject),
         UserSecretsConnectionProvider.getInstance(intellijProject),
+        LocalSettingsConnectionProvider.getInstance(intellijProject),
         DataGripConnectionProvider.getInstance(intellijProject)
     )
 
