@@ -43,7 +43,7 @@
 
   <actions>
     <group id="EfCore.Groups.Dialogs" popup="true" class="com.jetbrains.rider.plugins.efcore.features.shared.EfCoreActionsGroup">
-      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="before" relative-to-action="BackendEntityFrameworkActionGroup"/>
+      <add-to-group group-id="SolutionExplorerPopupMenu" anchor="before" relative-to-action="BackendEntityFrameworkActionGroupNew"/>
       <add-to-group group-id="ToolsMenu"/>
 
       <action id="EfCore.Features.Migrations.AddMigrationAction"
