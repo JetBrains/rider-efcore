@@ -35,9 +35,6 @@ class UpdateDatabaseDialogWrapper(
     selectedProjectId,
     true
 ) {
-
-    private val databaseCommandFactory by lazy { DatabaseCommandFactory.getInstance(intellijProject) }
-
     //
     // Internal data
     private val targetMigrationsView = observableList<MigrationItem?>()

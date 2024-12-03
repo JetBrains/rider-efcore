@@ -31,8 +31,6 @@ class AddMigrationDialogWrapper(
     intellijProject,
     selectedProjectId
 ) {
-    private val migrationsCommandFactory by lazy { MigrationsCommandFactory.getInstance(intellijProject) }
-
     //
     // Internal data
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")

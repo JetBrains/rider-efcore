@@ -23,8 +23,6 @@ class RemoveLastMigrationDialogWrapper(
     selectedProjectId,
     true
 ) {
-    private val migrationsCommandFactory by lazy { MigrationsCommandFactory.getInstance(intellijProject) }
-
     init {
         initUi()
     }

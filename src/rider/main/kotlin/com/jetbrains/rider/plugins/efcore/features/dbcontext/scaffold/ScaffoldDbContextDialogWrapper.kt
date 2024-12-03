@@ -48,8 +48,6 @@ class ScaffoldDbContextDialogWrapper(
     selectedProjectId,
     requireMigrationsInProject = false
 ) {
-    private val dbContextCommandFactory by lazy { DbContextCommandFactory.getInstance(intellijProject) }
-
     //
     // Internal data
     private lateinit var mainTab: DialogPanel

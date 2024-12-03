@@ -23,8 +23,6 @@ class DropDatabaseDialogWrapper(
     selectedProjectId,
     false
 ) {
-    private val databaseCommandFactory by lazy { DatabaseCommandFactory.getInstance(intellijProject) }
-
     //
     // Constructor
     init {

@@ -30,8 +30,6 @@ class GenerateScriptDialogWrapper(
     selectedProjectId,
     requireMigrationsInProject = true
 ) {
-    private val migrationsCommandFactory by lazy { intellijProject.service<MigrationsCommandFactory>() }
-
     //
     // Internal data
     private val fromMigrationsView = observableList<MigrationItem?>()
