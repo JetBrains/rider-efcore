@@ -31,6 +31,8 @@ class DropDatabaseDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.DropDatabase"
+
     override fun doOKAction() {
         val projectName = dataCtx.migrationsProject.value?.name
         val dbContext = dataCtx.dbContext.value?.name

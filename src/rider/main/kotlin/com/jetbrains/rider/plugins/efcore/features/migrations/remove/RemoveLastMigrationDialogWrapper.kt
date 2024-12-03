@@ -29,6 +29,8 @@ class RemoveLastMigrationDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.RemoveLastMigration"
+
     override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
 

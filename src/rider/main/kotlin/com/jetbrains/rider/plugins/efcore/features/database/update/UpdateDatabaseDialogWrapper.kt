@@ -54,6 +54,8 @@ class UpdateDatabaseDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.UpdateDatabase"
+
     override fun initBindings() {
         super.initBindings()
 

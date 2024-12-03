@@ -49,6 +49,8 @@ class AddMigrationDialogWrapper(
         initUi()
     }
 
+    override fun getHelpId() = "EFCore.Features.Migrations.AddMigration"
+
     override fun initBindings() {
         super.initBindings()
 
