@@ -5,7 +5,7 @@ import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
 import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOptions
-import com.jetbrains.rider.run.withRawParameters
+import com.jetbrains.rider.shared.run.withRawParameters
 import java.nio.file.Paths
 
 class EfCoreCliCommandBuilder(
