@@ -45,8 +45,8 @@ namespace Rider.Plugins.EfCore.Compatibility
     }
 
     private bool StartupProjectPackagesInstalled(IProject project) =>
-      _nugetTracker.HasPackage(project, EfCoreRequiredPackages.EfCoreToolsNugetId)
-      || _nugetTracker.HasPackage(project, EfCoreRequiredPackages.EfCoreDesignNugetId);
+      _nugetTracker.HasInstalledPackage(project, EfCoreRequiredPackages.EfCoreToolsNugetId)
+      || _nugetTracker.HasInstalledPackage(project, EfCoreRequiredPackages.EfCoreDesignNugetId);
 
     private IEnumerable<IProject> GetReferencingProjects(IProject project) =>
       project.TargetFrameworkIds
