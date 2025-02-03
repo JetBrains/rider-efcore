@@ -2,11 +2,9 @@ package com.jetbrains.rider.plugins.efcore.features.shared.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.rd.MigrationsProjectInfo
 import com.jetbrains.rider.plugins.efcore.rd.StartupProjectInfo
 import com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService
-import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
 import java.util.*
 
 @Service(Service.Level.APP)

@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.features.shared
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.observables.ObservableCollection
 import com.jetbrains.observables.ObservableProperty
 import com.jetbrains.observables.bind
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo

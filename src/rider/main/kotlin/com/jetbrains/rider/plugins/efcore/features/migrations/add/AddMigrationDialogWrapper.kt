@@ -9,9 +9,7 @@ import com.jetbrains.observables.observable
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.cli.api.MigrationsCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
