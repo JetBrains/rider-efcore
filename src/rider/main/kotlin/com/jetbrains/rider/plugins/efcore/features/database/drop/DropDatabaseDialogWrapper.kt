@@ -3,10 +3,7 @@ package com.jetbrains.rider.plugins.efcore.features.database.drop
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.showYesNoDialog
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.cli.api.DatabaseCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
-import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import java.util.*

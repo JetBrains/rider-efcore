@@ -1,7 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.ui
 
 import icons.ReSharperIcons
-import icons.RiderIcons
 import org.jetbrains.annotations.NonNls
 import javax.swing.Icon
 

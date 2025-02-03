@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.efcore.features.shared
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
-import com.jetbrains.observables.ObservableCollection
 import com.jetbrains.observables.ObservableProperty
 import com.jetbrains.observables.bind
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle

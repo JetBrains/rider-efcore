@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.components.JBCheckBox
