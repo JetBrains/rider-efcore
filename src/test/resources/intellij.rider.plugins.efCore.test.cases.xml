@@ -1,0 +1,8 @@
+<idea-plugin>
+    <dependencies>
+        <plugin id="me.seclerp.rider.plugins.efcore"/>
+        <module name="intellij.rider.test.framework"/>
+        <module name="intellij.rider.test.framework._test"/>
+        <module name="intellij.rider.test.framework.core"/>
+    </dependencies>
+</idea-plugin>
