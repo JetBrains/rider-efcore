@@ -10,7 +10,7 @@ namespace Rider.Plugins.EfCore
 {
   [ZoneDefinition]
   // [ZoneDefinitionConfigurableFeature("Title", "Description", IsInProductSection: false)]
-  public interface IRiderEfCoreZone : IPsiLanguageZone,
+  public interface IRiderEfCoreZone : IZone, IRequire<IPsiLanguageZone>,
     IRequire<ILanguageCSharpZone>,
     IRequire<DaemonZone>,
     IRequire<INuGetZone>,
