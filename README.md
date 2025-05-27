@@ -58,7 +58,8 @@ More about features and available dialogs you could read on [**the documentation
 Before opening the issue, please make sure that your projects and development environment completely satisfies these requirements:
 
 - Target frameworks
-  - `net8.0` (preview)
+  - `net9.0`
+  - `net8.0`
   - `net7.0`
   - `net6.0`
   - `net5.0`
@@ -74,7 +75,7 @@ Before opening the issue, please make sure that your projects and development en
 
 ### Development
 
-> **Note**: You should have JDK 17 and .NET SDK 7.0+ installed and configured.
+> **Note**: You should have JDK 21 and .NET SDK 8.0+ installed and configured.
 
 #### Preparing
 
