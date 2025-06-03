@@ -78,7 +78,7 @@ sourceSets {
 
 dependencies {
     intellijPlatform {
-        rider(productVersion)
+        rider(productVersion, useInstaller = false)
         jetbrainsRuntime()
 
         instrumentationTools()
