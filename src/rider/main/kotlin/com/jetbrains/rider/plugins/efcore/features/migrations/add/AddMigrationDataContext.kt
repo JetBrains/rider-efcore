@@ -12,6 +12,7 @@ class AddMigrationDataContext(
     val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
     val migrationName = observable("")
     val migrationsOutputFolder = observable("Migrations")
+    val openMigrationFile = observable(false)
 
     override fun initBindings() {
         super.initBindings()

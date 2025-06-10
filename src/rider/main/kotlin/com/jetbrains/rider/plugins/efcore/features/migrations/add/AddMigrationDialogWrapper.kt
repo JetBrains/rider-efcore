@@ -6,6 +6,7 @@ import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
 import com.jetbrains.observables.bind
 import com.jetbrains.observables.observable
+import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
@@ -93,6 +94,10 @@ class AddMigrationDialogWrapper(
                     .applyToComponent {
                         dataCtx.migrationsProject.afterChange { isEnabled = it != null }
                     }
+            }
+            row {
+                checkBox(EfCoreUiBundle.message("checkbox.open.migration.file"))
+                    .bindSelected(dataCtx.openMigrationFile)
             }
         }
     }
