@@ -29,6 +29,7 @@ class EfCoreConsoleToolWindowProvider(intellijProject: Project) {
         val contentManager = toolWindow.contentManager
         val factory = contentManager.factory
         val content = factory.createContent(console.component, command.presentationInfo.name, true)
+        content.setDisposer(console)
         contentManager.addContent(content)
         toolWindow.activate {
             contentManager.setSelectedContent(content)
