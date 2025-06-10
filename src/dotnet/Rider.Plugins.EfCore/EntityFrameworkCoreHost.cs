@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.Application.Parts;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
@@ -68,6 +69,7 @@ namespace Rider.Plugins.EfCore
 
       _efCoreModel.HasAvailableMigrations.SetSync(HasAvailableMigrations);
       _efCoreModel.GetAvailableMigrations.SetSync(GetAvailableMigrations);
+      _efCoreModel.GetMigration.SetSync(GetMigration);
       _efCoreModel.GetAvailableDbContexts.SetSync(GetAvailableDbContexts);
       _efCoreModel.GetAvailableDbProviders.SetSync(GetAvailableDbProviders);
       _efCoreModel.GetAvailableToolPackages.SetSync(GetAvailableToolsPackages);
@@ -206,6 +208,17 @@ namespace Rider.Plugins.EfCore
       {
         var project = GetProjectById(identity.ProjectId);
         return _migrationsProvider.GetMigrations(project, identity.DbContextClassFullName).ToList();
+      }
+    }
+
+    [CanBeNull]
+    private MigrationInfo GetMigration(Lifetime lifetime, MigrationIdentity identity)
+    {
+      using (ReadLockCookie.Create())
+      {
+        var project = GetProjectById(identity.ProjectId);
+        return _migrationsProvider
+          .GetMigration(project, identity.DbContextClassFullName, identity.MigrationShortName);
       }
     }
 
