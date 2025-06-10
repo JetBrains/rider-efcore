@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.jetbrains.rd.platform.util.TimeoutTracker
 import com.jetbrains.rider.model.projectModelTasks
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.services.RiderBackendWaiter
 import com.jetbrains.rider.services.RiderProjectModelWaiter
 import com.jetbrains.rider.util.idea.syncFromBackend
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,6 @@ internal suspend fun Project.waitForFiles(folderPath: String) {
     VfsUtil.markDirtyAndRefresh(false, true, true, migrationDirVF)
 
     withContext(Dispatchers.Main) {
-        RiderBackendWaiter.waitBackendSuspending(this@waitForFiles)
         val timeoutTracker = TimeoutTracker(java.time.Duration.ofSeconds(20))
         RiderProjectModelWaiter.waitForProjectModelReadySuspending(this@waitForFiles, timeoutTracker)
 
