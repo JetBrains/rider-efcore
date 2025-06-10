@@ -1,5 +1,8 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
@@ -10,14 +13,19 @@ import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
+import com.jetbrains.rider.plugins.efcore.rd.MigrationIdentity
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 class AddMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,
@@ -96,10 +104,30 @@ class AddMigrationDialogWrapper(
                     }
             }
             row {
-                checkBox(EfCoreUiBundle.message("checkbox.open.migration.file"))
+                checkBox(EfCoreUiBundle.message("checkbox.open.migration.file.after.executing"))
                     .bindSelected(dataCtx.openMigrationFile)
             }
         }
+    }
+
+    override suspend fun postCommandExecute(commandResult: CliCommandResult) {
+        if (!commandResult.succeeded || !dataCtx.openMigrationFile.value)
+            return
+
+        val migrationsOutputFolderPath = Path(migrationProjectFolder.value).resolve(dataCtx.migrationsOutputFolder.value)
+        val migrationIdentity = MigrationIdentity(
+            dataCtx.migrationName.value,
+            dataCtx.migrationsProject.value!!.id,
+            dataCtx.dbContext.value!!.fullName)
+        val openFileService = intellijProject.service<OpenMigrationFileService>()
+
+        if (!openFileService.tryOpenMigrationFile(migrationsOutputFolderPath.pathString, migrationIdentity))
+            NotificationGroupManager.getInstance().getNotificationGroup(KnownNotificationGroups.efCore)
+                .createNotification(
+                    EfCoreUiBundle.message("notification.title.failed.to.open.migration.file"),
+                    EfCoreUiBundle.message("notification.content.failed.to.open.migration.file"),
+                    NotificationType.ERROR)
+                .notify(intellijProject)
     }
 
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
