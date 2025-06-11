@@ -19,13 +19,12 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     private val StartupProjectInfo = structdef extends ProjectInfo
     private val MigrationsProjectInfo = structdef extends ProjectInfo
 
-    private val MigrationsIdentityBase = basestruct {
+    private val MigrationsIdentity = openstruct {
         field("projectId", guid)
         field("dbContextClassFullName", string)
     }
 
-    private val MigrationsIdentity = structdef extends MigrationsIdentityBase {}
-    private val MigrationIdentity = structdef extends MigrationsIdentityBase {
+    private val MigrationIdentity = structdef extends MigrationsIdentity {
         field("migrationShortName", string)
     }
 

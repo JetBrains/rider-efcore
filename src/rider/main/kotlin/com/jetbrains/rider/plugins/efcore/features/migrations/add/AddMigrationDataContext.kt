@@ -33,7 +33,7 @@ class AddMigrationDataContext(
         commonDialogState.get(KnownStateKeys.OUTPUT_FOLDER)?.apply {
             migrationsOutputFolder.value = this
         }
-        commonDialogState.getBool(KnownStateKeys.OPEN_MIGRATION_FILE)?.apply {
+        commonDialogState.getBool(KnownStateKeys.OPEN_MIGRATION_FILE_AFTER_EXECUTING)?.apply {
             openMigrationFile.value = this
         }
     }
@@ -42,11 +42,11 @@ class AddMigrationDataContext(
         super.saveState(commonDialogState)
 
         commonDialogState.set(KnownStateKeys.OUTPUT_FOLDER, migrationsOutputFolder.value)
-        commonDialogState.set(KnownStateKeys.OPEN_MIGRATION_FILE, openMigrationFile.value)
+        commonDialogState.set(KnownStateKeys.OPEN_MIGRATION_FILE_AFTER_EXECUTING, openMigrationFile.value)
     }
 
     object KnownStateKeys {
         const val OUTPUT_FOLDER = "outputFolder"
-        const val OPEN_MIGRATION_FILE = "openFile"
+        const val OPEN_MIGRATION_FILE_AFTER_EXECUTING = "openFile"
     }
 }

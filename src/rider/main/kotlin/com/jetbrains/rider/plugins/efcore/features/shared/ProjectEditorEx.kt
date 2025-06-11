@@ -47,7 +47,7 @@ internal fun Project.waitForSyncPoints(timeout: Duration = Duration.ofSeconds(DE
     while (hasNotReachedSyncPoints) {
         val notReachedSyncPoints = tasks.getNotReachedSyncPoints.syncFromBackend(Unit, this)!!
         hasNotReachedSyncPoints = notReachedSyncPoints.any {
-            // Do not wait for HotspotSession termination, continue tests with active session
+            // Do not wait for HotspotSession termination, continue with the active session
             !it.startsWith("HotspotSession")
         }
 
