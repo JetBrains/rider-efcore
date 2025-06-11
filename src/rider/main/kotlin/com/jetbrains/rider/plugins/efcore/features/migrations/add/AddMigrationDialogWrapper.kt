@@ -114,7 +114,8 @@ class AddMigrationDialogWrapper(
         if (!commandResult.succeeded || !dataCtx.openMigrationFile.value)
             return
 
-        val migrationsOutputFolderPath = Path(migrationProjectFolder.value).resolve(dataCtx.migrationsOutputFolder.value)
+        val migrationsOutputFolderPath = Path(migrationProjectFolder.value)
+            .resolve(dataCtx.migrationsOutputFolder.value)
         val migrationIdentity = MigrationIdentity(
             dataCtx.migrationName.value,
             dataCtx.migrationsProject.value!!.id,
