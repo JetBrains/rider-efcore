@@ -32,6 +32,11 @@
 ]]>
   </description>
 
+  <extensionPoints>
+    <extensionPoint qualifiedName="rider.plugins.efcore.migrationNameGenerator"
+                    interface="com.jetbrains.rider.plugins.efcore.features.llm.MigrationNameGenerator" />
+  </extensionPoints>
+
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup id="EfCore.Groups.Notifications" displayType="BALLOON"/>
     <rd.solutionExtListener endpoint="IDE Frontend" listener="com.jetbrains.rider.plugins.efcore.startup.EfCoreStartupListener"/>
