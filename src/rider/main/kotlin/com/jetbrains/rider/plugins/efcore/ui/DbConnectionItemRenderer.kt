@@ -19,6 +19,7 @@ class DbConnectionItemRenderer : ListCellRenderer<DbConnectionItem> {
     private val connectionStringComponent = createColumnComponent().apply { foreground = JBColor.GRAY }
     private val sourceNameComponent = createColumnComponent().apply { foreground = JBColor.GRAY }
 
+    @Suppress("UnstableApiUsage") // JBInsets.emptyInsets for some reason still unstable
     private val rowComponent = createRowComponent().apply {
         add(connectionNameComponent, GridBagConstraints(
             0, 0,

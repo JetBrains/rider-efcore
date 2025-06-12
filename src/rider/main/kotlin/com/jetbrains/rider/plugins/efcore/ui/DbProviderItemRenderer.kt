@@ -17,6 +17,7 @@ class DbProviderItemRenderer : ListCellRenderer<DbProviderItem> {
     private val packageIdComponent = createColumnComponent().apply { foreground = JBColor.BLACK }
     private val packageVersionComponent = createColumnComponent().apply { foreground = JBColor.GRAY }
 
+    @Suppress("UnstableApiUsage") // JBInsets.emptyInsets for some reason still unstable
     private val rowComponent = createRowComponent().apply {
         add(packageIdComponent, GridBagConstraints(
             0, 0,

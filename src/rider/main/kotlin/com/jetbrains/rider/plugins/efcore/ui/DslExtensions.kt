@@ -25,6 +25,7 @@ fun JComponent.monospaced(): JComponent =
         font = EditorColorsManager.getInstance().globalScheme.getFont(EditorFontType.PLAIN)
     }
 
+@Suppress("UnstableApiUsage") // textFieldWithBrowseButton still unstable
 fun Row.textFieldForRelativeFolder(
   basePathGetter: () -> String,
   project: Project? = null,

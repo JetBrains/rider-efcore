@@ -25,17 +25,6 @@ class JsonSerializer {
 
     private val logger = logger<JsonSerializer>()
 
-    fun deserializeNode(jsonString: String): JsonNode? {
-        return try {
-            json.readTree(jsonString)
-        } catch (e: JacksonException) {
-            @NonNls
-            val message = "Input JSON is invalid"
-            logger.error(message, e)
-            null
-        }
-    }
-
     fun deserializeNode(jsonFile: File): JsonNode? {
         return try {
             json.readTree(jsonFile)

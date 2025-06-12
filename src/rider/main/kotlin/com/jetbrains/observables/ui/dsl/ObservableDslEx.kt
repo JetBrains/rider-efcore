@@ -93,16 +93,6 @@ fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
         .align(AlignX.FILL)
 }
 
-fun Row.textFieldWithCompletion(
-    property: ObservableProperty<String>,
-    completions: MutableList<String>,
-    project: Project? = null,
-    icon: Icon? = null
-): Cell<TextFieldWithCompletion> {
-    return textFieldWithCompletion(property.getter, property.setter, completions, project, icon)
-        .applyToComponent { property.afterChange { this.text = it } }
-}
-
 private fun Row.textFieldWithCompletion(
     getter: () -> String,
     setter: (String) -> Unit,

@@ -13,7 +13,6 @@ import com.jetbrains.rider.projectView.workspace.findProjects
 import java.util.*
 
 @Service(Service.Level.PROJECT)
-@Suppress("UnstableApiUsage")
 internal class DbConnectionsCollector(private val intellijProject: Project) {
     companion object {
         fun getInstance(intellijProject: Project) = intellijProject.service<DbConnectionsCollector>()

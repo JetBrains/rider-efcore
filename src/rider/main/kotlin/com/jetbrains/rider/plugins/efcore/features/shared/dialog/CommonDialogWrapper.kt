@@ -43,9 +43,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     private val selectedProjectId: UUID?,
     requireMigrationsInProject: Boolean = false
 ) : BaseDialogWrapper() {
-
-    private val dialogId = dialogTitle.replace(" ", "")
-
     protected val beModel = intellijProject.solution.riderEfCoreModel
 
     //
