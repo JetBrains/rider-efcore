@@ -17,9 +17,12 @@ import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.cli.api.EfCoreCliCommandFactory
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutorProvider
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
+import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.statistics.CommandUsageCollector
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
 import java.util.UUID
@@ -74,17 +77,19 @@ abstract class BaseCommandAction : AnAction() {
         val dialog = createDialog(intellijProject, efCoreVersion, model, currentDotnetProjectName)
 
         if (dialog.showAndGet()) {
-            val executor = PreferredCommandExecutorProvider.getInstance(intellijProject).getExecutor()
             val command = dialog.generateCommand()
             val cliCommand = EfCoreCliCommandFactory.getInstance(intellijProject).create(command, efCoreVersion)
             CommandUsageCollector.withCommandActivity(intellijProject, command) {
                 withBackgroundContext {
-                    executor.execute(cliCommand)?.apply {
-                        dialog.postCommandExecute(this)
-                    }
+                    executeCommand(cliCommand, intellijProject)
                 }
             }
         }
+    }
+
+    protected open suspend fun executeCommand(cliCommand: CliCommand, intellijProject: Project): CliCommandResult? {
+        val executor = PreferredCommandExecutorProvider.getInstance(intellijProject).getExecutor()
+        return executor.execute(cliCommand)
     }
 
     private fun notifyEfIsNotInstalled(intellijProject: Project) {

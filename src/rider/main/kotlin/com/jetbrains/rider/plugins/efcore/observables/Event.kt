@@ -1,6 +1,6 @@
-package com.jetbrains.observables
+package com.jetbrains.rider.plugins.efcore.observables
 
-class Event<T> {
+internal class Event<T> {
     private val observersList = mutableListOf<(T) -> Unit>()
     val observers: List<(T) -> Unit> get() = observersList
 

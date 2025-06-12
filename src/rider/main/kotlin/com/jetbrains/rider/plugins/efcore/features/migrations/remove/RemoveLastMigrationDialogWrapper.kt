@@ -32,12 +32,4 @@ class RemoveLastMigrationDialogWrapper(
 
         return RemoveLastMigrationCommand(commonOptions)
     }
-
-    override fun postCommandExecute(commandResult: CliCommandResult) {
-        if (!commandResult.succeeded)
-            return
-
-        val folderService = intellijProject.service<RemoveLastMigrationFolderService>()
-        folderService.deleteMigrationsFolderIfEmpty(dataCtx.availableMigrations.value.firstOrNull())
-    }
 }

@@ -10,7 +10,7 @@ import com.intellij.ui.components.fields.ExpandableTextField
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindText
-import com.jetbrains.observables.ObservableProperty
+import com.jetbrains.rider.plugins.efcore.observables.ObservableProperty
 import com.jetbrains.rdclient.util.idea.toIOFile
 import java.io.File
 import javax.swing.JComponent

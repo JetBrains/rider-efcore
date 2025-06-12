@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
-import com.jetbrains.observables.ObservableCollection
+import com.jetbrains.rider.plugins.efcore.observables.ObservableCollection
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
 import com.jetbrains.rider.plugins.efcore.ui.items.DbProviderItem

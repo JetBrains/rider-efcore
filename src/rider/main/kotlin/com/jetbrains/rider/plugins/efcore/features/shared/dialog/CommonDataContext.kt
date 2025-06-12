@@ -4,8 +4,12 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.runUnderProgress
-import com.jetbrains.observables.*
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.observables.bind
+import com.jetbrains.rider.plugins.efcore.observables.bindSafe
+import com.jetbrains.rider.plugins.efcore.observables.observable
+import com.jetbrains.rider.plugins.efcore.observables.observableList
+import com.jetbrains.rider.plugins.efcore.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.rd.*
 import com.jetbrains.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService

@@ -1,6 +1,6 @@
-package com.jetbrains.observables
+package com.jetbrains.rider.plugins.efcore.observables
 
-open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : ObservableProperty<List<T>>(initialCollection), MutableList<T> {
+internal open class ObservableCollection<T>(initialCollection: List<T> = listOf()) : ObservableProperty<List<T>>(initialCollection), MutableList<T> {
     private var items = initialCollection.toMutableList()
 
     val onAdded: Event<T> = Event()

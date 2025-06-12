@@ -1,8 +1,8 @@
-package com.jetbrains.observables
+package com.jetbrains.rider.plugins.efcore.observables
 
 import java.util.Random
 
-open class ObservableProperty<T>(defaultValue: T) : com.jetbrains.observables.Observable<T> {
+internal open class ObservableProperty<T>(defaultValue: T) : Observable<T> {
     private var internalValue = defaultValue
 
     //
@@ -23,7 +23,7 @@ open class ObservableProperty<T>(defaultValue: T) : com.jetbrains.observables.Ob
         }
     }
 
-    override val onChange: com.jetbrains.observables.Event<T> = com.jetbrains.observables.Event()
+    override val onChange: Event<T> = Event()
 
     override var isInitialized: Boolean = false
         protected set

@@ -15,7 +15,7 @@ class PreferredCommandExecutorProvider(private val intellijProject: Project) {
 
     fun getExecutor(): CliCommandExecutor =
         when (settingsStateService.useTerminalExecution) {
-            true -> TerminalCommandExecutor(intellijProject)
+            true -> TerminalShellCommandExecutor(intellijProject)
             false -> SilentCommandExecutor(intellijProject)
         }
 }

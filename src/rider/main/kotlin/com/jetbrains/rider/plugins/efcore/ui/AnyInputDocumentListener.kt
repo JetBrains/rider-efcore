@@ -1,6 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.ui
 
-import com.jetbrains.observables.ObservableProperty
+import com.jetbrains.rider.plugins.efcore.observables.ObservableProperty
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 

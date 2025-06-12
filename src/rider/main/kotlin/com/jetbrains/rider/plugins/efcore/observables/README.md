@@ -1,6 +1,6 @@
-## `com.jetbrains.observables`
+## `com.jetbrains.rider.plugins.efcore..observables`
 
-This package provides very basic implementation of Observer pattern implemented in the scope of MVVM and data-binding in Kotlin-based applications.
+This package provides very basic implementation of the Observer pattern, implemented in the scope of MVVM and data-binding in Kotlin-based applications.
 
 ### `ObservableProperty<T>`
 

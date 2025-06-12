@@ -1,4 +1,4 @@
-package com.jetbrains.observables.ui.dsl
+package com.jetbrains.rider.plugins.efcore.observables.ui.dsl
 
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
@@ -11,16 +11,17 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.util.textCompletion.TextFieldWithCompletion
-import com.jetbrains.observables.ObservableProperty
+import com.jetbrains.rider.plugins.efcore.observables.Observable
+import com.jetbrains.rider.plugins.efcore.observables.ObservableProperty
 import com.jetbrains.rider.plugins.efcore.ui.IconComboBoxRendererAdapter
 import com.jetbrains.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
 import javax.swing.*
 import javax.swing.plaf.basic.BasicComboBoxEditor
 
-fun <T : IconItem<*>> Row.iconComboBox(
-        selectedItemProperty: com.jetbrains.observables.Observable<T?>,
-        availableItemsProperty: com.jetbrains.observables.Observable<List<T?>>
+internal fun <T : IconItem<*>> Row.iconComboBox(
+    selectedItemProperty: Observable<T?>,
+    availableItemsProperty: Observable<List<T?>>
 ): Cell<ComboBox<T>> {
     val model = DefaultComboBoxModel<T>()
         .apply {
@@ -49,10 +50,10 @@ fun <T : IconItem<*>> Row.iconComboBox(
         }
 }
 
-fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
-        selectedTextProperty: com.jetbrains.observables.Observable<String>,
-        availableItemsProperty: com.jetbrains.observables.Observable<List<T>>,
-        itemMapper: (TValue) -> String
+internal fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
+    selectedTextProperty: Observable<String>,
+    availableItemsProperty: Observable<List<T>>,
+    itemMapper: (TValue) -> String
 ): Cell<ComboBox<T>> {
     val model = DefaultComboBoxModel<T>()
         .apply {
@@ -93,7 +94,7 @@ fun <T : IconItem<TValue>, TValue> Row.editableComboBox(
         .align(AlignX.FILL)
 }
 
-fun Row.textFieldWithCompletion(
+internal fun Row.textFieldWithCompletion(
     property: ObservableProperty<String>,
     completions: MutableList<String>,
     project: Project? = null,
@@ -121,7 +122,7 @@ private fun Row.textFieldWithCompletion(
     return cell(textField)
 }
 
-fun Cell<JBCheckBox>.bindSelected(
+internal fun Cell<JBCheckBox>.bindSelected(
     property: ObservableProperty<Boolean>,
 ): Cell<JBCheckBox> {
     return this
@@ -129,7 +130,7 @@ fun Cell<JBCheckBox>.bindSelected(
         .applyToComponent { property.afterChange { this.isSelected = it } }
 }
 
-fun Cell<JBTextField>.bindText(
+internal fun Cell<JBTextField>.bindText(
     property: ObservableProperty<String>,
 ): Cell<JBTextField> {
     return this
@@ -138,7 +139,7 @@ fun Cell<JBTextField>.bindText(
 }
 
 @JvmName("bindTextTextFieldWithBrowseButton")
-fun Cell<TextFieldWithBrowseButton>.bindText(
+internal fun Cell<TextFieldWithBrowseButton>.bindText(
     property: ObservableProperty<String>,
 ): Cell<TextFieldWithBrowseButton> {
     return this

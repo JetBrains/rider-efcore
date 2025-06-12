@@ -10,18 +10,18 @@ import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.jetbrains.rd.util.reactive.hasValue
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.observables.bind
-import com.jetbrains.observables.observable
-import com.jetbrains.observables.observableList
-import com.jetbrains.observables.withLogger
+import com.jetbrains.rider.plugins.efcore.observables.bind
+import com.jetbrains.rider.plugins.efcore.observables.observable
+import com.jetbrains.rider.plugins.efcore.observables.observableList
+import com.jetbrains.rider.plugins.efcore.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.preview.CommandPreviewDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.services.PreferredProjectsManager
 import com.jetbrains.rider.plugins.efcore.rd.*
 import com.jetbrains.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
-import com.jetbrains.observables.ui.dsl.bindSelected
-import com.jetbrains.observables.ui.dsl.iconComboBox
+import com.jetbrains.rider.plugins.efcore.observables.ui.dsl.bindSelected
+import com.jetbrains.rider.plugins.efcore.observables.ui.dsl.iconComboBox
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.EfCoreCliCommandFactory
 import com.jetbrains.rider.plugins.efcore.ui.items.*
@@ -43,9 +43,6 @@ abstract class CommonDialogWrapper<TContext : CommonDataContext>(
     private val selectedProjectId: UUID?,
     requireMigrationsInProject: Boolean = false
 ) : BaseDialogWrapper() {
-
-    private val dialogId = dialogTitle.replace(" ", "")
-
     protected val beModel = intellijProject.solution.riderEfCoreModel
 
     //

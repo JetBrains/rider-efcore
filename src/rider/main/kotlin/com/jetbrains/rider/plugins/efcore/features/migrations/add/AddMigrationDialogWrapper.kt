@@ -4,10 +4,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
-import com.jetbrains.observables.bind
-import com.jetbrains.observables.observable
-import com.jetbrains.observables.ui.dsl.bindText
-import com.jetbrains.observables.withLogger
+import com.jetbrains.rider.plugins.efcore.observables.bind
+import com.jetbrains.rider.plugins.efcore.observables.observable
+import com.jetbrains.rider.plugins.efcore.observables.ui.dsl.bindText
+import com.jetbrains.rider.plugins.efcore.observables.withLogger
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper

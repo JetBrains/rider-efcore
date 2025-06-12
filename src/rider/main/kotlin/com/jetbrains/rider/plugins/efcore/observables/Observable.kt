@@ -1,11 +1,11 @@
-package com.jetbrains.observables
+package com.jetbrains.rider.plugins.efcore.observables
 
 import org.jetbrains.annotations.NonNls
 
-interface Observable<T> {
+internal interface Observable<T> {
     val id: Int
     var value: T
-    val onChange: com.jetbrains.observables.Event<T>
+    val onChange: Event<T>
     val isInitialized: Boolean
     val getter: () -> T
     val setter: (T) -> Unit
