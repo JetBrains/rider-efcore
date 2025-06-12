@@ -19,13 +19,14 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
     private val StartupProjectInfo = structdef extends ProjectInfo
     private val MigrationsProjectInfo = structdef extends ProjectInfo
 
-    private val MigrationsIdentity = openstruct {
+    private val MigrationsIdentity = structdef {
         field("projectId", guid)
         field("dbContextClassFullName", string)
     }
 
-    private val MigrationIdentity = structdef extends MigrationsIdentity {
+    private val AddMigrationInfo = structdef {
         field("migrationShortName", string)
+        field("migrationFolderPath", string)
     }
 
     private val MigrationInfo = structdef {
@@ -78,11 +79,14 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
 
         call("hasAvailableMigrations", MigrationsIdentity, bool)
         call("getAvailableMigrations", MigrationsIdentity, immutableList(MigrationInfo))
-        call("getMigration", MigrationIdentity, MigrationInfo.nullable)
         call("getAvailableDbContexts", guid, immutableList(DbContextInfo))
         call("getAvailableDbProviders", guid, immutableList(DbProviderInfo))
         call("getAvailableToolPackages", guid, immutableList(ToolsPackageInfo))
         call("refreshDotNetToolsCache", void, void)
+
+        // async?
+        source("addMigrationExecuted", AddMigrationInfo)
+        sink("migrationFileCreated", string)
 
         callback("onMissingEfCoreToolsDetected", void, void)
     }

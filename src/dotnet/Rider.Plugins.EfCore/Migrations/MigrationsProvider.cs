@@ -44,24 +44,6 @@ namespace Rider.Plugins.EfCore.Migrations
       }
     }
 
-    [CanBeNull]
-    public MigrationInfo GetMigration(IProject project, string dbContextFullName, string migrationShortName)
-    {
-      using (CompilationContextCookie.GetExplicitUniversalContextIfNotSet())
-      {
-        var foundMigration = project
-          .GetPsiModules()
-          .SelectMany(module => module.FindInheritorsOf(EfCoreKnownTypeNames.MigrationBaseClass))
-          .Where(migrationClass => migrationClass.ShortName == migrationShortName)
-          // To get around of multiple modules (multiple target frameworks)
-          .Distinct(migrationClass => migrationClass.GetClrName().FullName)
-          .TrySelect<IClass, MigrationInfo>(TryGetMigrationInfo)
-          .FirstOrDefault(m => m.DbContextClassFullName == dbContextFullName);
-
-        return foundMigration;
-      }
-    }
-
     private static bool TryGetMigrationInfo([CanBeNull] IClass @class, out MigrationInfo migrationInfo)
     {
       migrationInfo = null;
