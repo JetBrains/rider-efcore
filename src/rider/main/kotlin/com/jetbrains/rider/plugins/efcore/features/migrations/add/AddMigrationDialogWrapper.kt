@@ -15,7 +15,6 @@ import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
-import com.jetbrains.rider.plugins.efcore.rd.AddMigrationInfo
 import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
@@ -113,12 +112,9 @@ class AddMigrationDialogWrapper(
 
         val migrationsOutputFolderPath = Path(migrationProjectFolder.value)
             .resolve(dataCtx.migrationsOutputFolder.value)
-        val migrationIdentity = AddMigrationInfo(
-            dataCtx.migrationName.value,
-            migrationsOutputFolderPath.pathString)
         val openFileService = intellijProject.service<OpenMigrationFileService>()
 
-        openFileService.openMigrationFile(migrationIdentity)
+        openFileService.openMigrationFile(migrationsOutputFolderPath.pathString,dataCtx.migrationName.value)
     }
 
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {

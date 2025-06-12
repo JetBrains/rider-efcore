@@ -38,7 +38,6 @@ namespace Rider.Plugins.EfCore
     private readonly MigrationsProvider _migrationsProvider;
     private readonly DbContextProvider _dbContextProvider;
     private readonly EfCorePackagesProvider _packagesProvider;
-    private readonly IFileSystemTracker _fileSystemTracker;
     private readonly ILogger _logger;
 
     private readonly RiderEfCoreModel _efCoreModel;
@@ -55,7 +54,6 @@ namespace Rider.Plugins.EfCore
       MigrationsProvider migrationsProvider,
       DbContextProvider dbContextProvider,
       EfCorePackagesProvider packagesProvider,
-      IFileSystemTracker fileSystemTracker,
       ILogger logger)
     {
       _lifetime = lifetime;
@@ -67,7 +65,6 @@ namespace Rider.Plugins.EfCore
       _migrationsProvider = migrationsProvider;
       _dbContextProvider = dbContextProvider;
       _packagesProvider = packagesProvider;
-      _fileSystemTracker = fileSystemTracker;
       _logger = logger;
 
       _efCoreModel = solution.GetProtocolSolution().GetRiderEfCoreModel();
@@ -78,8 +75,6 @@ namespace Rider.Plugins.EfCore
       _efCoreModel.GetAvailableDbProviders.SetSync(GetAvailableDbProviders);
       _efCoreModel.GetAvailableToolPackages.SetSync(GetAvailableToolsPackages);
       _efCoreModel.RefreshDotNetToolsCache.SetVoid(RefreshDotNetToolsCache);
-
-      _efCoreModel.AddMigrationExecuted.Advise(_lifetime, OnAddMigrationExecuted);
 
       _solutionTracker.OnAfterSolutionUpdate += InvalidateProjects;
       _solutionTracker.OnAfterToolsCacheUpdate += InvalidateEfToolsDefinition;
@@ -194,31 +189,6 @@ namespace Rider.Plugins.EfCore
           "Migration projects invalidated:" +
           $"\n\t{string.Join("\n\t", _efCoreModel.AvailableMigrationProjects.Value.Select(project => project.Name))}");
       });
-    }
-
-    private void OnAddMigrationExecuted(AddMigrationInfo info)
-    {
-      var tempLifetime = _lifetime.CreateNested();
-      _fileSystemTracker.AdviseDirectoryChanges(tempLifetime.Lifetime,
-        VirtualFileSystemPath.Parse(info.MigrationFolderPath, InteractionContext.Local), false,
-        delta =>
-        {
-          if (delta.ChangeType != FileSystemChangeType.CHANGED &&
-              delta.ChangeType != FileSystemChangeType.ADDED)
-            return;
-
-          foreach (var childDelta in delta.GetChildren())
-          {
-            if (childDelta.ChangeType == FileSystemChangeType.ADDED &&
-                childDelta.NewPath.ExtensionNoDot == "cs" &&
-                childDelta.NewPath.NameWithoutExtension.EndsWith($"_{info.MigrationShortName}"))
-            {
-              _efCoreModel.MigrationFileCreated(childDelta.NewPath.ToString());
-              tempLifetime.Terminate();
-              break;
-            }
-          }
-        });
     }
 
     //

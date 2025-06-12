@@ -24,11 +24,6 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         field("dbContextClassFullName", string)
     }
 
-    private val AddMigrationInfo = structdef {
-        field("migrationShortName", string)
-        field("migrationFolderPath", string)
-    }
-
     private val MigrationInfo = structdef {
         field("dbContextClassFullName", string)
         field("migrationShortName", string)
@@ -83,10 +78,6 @@ object RiderEfCoreModel : Ext(SolutionModel.Solution) {
         call("getAvailableDbProviders", guid, immutableList(DbProviderInfo))
         call("getAvailableToolPackages", guid, immutableList(ToolsPackageInfo))
         call("refreshDotNetToolsCache", void, void)
-
-        // async?
-        source("addMigrationExecuted", AddMigrationInfo)
-        sink("migrationFileCreated", string)
 
         callback("onMissingEfCoreToolsDetected", void, void)
     }
