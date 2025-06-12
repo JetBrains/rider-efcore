@@ -41,9 +41,6 @@ class OpenMigrationFileService(private val intellijProject: Project) {
 
     private fun openFileInEditor(file: VirtualFile) =
         ApplicationManager.getApplication().invokeLater {
-            FileEditorManager.getInstance(intellijProject).openTextEditor(
-                OpenFileDescriptor(intellijProject, file),
-                true
-            )
+            FileEditorManager.getInstance(intellijProject).openFile(file, true)
         }
 }
