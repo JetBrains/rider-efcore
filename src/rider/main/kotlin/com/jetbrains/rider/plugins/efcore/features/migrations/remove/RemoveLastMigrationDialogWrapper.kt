@@ -33,7 +33,7 @@ class RemoveLastMigrationDialogWrapper(
         return RemoveLastMigrationCommand(commonOptions)
     }
 
-    override suspend fun postCommandExecute(commandResult: CliCommandResult) {
+    override fun postCommandExecute(commandResult: CliCommandResult) {
         if (!commandResult.succeeded)
             return
 

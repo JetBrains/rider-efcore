@@ -106,15 +106,20 @@ class AddMigrationDialogWrapper(
         }
     }
 
-    override suspend fun postCommandExecute(commandResult: CliCommandResult) {
-        if (!commandResult.succeeded || !dataCtx.openMigrationFile.value)
+    override fun preCommandExecute() {
+        if (!dataCtx.openMigrationFile.value)
             return
 
         val migrationsOutputFolderPath = Path(migrationProjectFolder.value)
-            .resolve(dataCtx.migrationsOutputFolder.value)
-        val openFileService = intellijProject.service<OpenMigrationFileService>()
+            .resolve(dataCtx.migrationsOutputFolder.value).pathString
 
-        openFileService.openMigrationFile(migrationsOutputFolderPath.pathString,dataCtx.migrationName.value)
+        intellijProject.service<OpenMigrationFileService>()
+            .startOpeningFile(migrationsOutputFolderPath, dataCtx.migrationName.value)
+    }
+
+    override fun postCommandExecute(commandResult: CliCommandResult) {
+        if (!commandResult.succeeded && dataCtx.openMigrationFile.value)
+            intellijProject.service<OpenMigrationFileService>().stopOpeningFile()
     }
 
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {

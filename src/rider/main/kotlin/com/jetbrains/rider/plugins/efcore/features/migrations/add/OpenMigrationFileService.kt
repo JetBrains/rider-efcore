@@ -2,68 +2,52 @@ package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.rd.util.lifetime
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.isFile
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.util.messages.SimpleMessageBusConnection
-import kotlinx.coroutines.CoroutineScope
+import com.jetbrains.rd.util.lifetime.LifetimeDefinition
+import com.jetbrains.rd.util.reactive.adviseOnce
+import com.jetbrains.rd.util.reactive.filter
 
 @Service(Service.Level.PROJECT)
-class OpenMigrationFileService(
-    private val intellijProject: Project,
-    private val projectScope: CoroutineScope) {
-    fun openMigrationFile(migrationsFolderPath: String, migrationName: String) {
+class OpenMigrationFileService(val intellijProject: Project) {
 
-        intellijProject.messageBus.connect(projectScope).apply {
-            subscribe(VirtualFileManager.VFS_CHANGES,
-                MigrationFileCreatedListener(migrationsFolderPath, migrationName, this))
-        }
+    private companion object {
+        private const val MIGRATION_FILE_NAME_PATTERN = "^\\d{14}_%s.cs$"
     }
 
-    private inner class MigrationFileCreatedListener(
-        private val migrationsFolderPath: String,
-        private val migrationName: String,
-        private val connection: SimpleMessageBusConnection,
-    ) : BulkFileListener {
-        override fun after(events: MutableList<out VFileEvent>) {
-            for (event in events) {
-                if (event !is VFileCreateEvent)
-                    continue
+    var fileListenerLifetimeDef: LifetimeDefinition? = null
+    var expectedFileNamePattern: String? = null
+    var migrationsFolderPath: String? = null
 
-                val file = event.file ?: continue
+    fun startOpeningFile(migrationsOutputFolderPath: String, migrationName: String) {
+        expectedFileNamePattern = MIGRATION_FILE_NAME_PATTERN.format(migrationName)
+        migrationsFolderPath = migrationsOutputFolderPath
+        fileListenerLifetimeDef = intellijProject.lifetime.createNested()
 
-                // In cases where the migrations folder was created with the migration
-                if (file.isDirectory && VfsUtil.pathEqualsTo(file, migrationsFolderPath)) {
-                    for (child in file.children) {
-                        if (tryHandleMigrationFile(child))
-                            return
-                    }
-                }
-
-                if (tryHandleMigrationFile(file))
-                    return
+        intellijProject.service<AddMigrationVfsListenerService>()
+            .fileCreated.filter { isMigrationFile(it) }
+            .adviseOnce(fileListenerLifetimeDef!!.lifetime) {
+                openFileInEditor(it)
+                stopOpeningFile()
             }
-        }
-
-        private fun tryHandleMigrationFile(file: VirtualFile): Boolean {
-            if (file.isFile && VfsUtil.pathEqualsTo(file.parent, migrationsFolderPath) && checkMigrationName(file.name)) {
-                openFileInEditor(file)
-                connection.disconnect()
-                return true
-            }
-
-            return false
-        }
-
-        private fun checkMigrationName(fileName: String) =
-            Regex("^\\d{14}_${migrationName}.cs$").matches(fileName)
     }
+
+    fun stopOpeningFile() {
+        fileListenerLifetimeDef?.terminate()
+        fileListenerLifetimeDef = null
+        expectedFileNamePattern = null
+        migrationsFolderPath = null
+    }
+
+    private fun isMigrationFile(file: VirtualFile) =
+        file.isFile && VfsUtil.pathEqualsTo(file.parent, migrationsFolderPath!!) &&
+                Regex(expectedFileNamePattern!!).matches(file.name)
+
 
     private fun openFileInEditor(file: VirtualFile) =
         ApplicationManager.getApplication().invokeLater {

@@ -6,5 +6,6 @@ import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
 abstract class BaseDialogWrapper : DialogWrapper(true) {
     abstract fun generateCommand(): DialogCommand
 
-    open suspend fun postCommandExecute(commandResult: CliCommandResult) {}
+    open fun postCommandExecute(commandResult: CliCommandResult) {}
+    open fun preCommandExecute() {}
 }
