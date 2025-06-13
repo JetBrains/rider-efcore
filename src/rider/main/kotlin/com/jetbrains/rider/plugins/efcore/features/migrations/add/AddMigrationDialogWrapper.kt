@@ -33,6 +33,8 @@ class AddMigrationDialogWrapper(
     intellijProject,
     selectedProjectId
 ) {
+    private val openMigrationFileService by lazy { OpenMigrationFileService.getInstance(intellijProject) }
+
     //
     // Internal data
     private val migrationProjectFolder = observable("").withLogger("migrationProjectFolder")
@@ -112,13 +114,12 @@ class AddMigrationDialogWrapper(
         val migrationsOutputFolderPath = Path(migrationProjectFolder.value)
             .resolve(dataCtx.migrationsOutputFolder.value).pathString
 
-        OpenMigrationFileService.getInstance(intellijProject)
-            .startOpeningFile(migrationsOutputFolderPath, dataCtx.migrationName.value)
+        openMigrationFileService.startOpeningFile(migrationsOutputFolderPath, dataCtx.migrationName.value)
     }
 
     override fun postCommandExecute(commandResult: CliCommandResult) {
         if (!commandResult.succeeded && dataCtx.openMigrationFileAfterExecuting.value)
-            OpenMigrationFileService.getInstance(intellijProject).stopOpeningFile()
+            openMigrationFileService.stopOpeningFile()
     }
 
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {
