@@ -37,11 +37,12 @@ Dialogs will become the central point of Views implementations from MVVM world. 
 ```kotlin
 internal class AddMigrationDialog(
     private val dataContext: AddMigrationContext, 
-    private val project: Project
-) : CommandDialog(dataContext, project) {
+    private val project: Project,
+    private val lifetime: Lifetime
+) : CommandDialog(dataContext, project, lifetime) {
     override suspend fun buildUi(): DialogPanel {
         // 1. Create bindings on data context
-        // 2. Resturt newly created panel
+        // 2. Return newly created panel
     }
     
     // In case some additional logic is required for OK and Cancel, like dangerous action confirmation
@@ -54,6 +55,44 @@ internal class AddMigrationDialog(
 
 Most of the commands in plugin are mapped to the corresponding EF Core design commands - Add migration, Update database,
 etc. They will implement the Command pattern and will be executed in decoupled way from the dialog, indirectly.
+
+```kotlin
+internal class AddMigrationCommand : DotnetEfCommand {
+    override suspend fun execute(lifetime: Lifetime) {
+        // ...
+    }
+}
+```
+
+## Command handlers
+
+They way how different kinds of commands should be executed is determined by the applicable handler. 
+
+```kotlin
+internal class DotnetEfCommandHandler : CommandHandler {
+    override fun isApplicable(command: Command) = command is DotnetEfCommand
+    
+    override suspend fun handle(command: Command, lifetime: Lifetime) {
+        val efCommand = command as? DotnetEfCommand ?: return
+        // Make some preparations, do threading, do toolwindow manipulation, etc.
+    }
+}
+```
+
+Default handler is a dead-end one and it just launches command's `execute` on a background thread.
+
+```kotlin
+internal class DefaultCommandHandler : CommandHandler {
+    override fun isApplicable(command: Command) = true
+    
+    override suspend fun handle(command: Command, lifetime: Lifetime) {
+        withContext(Dispatchers.Background) {
+            command.execute(lifetime)
+        }
+    }
+}
+```
+
 
 ## Providers (?)
 
