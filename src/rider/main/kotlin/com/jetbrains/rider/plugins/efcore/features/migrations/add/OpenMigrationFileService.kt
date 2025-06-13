@@ -15,22 +15,20 @@ import com.jetbrains.rd.util.reactive.filter
 
 @Service(Service.Level.PROJECT)
 class OpenMigrationFileService(val intellijProject: Project) {
-
-    private companion object {
+    companion object {
         private const val MIGRATION_FILE_NAME_PATTERN = "^\\d{14}_%s.cs$"
+
+        fun getInstance(intellijProject: Project) = intellijProject.service<OpenMigrationFileService>()
     }
 
     var fileListenerLifetimeDef: LifetimeDefinition? = null
-    var expectedFileNamePattern: String? = null
-    var migrationsFolderPath: String? = null
 
     fun startOpeningFile(migrationsOutputFolderPath: String, migrationName: String) {
-        expectedFileNamePattern = MIGRATION_FILE_NAME_PATTERN.format(migrationName)
-        migrationsFolderPath = migrationsOutputFolderPath
+        val expectedFileNamePattern = MIGRATION_FILE_NAME_PATTERN.format(migrationName)
         fileListenerLifetimeDef = intellijProject.lifetime.createNested()
 
-        intellijProject.service<AddMigrationVfsListenerService>()
-            .fileCreated.filter { isMigrationFile(it) }
+        FileEventsListenerService.getInstance(intellijProject)
+            .fileCreated.filter { isMigrationFile(it, expectedFileNamePattern, migrationsOutputFolderPath) }
             .adviseOnce(fileListenerLifetimeDef!!.lifetime) {
                 openFileInEditor(it)
                 stopOpeningFile()
@@ -40,13 +38,11 @@ class OpenMigrationFileService(val intellijProject: Project) {
     fun stopOpeningFile() {
         fileListenerLifetimeDef?.terminate()
         fileListenerLifetimeDef = null
-        expectedFileNamePattern = null
-        migrationsFolderPath = null
     }
 
-    private fun isMigrationFile(file: VirtualFile) =
-        file.isFile && VfsUtil.pathEqualsTo(file.parent, migrationsFolderPath!!) &&
-                Regex(expectedFileNamePattern!!).matches(file.name)
+    private fun isMigrationFile(file: VirtualFile, migrationNamePattern: String, migrationsFolderPath: String) =
+        file.isFile && VfsUtil.pathEqualsTo(file.parent, migrationsFolderPath) &&
+                Regex(migrationNamePattern).matches(file.name)
 
 
     private fun openFileInEditor(file: VirtualFile) =

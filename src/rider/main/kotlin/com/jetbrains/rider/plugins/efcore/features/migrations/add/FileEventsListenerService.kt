@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -12,7 +13,11 @@ import com.jetbrains.rd.util.reactive.Signal
 import kotlinx.coroutines.CoroutineScope
 
 @Service(Service.Level.PROJECT)
-class AddMigrationVfsListenerService(intellijProject: Project, projectScope: CoroutineScope) {
+class FileEventsListenerService(intellijProject: Project, projectScope: CoroutineScope) {
+    companion object {
+        fun getInstance(intellijProject: Project) = intellijProject.service<FileEventsListenerService>()
+    }
+
     val fileCreated = Signal<VirtualFile>()
 
     init {

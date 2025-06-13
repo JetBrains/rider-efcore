@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.add
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
@@ -101,25 +100,25 @@ class AddMigrationDialogWrapper(
             }
             row {
                 checkBox(EfCoreUiBundle.message("checkbox.open.migration.file.after.executing"))
-                    .bindSelected(dataCtx.openMigrationFile)
+                    .bindSelected(dataCtx.openMigrationFileAfterExecuting)
             }
         }
     }
 
     override fun preCommandExecute() {
-        if (!dataCtx.openMigrationFile.value)
+        if (!dataCtx.openMigrationFileAfterExecuting.value)
             return
 
         val migrationsOutputFolderPath = Path(migrationProjectFolder.value)
             .resolve(dataCtx.migrationsOutputFolder.value).pathString
 
-        intellijProject.service<OpenMigrationFileService>()
+        OpenMigrationFileService.getInstance(intellijProject)
             .startOpeningFile(migrationsOutputFolderPath, dataCtx.migrationName.value)
     }
 
     override fun postCommandExecute(commandResult: CliCommandResult) {
-        if (!commandResult.succeeded && dataCtx.openMigrationFile.value)
-            intellijProject.service<OpenMigrationFileService>().stopOpeningFile()
+        if (!commandResult.succeeded && dataCtx.openMigrationFileAfterExecuting.value)
+            OpenMigrationFileService.getInstance(intellijProject).stopOpeningFile()
     }
 
     private fun setupInitialMigrationNameListener(migrationNameField: JBTextField) {

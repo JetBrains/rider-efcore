@@ -12,7 +12,7 @@ class AddMigrationDataContext(
     val availableMigrations = ObservableMigrations(intellijProject, migrationsProject, dbContext)
     val migrationName = observable("")
     val migrationsOutputFolder = observable("Migrations")
-    val openMigrationFile = observable(false)
+    val openMigrationFileAfterExecuting = observable(false)
 
     override fun initBindings() {
         super.initBindings()
@@ -34,7 +34,7 @@ class AddMigrationDataContext(
             migrationsOutputFolder.value = this
         }
         commonDialogState.getBool(KnownStateKeys.OPEN_MIGRATION_FILE_AFTER_EXECUTING)?.apply {
-            openMigrationFile.value = this
+            openMigrationFileAfterExecuting.value = this
         }
     }
 
@@ -42,11 +42,11 @@ class AddMigrationDataContext(
         super.saveState(commonDialogState)
 
         commonDialogState.set(KnownStateKeys.OUTPUT_FOLDER, migrationsOutputFolder.value)
-        commonDialogState.set(KnownStateKeys.OPEN_MIGRATION_FILE_AFTER_EXECUTING, openMigrationFile.value)
+        commonDialogState.set(KnownStateKeys.OPEN_MIGRATION_FILE_AFTER_EXECUTING, openMigrationFileAfterExecuting.value)
     }
 
     object KnownStateKeys {
         const val OUTPUT_FOLDER = "outputFolder"
-        const val OPEN_MIGRATION_FILE_AFTER_EXECUTING = "openFile"
+        const val OPEN_MIGRATION_FILE_AFTER_EXECUTING = "openFileAfterExecuting"
     }
 }

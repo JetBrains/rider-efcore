@@ -37,7 +37,7 @@ class RemoveLastMigrationDialogWrapper(
         if (!commandResult.succeeded)
             return
 
-        val folderService = intellijProject.service<RemoveLastMigrationFolderService>()
+        val folderService = RemoveLastMigrationFolderService.getInstance(intellijProject)
         folderService.deleteMigrationsFolderIfEmpty(dataCtx.availableMigrations.value.firstOrNull())
     }
 }

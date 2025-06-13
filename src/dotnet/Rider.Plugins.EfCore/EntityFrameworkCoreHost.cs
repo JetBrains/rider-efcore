@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using JetBrains.Application.changes;
-using JetBrains.Application.FileSystemTracker;
 using JetBrains.Application.Parts;
 using JetBrains.Core;
 using JetBrains.Lifetimes;
