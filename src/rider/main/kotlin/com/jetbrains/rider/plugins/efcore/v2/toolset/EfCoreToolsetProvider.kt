@@ -17,7 +17,7 @@ internal class EfCoreToolsetProvider(private val project: Project) {
         val toolsDefinition = project.solution.riderEfCoreModel.cliToolsDefinition.valueOrNull
         val toolsVersion = toolsDefinition?.let { DotnetEfVersion.parse(it.version) }
 
-        return
+        return EfCoreToolset()
     }
 }
 
