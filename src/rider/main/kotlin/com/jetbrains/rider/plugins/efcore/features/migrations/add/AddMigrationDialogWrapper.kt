@@ -42,6 +42,7 @@ class AddMigrationDialogWrapper(
     //
     // Constructor
     init {
+        migrationProjectFolder.afterChange { doValidateAll() }
         initUi()
     }
 

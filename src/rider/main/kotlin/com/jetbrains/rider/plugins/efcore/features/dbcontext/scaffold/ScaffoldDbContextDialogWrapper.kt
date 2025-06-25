@@ -68,6 +68,7 @@ class ScaffoldDbContextDialogWrapper(
     //
     // Constructor
     init {
+        migrationProjectFolder.afterChange { doValidateAll() }
         initUi()
     }
 

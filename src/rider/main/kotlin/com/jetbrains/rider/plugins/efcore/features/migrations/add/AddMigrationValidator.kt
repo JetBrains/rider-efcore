@@ -21,8 +21,11 @@ class AddMigrationValidator(
     }
 
     fun migrationsOutputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
-        validateRelativeFolderPath(it.text.trim(), migrationsProjectFolderGetter()).let {
-            if (it.isValid) null else error(it.errorMessage!!)
-        }
+        if (migrationsProjectFolderGetter().isEmpty())
+            null
+        else
+            validateRelativeFolderPath(it.text.trim(), migrationsProjectFolderGetter()).let {
+                if (it.isValid) null else error(it.errorMessage!!)
+            }
     }
 }
