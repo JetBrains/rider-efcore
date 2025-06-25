@@ -81,8 +81,6 @@ dependencies {
         rider(productVersion, useInstaller = false)
         jetbrainsRuntime()
 
-        instrumentationTools()
-
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
 
