@@ -4,10 +4,12 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.features.shared.validateRelativeFolderPath
 import javax.swing.JTextField
 
 class AddMigrationValidator(
-    private val dataCtx: AddMigrationDataContext
+    private val dataCtx: AddMigrationDataContext,
+    private val migrationsProjectFolderGetter: () -> String
 ) {
     fun migrationNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {
         if (it.text.trim().isEmpty())
@@ -19,9 +21,8 @@ class AddMigrationValidator(
     }
 
     fun migrationsOutputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
-        if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.migrations.output.folder.could.not.be.empty"))
-        else
-            null
+        validateRelativeFolderPath(it.text.trim(), migrationsProjectFolderGetter()).let {
+            if (it.isValid) null else error(it.errorMessage!!)
+        }
     }
 }

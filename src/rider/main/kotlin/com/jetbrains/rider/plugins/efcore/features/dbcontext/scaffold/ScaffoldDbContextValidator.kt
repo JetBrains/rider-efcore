@@ -7,6 +7,7 @@ import com.intellij.ui.layout.ComponentPredicate
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.jetbrains.observables.ObservableCollection
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
+import com.jetbrains.rider.plugins.efcore.features.shared.validateRelativeFolderPath
 import com.jetbrains.rider.plugins.efcore.ui.items.DbConnectionItem
 import com.jetbrains.rider.plugins.efcore.ui.items.DbProviderItem
 import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
@@ -14,7 +15,9 @@ import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.text.JTextComponent
 
-class ScaffoldDbContextValidator {
+class ScaffoldDbContextValidator(
+    private val migrationsProjectFolderGetter: () -> String
+)  {
     fun connectionValidation(): ValidationInfoBuilder.(ComboBox<DbConnectionItem>) -> ValidationInfo? = {
         if (it.isEnabled && (it.editor.editorComponent as JTextComponent).text.isEmpty())
             error(EfCoreUiBundle.message("dialog.message.connection.could.not.be.empty"))
@@ -29,10 +32,9 @@ class ScaffoldDbContextValidator {
     }
 
     fun outputFolderValidation(): ValidationInfoBuilder.(TextFieldWithBrowseButton) -> ValidationInfo? = {
-        if (it.text.trim().isEmpty())
-            error(EfCoreUiBundle.message("dialog.message.output.folder.should.not.be.empty"))
-        else
-            null
+        validateRelativeFolderPath(it.text.trim(), migrationsProjectFolderGetter()).let {
+            if (it.isValid) null else error(it.errorMessage!!)
+        }
     }
 
     fun dbContextNameValidation(): ValidationInfoBuilder.(JTextField) -> ValidationInfo? = {

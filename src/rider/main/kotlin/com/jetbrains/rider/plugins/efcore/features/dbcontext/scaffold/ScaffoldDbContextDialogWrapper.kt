@@ -63,7 +63,7 @@ class ScaffoldDbContextDialogWrapper(
 
     //
     // Validation
-    private val validator = ScaffoldDbContextValidator()
+    private val validator = ScaffoldDbContextValidator(migrationProjectFolder.getter)
 
     //
     // Constructor
@@ -164,13 +164,13 @@ class ScaffoldDbContextDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange(EfCoreUiBundle.message("section.additional.options")) {
             row(EfCoreUiBundle.message("output.folder")) {
-                textFieldForRelativeFolder(
-                    migrationProjectFolder.getter,
-                    intellijProject,
+                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject,
                     EfCoreUiBundle.message("select.output.folder"))
                     .bindText(dataCtx.outputFolder)
                     .align(AlignX.FILL)
                     .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null } }
+                    .validationOnInput(validator.outputFolderValidation())
+                    .validationOnApply(validator.outputFolderValidation())
                     .comment(EfCoreUiBundle.message("text.field.for.relative.folder.comment"))
             }
 
