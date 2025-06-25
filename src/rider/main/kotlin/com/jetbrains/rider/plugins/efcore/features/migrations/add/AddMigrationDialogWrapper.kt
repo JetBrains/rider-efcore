@@ -61,7 +61,7 @@ class AddMigrationDialogWrapper(
     override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
         val migrationName = dataCtx.migrationName.value.trim()
-        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value
+        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value.ifEmpty { "." }
 
         return AddMigrationCommand(commonOptions, migrationName, migrationsOutputFolder)
     }
@@ -88,11 +88,8 @@ class AddMigrationDialogWrapper(
                 textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, EfCoreUiBundle.message("select.migrations.folder"))
                     .bindText(dataCtx.migrationsOutputFolder)
                     .align(AlignX.FILL)
-                    .validationOnInput(validator.migrationsOutputFolderValidation())
-                    .validationOnApply(validator.migrationsOutputFolderValidation())
-                    .applyToComponent {
-                        dataCtx.migrationsProject.afterChange { isEnabled = it != null }
-                    }
+                    .applyToComponent { dataCtx.migrationsProject.afterChange { isEnabled = it != null } }
+                    .comment(EfCoreUiBundle.message("text.field.for.relative.folder.comment"))
             }
         }
     }
