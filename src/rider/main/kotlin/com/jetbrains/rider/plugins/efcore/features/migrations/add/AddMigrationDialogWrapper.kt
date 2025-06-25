@@ -37,7 +37,7 @@ class AddMigrationDialogWrapper(
 
     //
     // Validation
-    private val validator = AddMigrationValidator(dataCtx)
+    private val validator = AddMigrationValidator(dataCtx, migrationProjectFolder.getter)
 
     //
     // Constructor
@@ -85,10 +85,13 @@ class AddMigrationDialogWrapper(
     override fun Panel.createAdditionalGroup() {
         groupRowsRange(EfCoreUiBundle.message("section.additional.options")){
             row(EfCoreUiBundle.message("migrations.folder")) {
-                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject, EfCoreUiBundle.message("select.migrations.folder"))
+                textFieldForRelativeFolder(migrationProjectFolder.getter, intellijProject,
+                    EfCoreUiBundle.message("select.migrations.folder"))
                     .bindText(dataCtx.migrationsOutputFolder)
                     .align(AlignX.FILL)
                     .applyToComponent { dataCtx.migrationsProject.afterChange { isEnabled = it != null } }
+                    .validationOnInput(validator.migrationsOutputFolderValidation())
+                    .validationOnApply(validator.migrationsOutputFolderValidation())
                     .comment(EfCoreUiBundle.message("text.field.for.relative.folder.comment"))
             }
         }
