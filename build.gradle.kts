@@ -41,6 +41,7 @@ val sinceProductVersion = run {
 }
 
 intellijPlatform {
+    instrumentCode = false
     buildSearchableOptions = buildConfiguration == "Release"
 }
 
