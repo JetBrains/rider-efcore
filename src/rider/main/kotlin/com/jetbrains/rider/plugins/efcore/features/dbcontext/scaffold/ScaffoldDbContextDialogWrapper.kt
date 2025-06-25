@@ -170,9 +170,8 @@ class ScaffoldDbContextDialogWrapper(
                     EfCoreUiBundle.message("select.output.folder"))
                     .bindText(dataCtx.outputFolder)
                     .align(AlignX.FILL)
-                    .validationOnInput(validator.outputFolderValidation())
-                    .validationOnApply(validator.outputFolderValidation())
-                    .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null }  }
+                    .applyToComponent { dataCtx.migrationsProject.afterChange { this.isEnabled = it != null } }
+                    .comment(EfCoreUiBundle.message("text.field.for.relative.folder.comment"))
             }
 
             row {
