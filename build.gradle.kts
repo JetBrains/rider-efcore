@@ -185,7 +185,7 @@ tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         dependsOn(":protocol:rdgen")
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = "21"
             freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
         }
     }
