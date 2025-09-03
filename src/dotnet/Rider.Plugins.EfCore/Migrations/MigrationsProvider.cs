@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -43,9 +44,12 @@ namespace Rider.Plugins.EfCore.Migrations
       }
     }
 
-    private static bool TryGetMigrationInfo(IClass @class, out MigrationInfo migrationInfo)
+    private static bool TryGetMigrationInfo([CanBeNull] IClass @class, out MigrationInfo migrationInfo)
     {
       migrationInfo = null;
+
+      if (@class is null)
+        return false;
 
       var migrationShortName = @class.ShortName;
       var migrationAttribute = @class.GetAttributeInstance("MigrationAttribute");
