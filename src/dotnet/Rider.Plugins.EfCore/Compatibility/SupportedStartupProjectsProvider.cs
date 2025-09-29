@@ -55,11 +55,7 @@ namespace Rider.Plugins.EfCore.Compatibility
         .ToList();
 
     private static bool IsSupportedInStartupProject(TargetFrameworkId targetFrameworkId) =>
-      targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net5)
-      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net6)
-      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net7)
-      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net8)
-      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.Net9)
-      || targetFrameworkId.UniqueString.StartsWith(SupportedTargetFrameworks.NetCore31);
+      targetFrameworkId.IsNetCoreApp &&
+      targetFrameworkId.Version >= SupportedTargetFrameworks.OurMinimalNetCoreSupportedVersion;
   }
 }
