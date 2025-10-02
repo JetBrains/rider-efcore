@@ -3,7 +3,7 @@
   <ItemGroup>
     <PackageLock Include="JetBrains.Lifetimes" Version="2025.2.3" />
     <PackageLock Include="JetBrains.RdFramework" Version="2025.2.3" />
-    <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.0.20251001.161" />
-    <PackageLock Include="JetBrains.NuGet.Versioning" Version="7.0.20251001.161" />
+    <PackageLock Include="JetBrains.NuGet.Packaging" Version="7.0.20251002.162" />
+    <PackageLock Include="JetBrains.NuGet.Versioning" Version="7.0.20251002.162" />
   </ItemGroup>
 </Project>
