@@ -31,6 +31,6 @@ namespace Rider.Plugins.EfCore
 namespace Rider.Plugins.EfCoreActivator
 {
   [ZoneActivator]
-  [ZoneMarker(typeof(IRiderBackendFeatureEnvironmentZone))]
+  [ZoneMarker(typeof(IRiderBackendFullFeatureEnvironmentZone))]
   public class EfPluginActivator : IActivate<IRiderEfCoreZone>;
 }
