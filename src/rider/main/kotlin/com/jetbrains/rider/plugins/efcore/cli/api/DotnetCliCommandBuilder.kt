@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.efcore.cli.api
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
+import com.jetbrains.rider.ijent.extensions.toNioPathOrNull
 import com.jetbrains.rider.model.dotNetActiveRuntimeModel
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
@@ -10,8 +11,8 @@ import com.jetbrains.rider.projectView.solutionDirectoryPath
 import com.jetbrains.rider.shared.run.FormatPreservingPtyCommandLine
 import com.jetbrains.rider.shared.run.withRawParameters
 import org.jetbrains.annotations.NonNls
-import java.io.File
 import java.nio.charset.Charset
+import kotlin.io.path.pathString
 
 open class DotnetCliCommandBuilder(
     private val presentation: CliCommandPresentationInfo,
@@ -24,11 +25,11 @@ open class DotnetCliCommandBuilder(
     @NonNls
     private var generalCommandLine: GeneralCommandLine =
         FormatPreservingPtyCommandLine()
-            .withExePath(getDotnetExePath())
+            .withExePath(getDotnetExePath().pathString)
             .withRawParameters(baseCommands.joinToString(" "))
             .withCharset(Charset.forName("UTF-8"))
             .withWorkDirectory(solutionDirectory)
-            .withEnvironment("DOTNET_ROOT", getDotnetRootPath())
+            .withEnvironment("DOTNET_ROOT", getDotnetRootPath().pathString)
             .withEnvironment("DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "true")
             .withEnvironment("DOTNET_NOLOGO", "true")
 
@@ -63,8 +64,8 @@ open class DotnetCliCommandBuilder(
     open fun build() = CliCommand(generalCommandLine.exePath, generalCommandLine, presentation)
 
     private fun getDotnetExePath() =
-        activeRuntime?.dotNetCliExePath
+        activeRuntime?.dotNetCliExePath?.toNioPathOrNull()
             ?: throw Exception(".NET / .NET Core is not configured, unable to run commands.")
 
-    private fun getDotnetRootPath() = File(getDotnetExePath()).parent
+    private fun getDotnetRootPath() = getDotnetExePath().parent
 }

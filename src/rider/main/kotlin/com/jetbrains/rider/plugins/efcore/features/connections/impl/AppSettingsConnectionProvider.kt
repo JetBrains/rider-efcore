@@ -3,12 +3,12 @@ package com.jetbrains.rider.plugins.efcore.features.connections.impl
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
+import com.jetbrains.rider.ijent.extensions.toNioPathOrNull
 import com.jetbrains.rider.model.RdCustomLocation
 import com.jetbrains.rider.model.RdProjectDescriptor
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.shared.services.JsonSerializer
 import org.jetbrains.annotations.NonNls
-import kotlin.io.path.Path
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
@@ -23,7 +23,7 @@ class AppSettingsConnectionProvider(private val intellijProject: Project) : DbCo
 
     override fun getAvailableConnections(project: RdProjectDescriptor) =
         buildList {
-            val directory = (project.location as? RdCustomLocation)?.customLocation?.let(::Path)?.parent ?: return@buildList
+            val directory = (project.location as? RdCustomLocation)?.customLocation?.toNioPathOrNull()?.parent ?: return@buildList
             @NonNls
             val connectionStrings = directory.listDirectoryEntries("appsettings*.json")
                 .filter { it.isRegularFile() }
