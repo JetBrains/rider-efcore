@@ -5,6 +5,7 @@ import org.jetbrains.changelog.exceptions.MissingVersionException
 import org.jetbrains.intellij.platform.gradle.Constants
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import kotlin.collections.*
 import kotlin.io.path.absolute
 import kotlin.io.path.isDirectory
@@ -184,9 +185,9 @@ tasks {
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         dependsOn(":protocol:rdgen")
-        kotlinOptions {
-            jvmTarget = "21"
-            freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+            freeCompilerArgs.add("-Xopt-in=kotlin.RequiresOptIn")
         }
     }
 
