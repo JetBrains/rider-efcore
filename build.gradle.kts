@@ -88,6 +88,8 @@ dependencies {
 
         testFramework(TestFrameworkType.Bundled)
     }
+    
+    testImplementation(libs.junit)
 }
 
 val riderModel: Configuration by configurations.creating {
