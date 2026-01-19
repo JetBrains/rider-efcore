@@ -79,6 +79,7 @@ abstract class BaseCommandAction : AnAction() {
             val cliCommand = EfCoreCliCommandFactory.getInstance(intellijProject).create(command, efCoreVersion)
             CommandUsageCollector.withCommandActivity(intellijProject, command) {
                 withBackgroundContext {
+                    dialog.preCommandExecute()
                     executor.execute(cliCommand)?.apply {
                         dialog.postCommandExecute(this)
                     }
