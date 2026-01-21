@@ -194,7 +194,12 @@ tasks {
     }
 
     patchPluginXml {
+<<<<<<< HEAD
         sinceBuild.set(sinceProductVersion)
+=======
+        sinceBuild.set("242.0")
+        untilBuild.set("242.*")
+>>>>>>> 429bac0 (Adding 'Don't show again' button to ef core tools warning, resolves #213)
         val latestChangelog = try {
             changelog.getUnreleased()
         } catch (_: MissingVersionException) {
