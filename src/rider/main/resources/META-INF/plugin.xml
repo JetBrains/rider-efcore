@@ -34,6 +34,9 @@
   <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
   <dependencies>
     <module name="intellij.rd.client"/>
+    <module name="intellij.rider.model.generated"/>
+    <module name="intellij.rider.rdclient.dotnet"/>
+    <module name="intellij.rider.shared"/>
   </dependencies>
   <!-- endregion -->
   <extensions defaultExtensionNs="com.intellij">
@@ -73,5 +76,5 @@
             text="Entity Framework Core Quick Actions"
             description="Opens available EF Core quick actions"/>
   </actions>
-
+  <content namespace="jetbrains"/>
 </idea-plugin>
