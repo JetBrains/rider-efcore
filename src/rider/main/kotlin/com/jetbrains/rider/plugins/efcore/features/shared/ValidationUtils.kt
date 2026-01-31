@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.xml.util.XmlStringUtil
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import java.nio.file.Path
-import java.util.*
+import java.util.StringTokenizer
 
 data class ValidationResult(val isValid: Boolean, val errorMessage: String? = null) {
     companion object {

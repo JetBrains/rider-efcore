@@ -16,7 +16,7 @@ import com.jetbrains.rider.plugins.efcore.ui.AnyInputDocumentListener
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import org.jetbrains.annotations.NonNls
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 class AddMigrationDialogWrapper(
     toolsVersion: DotnetEfVersion,

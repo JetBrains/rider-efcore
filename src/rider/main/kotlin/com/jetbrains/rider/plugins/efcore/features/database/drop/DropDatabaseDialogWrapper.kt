@@ -6,7 +6,7 @@ import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
-import java.util.*
+import java.util.UUID
 
 class DropDatabaseDialogWrapper(
     toolsVersion: DotnetEfVersion,
