@@ -5,7 +5,9 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
-import com.jetbrains.rider.plugins.efcore.cli.execution.*
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommand
+import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandPresentationInfo
+import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOptions
 
 @Service(Service.Level.PROJECT)

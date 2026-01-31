@@ -1,7 +1,11 @@
 package com.jetbrains.rider.plugins.efcore.state
 
-import com.intellij.openapi.components.*
-import java.util.*
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.State
+import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
+import java.util.UUID
 
 @Service
 @State(name = "EfCoreCommonOptions", storages = [Storage("efCoreCommonOptions.xml")])
