@@ -1,8 +1,8 @@
 package com.jetbrains.rider.plugins.efcore.ui.items
 
 import com.intellij.icons.AllIcons
-import icons.DatabaseIcons
 import com.jetbrains.rider.plugins.efcore.rd.DbProviderInfo
+import icons.DatabaseIcons
 import org.jetbrains.annotations.NonNls
 
 class DbProviderItem(data: DbProviderInfo)

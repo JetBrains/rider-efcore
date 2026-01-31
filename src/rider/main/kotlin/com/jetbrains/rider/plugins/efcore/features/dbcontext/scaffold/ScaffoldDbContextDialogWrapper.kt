@@ -13,7 +13,11 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.table.JBTable
-import com.jetbrains.observables.*
+import com.jetbrains.observables.ObservableCollection
+import com.jetbrains.observables.ObservableProperty
+import com.jetbrains.observables.bind
+import com.jetbrains.observables.observable
+import com.jetbrains.observables.observableList
 import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.ui.dsl.editableComboBox
@@ -31,7 +35,7 @@ import com.jetbrains.rider.plugins.efcore.ui.items.SimpleItem
 import com.jetbrains.rider.plugins.efcore.ui.items.SimpleListTableModel
 import com.jetbrains.rider.plugins.efcore.ui.textFieldForRelativeFolder
 import java.io.File
-import java.util.*
+import java.util.UUID
 import javax.swing.JComponent
 
 @Suppress("UnstableApiUsage")
