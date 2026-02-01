@@ -1,14 +1,22 @@
 package com.jetbrains.rider.plugins.efcore.features.shared.dialog
 
 import com.intellij.openapi.project.Project
+import com.jetbrains.observables.bind
+import com.jetbrains.observables.bindSafe
+import com.jetbrains.observables.observable
+import com.jetbrains.observables.observableList
+import com.jetbrains.observables.withLogger
 import com.jetbrains.rd.ui.bedsl.extensions.valueOrEmpty
-import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.runUnderProgress
-import com.jetbrains.observables.*
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.rd.*
+import com.jetbrains.rider.plugins.efcore.rd.DbContextInfo
+import com.jetbrains.rider.plugins.efcore.rd.MigrationsProjectInfo
+import com.jetbrains.rider.plugins.efcore.rd.StartupProjectInfo
+import com.jetbrains.rider.plugins.efcore.rd.TargetFrameworkId
+import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.plugins.efcore.settings.EfCoreUiSettingsStateService
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
+import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.util.idea.runUnderProgress
 
 open class CommonDataContext(
     protected val intellijProject: Project,

@@ -2,7 +2,13 @@
 package com.jetbrains.rider.plugins.efcore.features.shared.statistics
 
 import com.intellij.internal.statistic.eventLog.EventLogGroup
-import com.intellij.internal.statistic.eventLog.events.*
+import com.intellij.internal.statistic.eventLog.events.EventField
+import com.intellij.internal.statistic.eventLog.events.EventFields
+import com.intellij.internal.statistic.eventLog.events.EventPair
+import com.intellij.internal.statistic.eventLog.events.ObjectDescription
+import com.intellij.internal.statistic.eventLog.events.ObjectEventData
+import com.intellij.internal.statistic.eventLog.events.ObjectEventField
+import com.intellij.internal.statistic.eventLog.events.ObjectListEventField
 import com.intellij.internal.statistic.service.fus.collectors.CounterUsagesCollector
 import com.intellij.openapi.util.Version
 import com.jetbrains.rider.plugins.efcore.cli.execution.CliCommandResult
@@ -13,7 +19,13 @@ import com.jetbrains.rider.plugins.efcore.features.migrations.add.AddMigrationCo
 import com.jetbrains.rider.plugins.efcore.features.migrations.remove.RemoveLastMigrationCommand
 import com.jetbrains.rider.plugins.efcore.features.migrations.script.GenerateScriptCommand
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommand
-import com.jetbrains.rider.plugins.efcore.rd.*
+import com.jetbrains.rider.plugins.efcore.rd.CliToolDefinition
+import com.jetbrains.rider.plugins.efcore.rd.DbProviderInfo
+import com.jetbrains.rider.plugins.efcore.rd.ProjectInfo
+import com.jetbrains.rider.plugins.efcore.rd.TargetFrameworkVersion
+import com.jetbrains.rider.plugins.efcore.rd.ToolKind
+import com.jetbrains.rider.plugins.efcore.rd.ToolsPackageInfo
+import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 
 @Suppress("UnstableApiUsage", "HardCodedStringLiteral")

@@ -1,13 +1,17 @@
 package com.jetbrains.rider.plugins.efcore.cli.execution
 
-import com.intellij.execution.process.*
+import com.intellij.execution.process.AnsiEscapeDecoder
+import com.intellij.execution.process.ProcessAdapter
+import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.rd.util.withUiContext
 import com.intellij.openapi.util.Key
 import com.intellij.terminal.TerminalExecutionConsole
 import com.jetbrains.rider.run.TerminalProcessHandler
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 
 class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(intellijProject) {
     private val logger = logger<TerminalCommandExecutor>()

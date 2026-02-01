@@ -7,9 +7,9 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.RdProjectDescriptor
+import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionProvider
-import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import org.jetbrains.annotations.NonNls
 
 @Service(Service.Level.PROJECT)

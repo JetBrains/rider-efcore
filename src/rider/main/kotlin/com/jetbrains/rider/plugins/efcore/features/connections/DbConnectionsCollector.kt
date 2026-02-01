@@ -10,7 +10,7 @@ import com.jetbrains.rider.plugins.efcore.features.connections.impl.DataGripConn
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.LocalSettingsConnectionProvider
 import com.jetbrains.rider.plugins.efcore.features.connections.impl.UserSecretsConnectionProvider
 import com.jetbrains.rider.projectView.workspace.findProjects
-import java.util.*
+import java.util.UUID
 
 @Service(Service.Level.PROJECT)
 internal class DbConnectionsCollector(private val intellijProject: Project) {

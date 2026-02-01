@@ -1,12 +1,16 @@
 package com.jetbrains.rider.plugins.efcore.features.shared
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.runUnderProgress
 import com.jetbrains.observables.ObservableProperty
 import com.jetbrains.observables.bind
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
-import com.jetbrains.rider.plugins.efcore.rd.*
+import com.jetbrains.rider.plugins.efcore.rd.DbContextInfo
+import com.jetbrains.rider.plugins.efcore.rd.MigrationInfo
+import com.jetbrains.rider.plugins.efcore.rd.MigrationsIdentity
+import com.jetbrains.rider.plugins.efcore.rd.MigrationsProjectInfo
+import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
+import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.util.idea.runUnderProgress
 
 class ObservableMigrations(
     private val intellijProject: Project,

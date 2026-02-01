@@ -10,9 +10,6 @@ import com.intellij.openapi.rd.util.launchOnUi
 import com.intellij.openapi.rd.util.lifetime
 import com.intellij.openapi.rd.util.withBackgroundContext
 import com.jetbrains.rider.model.dotNetActiveRuntimeModel
-import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
-import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
-import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
 import com.jetbrains.rider.plugins.efcore.cli.api.EfCoreCliCommandFactory
@@ -21,7 +18,10 @@ import com.jetbrains.rider.plugins.efcore.cli.execution.PreferredCommandExecutor
 import com.jetbrains.rider.plugins.efcore.features.eftools.InstallDotnetEfAction
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.BaseDialogWrapper
 import com.jetbrains.rider.plugins.efcore.features.shared.statistics.CommandUsageCollector
+import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
+import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
+import com.jetbrains.rider.projectView.solution
 import java.util.UUID
 
 abstract class BaseCommandAction : AnAction() {

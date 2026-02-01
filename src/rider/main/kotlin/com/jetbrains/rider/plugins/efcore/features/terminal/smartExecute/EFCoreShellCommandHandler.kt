@@ -18,7 +18,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.features.shared.QuickActionsGroup
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
-import java.util.*
+import java.util.UUID
 
 private class EFCoreShellCommandHandler : TerminalShellCommandHandler {
     companion object {

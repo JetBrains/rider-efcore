@@ -9,13 +9,20 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.TextFieldWithAutoCompletion
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.Cell
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.bindText
 import com.intellij.util.textCompletion.TextFieldWithCompletion
 import com.jetbrains.observables.ObservableProperty
 import com.jetbrains.rider.plugins.efcore.ui.IconComboBoxRendererAdapter
 import com.jetbrains.rider.plugins.efcore.ui.items.IconItem
 import java.awt.event.ItemEvent
-import javax.swing.*
+import javax.swing.DefaultComboBoxModel
+import javax.swing.Icon
+import javax.swing.JTextField
 import javax.swing.plaf.basic.BasicComboBoxEditor
 
 fun <T : IconItem<*>> Row.iconComboBox(

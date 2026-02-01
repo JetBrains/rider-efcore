@@ -4,11 +4,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.layout.ValidationInfoBuilder
-import com.jetbrains.rider.util.idea.runUnderProgress
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.rd.MigrationsIdentity
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
-import com.jetbrains.rider.plugins.efcore.ui.items.*
+import com.jetbrains.rider.plugins.efcore.ui.items.BaseTargetFrameworkItem
+import com.jetbrains.rider.plugins.efcore.ui.items.BuildConfigurationItem
+import com.jetbrains.rider.plugins.efcore.ui.items.DbContextItem
+import com.jetbrains.rider.plugins.efcore.ui.items.MigrationsProjectItem
+import com.jetbrains.rider.plugins.efcore.ui.items.StartupProjectItem
+import com.jetbrains.rider.util.idea.runUnderProgress
 
 class CommonDialogValidator(
     private val dataCtx: CommonDataContext,

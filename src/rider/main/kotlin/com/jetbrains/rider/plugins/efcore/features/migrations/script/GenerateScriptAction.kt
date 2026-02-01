@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
-import java.util.*
+import java.util.UUID
 
 class GenerateScriptAction : BaseCommandAction() {
     override fun createDialog(

@@ -10,7 +10,7 @@ import com.jetbrains.rider.projectView.workspace.ProjectModelEntity
 import com.jetbrains.rider.projectView.workspace.getProjectModelEntities
 import com.jetbrains.rider.projectView.workspace.isProject
 import org.jetbrains.annotations.NonNls
-import java.util.*
+import java.util.UUID
 
 fun AnActionEvent.isEfCoreActionContext() = when {
   isProjectsModeContext() -> true

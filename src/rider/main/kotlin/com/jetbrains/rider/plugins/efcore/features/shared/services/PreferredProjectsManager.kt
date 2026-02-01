@@ -5,7 +5,7 @@ import com.intellij.openapi.components.service
 import com.jetbrains.rider.plugins.efcore.rd.MigrationsProjectInfo
 import com.jetbrains.rider.plugins.efcore.rd.StartupProjectInfo
 import com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService
-import java.util.*
+import java.util.UUID
 
 @Service(Service.Level.APP)
 class PreferredProjectsManager {

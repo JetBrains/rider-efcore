@@ -1,7 +1,9 @@
 package com.jetbrains.rider.plugins.efcore.features.migrations.script
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.observables.*
+import com.jetbrains.observables.bind
+import com.jetbrains.observables.observable
+import com.jetbrains.observables.observableList
 import com.jetbrains.rider.plugins.efcore.features.shared.ObservableMigrations
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDataContext
 import com.jetbrains.rider.plugins.efcore.state.DialogsStateService
