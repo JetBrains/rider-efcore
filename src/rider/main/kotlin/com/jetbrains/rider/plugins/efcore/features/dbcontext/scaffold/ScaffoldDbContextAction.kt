@@ -6,7 +6,7 @@ import com.jetbrains.rider.plugins.efcore.features.shared.BaseCommandAction
 import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import java.util.UUID
 
-class ScaffoldDbContextAction : BaseCommandAction() {
+internal class ScaffoldDbContextAction : BaseCommandAction() {
     override fun createDialog(
         intellijProject: Project,
         toolsVersion: DotnetEfVersion,

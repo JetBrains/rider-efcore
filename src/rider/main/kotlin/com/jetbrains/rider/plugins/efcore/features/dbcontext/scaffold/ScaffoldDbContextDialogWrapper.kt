@@ -39,7 +39,7 @@ import java.util.UUID
 import javax.swing.JComponent
 
 @Suppress("UnstableApiUsage")
-class ScaffoldDbContextDialogWrapper(
+internal class ScaffoldDbContextDialogWrapper(
     toolsVersion: DotnetEfVersion,
     intellijProject: Project,
     selectedProjectId: UUID?,
