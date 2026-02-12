@@ -11,7 +11,7 @@ import com.jetbrains.rider.plugins.efcore.cli.execution.KnownEfCommands
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOptions
 
 @Service(Service.Level.PROJECT)
-class MigrationsCommandFactory(private val intellijProject: Project) {
+internal class MigrationsCommandFactory(private val intellijProject: Project) {
     companion object {
         fun getInstance(project: Project) = project.service<MigrationsCommandFactory>()
     }
