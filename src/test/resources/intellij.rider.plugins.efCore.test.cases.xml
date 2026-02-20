@@ -6,5 +6,8 @@
     <module name="intellij.rider.test.framework.integration.testng._test"/>
     <module name="intellij.rider.test.framework.core"/>
     <module name="intellij.rider.test.framework.testng"/>
+    <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
+    <plugin id="com.jetbrains.rider.fsharp"/>
+    <!-- endregion -->
   </dependencies>
 </idea-plugin>
