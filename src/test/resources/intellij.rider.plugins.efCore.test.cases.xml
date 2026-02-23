@@ -1,13 +1,13 @@
 <idea-plugin>
+  <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
   <dependencies>
     <plugin id="me.seclerp.rider.plugins.efcore"/>
+    <plugin id="com.jetbrains.rider.fsharp"/>
     <module name="intellij.rider.test.framework"/>
     <module name="intellij.rider.test.framework.integration.testng"/>
     <module name="intellij.rider.test.framework.integration.testng._test"/>
     <module name="intellij.rider.test.framework.core"/>
     <module name="intellij.rider.test.framework.testng"/>
-    <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
-    <plugin id="com.jetbrains.rider.fsharp"/>
-    <!-- endregion -->
   </dependencies>
+  <!-- endregion -->
 </idea-plugin>
