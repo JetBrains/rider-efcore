@@ -34,7 +34,7 @@ fun Row.textFieldForRelativeFolder(
     val fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle(browseDialogTitle)
     val textFieldWithBrowseButtonCell = textFieldWithBrowseButton(fileChooserDescriptor, project) {
         val pathRelativeToAsFile = File(basePathGetter()).path
-        it.toIOFile().relativeTo(File(pathRelativeToAsFile)).path
+        it.toIOFile().relativeTo(File(pathRelativeToAsFile)).path.ifEmpty { "." }
     }
 
     return textFieldWithBrowseButtonCell
