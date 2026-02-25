@@ -7,7 +7,7 @@ class ScaffoldDbContextCommand(
     common: DialogCommonOptions,
     val connection: String,
     val provider: String,
-    val outputFolder: String,
+    val outputFolder: String?,
     val useAttributes: Boolean,
     val useDatabaseNames: Boolean,
     val generateOnConfiguring: Boolean,

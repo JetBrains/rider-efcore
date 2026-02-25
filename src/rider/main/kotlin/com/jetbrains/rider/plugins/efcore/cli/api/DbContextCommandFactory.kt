@@ -17,7 +17,7 @@ class DbContextCommandFactory(private val intellijProject: Project) {
     }
 
     fun scaffold(efCoreVersion: DotnetEfVersion, options: DialogCommonOptions, connection: String, provider: String,
-                 outputFolder: String, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
+                 outputFolder: String?, useAttributes: Boolean, useDatabaseNames: Boolean, generateOnConfiguring: Boolean,
                  usePluralizer: Boolean, dbContextName: String, dbContextFolder: String, scaffoldAllTables: Boolean,
                  tablesList: List<String>, scaffoldAllSchemas: Boolean, schemasList: List<String>): CliCommand {
         val presentation = CliCommandPresentationInfo(
@@ -32,7 +32,7 @@ class DbContextCommandFactory(private val intellijProject: Project) {
             addNamed("--context", dbContextName)
             addNamed("--context-dir", dbContextFolder)
             add("--force")
-            addNamed("--output-dir", outputFolder)
+            addNamedNullable("--output-dir", outputFolder)
 
             if (!scaffoldAllSchemas) {
                 schemasList.forEach {
