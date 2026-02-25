@@ -23,7 +23,7 @@ repositories {
 
 plugins {
     id("me.filippov.gradle.jvm.wrapper")
-    id("org.jetbrains.changelog") version "2.2.0"
+    id("org.jetbrains.changelog")
     id("org.jetbrains.intellij.platform")
     id("org.jetbrains.kotlin.jvm")
 }
@@ -80,7 +80,9 @@ sourceSets {
 
 dependencies {
     intellijPlatform {
-        rider(productVersion, useInstaller = false)
+        rider(productVersion) {
+            useInstaller = false
+        }
         jetbrainsRuntime()
 
         bundledPlugin("com.intellij.database")
@@ -155,19 +157,19 @@ tasks {
         }
     }
 
+    val rdGen = ":protocol:rdgen"
+
     register("prepare") {
-        dependsOn(":protocol:rdgen", generateNuGetConfig, prepareRiderBuildProps)
+        dependsOn(rdGen, generateNuGetConfig, prepareRiderBuildProps)
     }
 
-    val compileDotNet by registering {
-        dependsOn(":protocol:rdgen", generateNuGetConfig, prepareRiderBuildProps)
-        doLast {
-            exec {
-                workingDir(dotNetSrcDir)
-                executable("dotnet")
-                args("build", "-c", buildConfiguration)
-            }
-        }
+    val compileDotNet by registering(Exec::class) {
+        dependsOn(rdGen, generateNuGetConfig, generateNuGetConfig)
+        inputs.property("buildConfiguration", buildConfiguration)
+
+        workingDir(dotNetSrcDir)
+        executable("dotnet")
+        args("build", "-consoleLoggerParameters:ErrorsOnly", "--configuration", buildConfiguration)
     }
 
     register("testDotNet") {
@@ -176,7 +178,7 @@ tasks {
             val testsDir = dotNetSrcDir.resolve("Tests")
             testsDir.list { entry, name -> entry.isDirectory && name != ".DS_Store" }
                 ?.forEach {
-                    exec {
+                    providers.exec {
                         workingDir(testsDir.absolutePath)
                         executable("dotnet")
                         args("test", "-c", buildConfiguration, it)
@@ -186,7 +188,7 @@ tasks {
     }
 
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        dependsOn(":protocol:rdgen")
+        dependsOn(rdGen)
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
             freeCompilerArgs.add("-Xopt-in=kotlin.RequiresOptIn")
@@ -260,11 +262,6 @@ tasks {
     publishPlugin {
         token.set(publishToken)
         channels.set(listOf(publishChannel))
-    }
-
-    wrapper {
-        gradleVersion = "8.7"
-        distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-bin.zip"
     }
 }
 
