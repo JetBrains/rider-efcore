@@ -3,6 +3,7 @@ rootProject.name = "rider-efcore"
 pluginManagement {
     val rdVersion: String by settings
     val rdKotlinVersion: String by settings
+    val changelogVersion: String by settings
     val intellijPlatformGradlePluginVersion: String by settings
     val gradleJvmWrapperVersion: String by settings
 
@@ -19,6 +20,7 @@ pluginManagement {
     plugins {
         id("com.jetbrains.rdgen") version rdVersion
         id("org.jetbrains.kotlin.jvm") version rdKotlinVersion
+        id("org.jetbrains.changelog") version changelogVersion
         id("org.jetbrains.intellij.platform") version intellijPlatformGradlePluginVersion
         id("me.filippov.gradle.jvm.wrapper") version gradleJvmWrapperVersion
     }
