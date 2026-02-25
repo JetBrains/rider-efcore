@@ -164,7 +164,7 @@ tasks {
     }
 
     val compileDotNet by registering(Exec::class) {
-        dependsOn(rdGen, generateNuGetConfig, generateNuGetConfig)
+        dependsOn(rdGen, generateNuGetConfig, prepareRiderBuildProps)
         inputs.property("buildConfiguration", buildConfiguration)
 
         workingDir(dotNetSrcDir)
