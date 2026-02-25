@@ -6,5 +6,5 @@ import com.jetbrains.rider.plugins.efcore.features.shared.dialog.DialogCommonOpt
 class AddMigrationCommand(
     common: DialogCommonOptions,
     val migrationName: String,
-    val outputFolder: String
+    val outputFolder: String?
 ) : DialogCommand(common)
