@@ -21,7 +21,6 @@ import com.jetbrains.observables.observableList
 import com.jetbrains.observables.ui.dsl.bindSelected
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.ui.dsl.editableComboBox
-import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.connections.DbConnectionInfo
@@ -105,7 +104,7 @@ internal class ScaffoldDbContextDialogWrapper(
             commonOptions,
             dataCtx.connection.value,
             dataCtx.provider.value,
-            dataCtx.outputFolder.value.nullIfEmpty(),
+            dataCtx.outputFolder.value.takeIf { it.isNotBlank() },
             dataCtx.useAttributes.value,
             dataCtx.useDatabaseNames.value,
             dataCtx.generateOnConfiguring.value,
