@@ -8,7 +8,6 @@ import com.jetbrains.observables.bind
 import com.jetbrains.observables.observable
 import com.jetbrains.observables.ui.dsl.bindText
 import com.jetbrains.observables.withLogger
-import com.jetbrains.rd.generator.nova.GenerationSpec.Companion.nullIfEmpty
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.cli.api.models.DotnetEfVersion
 import com.jetbrains.rider.plugins.efcore.features.shared.dialog.CommonDialogWrapper
@@ -63,7 +62,7 @@ class AddMigrationDialogWrapper(
     override fun generateCommand(): DialogCommand {
         val commonOptions = getCommonOptions()
         val migrationName = dataCtx.migrationName.value.trim()
-        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value.nullIfEmpty()
+        val migrationsOutputFolder = dataCtx.migrationsOutputFolder.value.takeIf { it.isNotBlank() }
 
         return AddMigrationCommand(commonOptions, migrationName, migrationsOutputFolder)
     }
