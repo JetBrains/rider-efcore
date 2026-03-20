@@ -87,11 +87,20 @@ dependencies {
 
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
+        bundledModules(
+            "intellij.rd.client",
+            "intellij.rider.rdclient.dotnet",
+            "intellij.rider.shared"
+        )
 
         testFramework(TestFrameworkType.Bundled)
+        // Needed in runtime, uncomment me when MRI-4132 (internal) gets resolved.
+        // If you need to run tests before that's resolved, G̶o̶d̶ ̶s̶a̶v̶e̶ ̶y̶o̶u̶r̶ ̶s̶o̶u̶l̶ contact Dr. ForNeVeR.
+        // testFramework(TestFrameworkType.JUnit5, "262.SNAPSHOT")
     }
     
     testImplementation(libs.junit)
+    testImplementation(libs.testng)
 }
 
 val riderModel: Configuration by configurations.creating {
