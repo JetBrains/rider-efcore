@@ -33,6 +33,7 @@
 
   <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
   <dependencies>
+    <module name="intellij.database"/>
     <module name="intellij.rd.client"/>
     <module name="intellij.rider.rdclient.dotnet"/>
     <module name="intellij.rider.shared"/>
