@@ -48,6 +48,9 @@
                              key="configurable.name.ef.core.ui"/>
     <terminal.shellCommandHandler implementation="com.jetbrains.rider.plugins.efcore.features.terminal.smartExecute.EFCoreShellCommandHandler"/>
     <statistics.counterUsagesCollector implementationClass="com.jetbrains.rider.plugins.efcore.features.shared.statistics.CommandUsageCollector"/>
+    <applicationSettings service="com.jetbrains.rider.plugins.efcore.settings.EfCoreUiSettingsStateService"/>
+    <applicationSettings service="com.jetbrains.rider.plugins.efcore.state.DialogsStateService"/>
+    <applicationSettings service="com.jetbrains.rider.plugins.efcore.state.CommonOptionsStateService"/>
   </extensions>
 
   <actions>
