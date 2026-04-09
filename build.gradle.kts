@@ -122,7 +122,7 @@ artifacts {
 
 tasks {
     wrapper {
-        gradleVersion = "8.7"
+        gradleVersion = "9.4.1"
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
     }
 
