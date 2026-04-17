@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: JetBrains YouTrack
+    url: https://jb.gg/rider-issue
+    about: Report a technical problem or feature request to YouTrack
+  - name: JetBrains Support
+    url: https://jb.gg/rider-support
+    about: Contact the JetBrains support team
