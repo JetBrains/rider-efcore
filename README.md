@@ -11,6 +11,15 @@
 
 ---
 
+> **Warning**
+> #### Reporting issues
+> 
+> This repository doesn't accept new issue reports or feature requests through **Issues** page.
+>
+> Since the plugin is a part of main Rider distribution, if you encourage any related problems or issues,
+> please report them using YouTrack using [jb.gg/rider-issue](https://jb.gg/rider-issue) 
+> or contact our support team via [jb.gg/rider-support](https://jb.gg/rider-support)
+
 ### Features
 
 There are a couple of UI stuff for:
@@ -58,6 +67,7 @@ More about features and available dialogs you could read on [**the documentation
 Before opening the issue, please make sure that your projects and development environment completely satisfies these requirements:
 
 - Target frameworks
+  - `net10.0`
   - `net9.0`
   - `net8.0`
   - `net7.0`
@@ -75,7 +85,7 @@ Before opening the issue, please make sure that your projects and development en
 
 ### Development
 
-> **Note**: You should have JDK 21 and .NET SDK 8.0+ installed and configured.
+> **Note**: You should have JDK 25 and .NET SDK 10.0+ installed and configured.
 
 #### Preparing
 
