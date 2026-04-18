@@ -11,7 +11,7 @@
 
 ---
 
-> **Warning**
+> [!WARNING]
 > #### Reporting issues
 > 
 > This repository doesn't accept new issue reports or feature requests through **Issues** page.
@@ -85,7 +85,8 @@ Before opening the issue, please make sure that your projects and development en
 
 ### Development
 
-> **Note**: You should have JDK 25 and .NET SDK 10.0+ installed and configured.
+> [!NOTE]
+> You should have JDK 25 and .NET SDK 10.0+ installed and configured.
 
 #### Preparing
 
