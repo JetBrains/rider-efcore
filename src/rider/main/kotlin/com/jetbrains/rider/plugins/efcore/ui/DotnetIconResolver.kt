@@ -1,5 +1,6 @@
 package com.jetbrains.rider.plugins.efcore.ui
 
+import com.intellij.icons.AllIcons
 import icons.ReSharperIcons
 import org.jetbrains.annotations.NonNls
 import javax.swing.Icon
@@ -23,7 +24,7 @@ object DotnetIconResolver {
     fun resolveForType(type: DotnetIconType): Icon {
         return when(type) {
             DotnetIconType.BUILD_CONFIGURATION -> ReSharperIcons.ProjectModel.ProjectProperties
-            DotnetIconType.CSHARP_CLASS -> ReSharperIcons.PsiCSharp.Csharp
+            DotnetIconType.CSHARP_CLASS -> AllIcons.FileTypes.Csharp
         }
     }
 }
