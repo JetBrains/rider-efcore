@@ -3,7 +3,7 @@ package com.jetbrains.rider.plugins.efcore.cli.execution
 import com.intellij.execution.process.AnsiEscapeDecoder
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.execution.process.ProcessOutputTypes
+import com.intellij.execution.process.ProcessOutputType
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.rd.util.withUiContext
@@ -48,9 +48,9 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
                         val trimmed = chunk.trim()
                         if (trimmed.isNotEmpty()) {
                             logger.info("${command.presentationInfo.name} [$outputType]: $trimmed")
-                            when (outputType) {
-                                ProcessOutputTypes.STDOUT -> outputBuilder.append(trimmed)
-                                ProcessOutputTypes.STDERR -> errorBuilder.append(trimmed)
+                            when {
+                                ProcessOutputType.isStdout(outputType) -> outputBuilder.append(trimmed)
+                                ProcessOutputType.isStderr(outputType) -> errorBuilder.append(trimmed)
                             }
                         }
                     }
