@@ -12,12 +12,14 @@
     <module name="intellij.libraries.kotlin.reflect"/>
     <module name="intellij.libraries.kotlinx.coroutines.core"/>
     <module name="intellij.libraries.teamcity.service.messages"/>
+    <module name="intellij.libraries.xz"/>
     <module name="intellij.platform.analysis.impl"/>
     <module name="intellij.platform.ide.core"/>
     <module name="intellij.platform.ide.impl"/>
     <module name="intellij.platform.lang.impl"/>
     <module name="intellij.rd.client"/>
     <module name="intellij.rider.languages"/>
+    <module name="intellij.xml.impl"/>
   </dependencies>
   <!-- endregion -->
 </idea-plugin>
