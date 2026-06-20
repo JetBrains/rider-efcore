@@ -8,9 +8,13 @@
     <module name="intellij.rider.test.framework.core"/>
     <module name="intellij.rider.test.framework.testng"/>
     <plugin id="com.jetbrains.rider.fsharp"/>
+    <module name="intellij.libraries.commons.compress"/>
+    <module name="intellij.libraries.commons.logging"/>
     <module name="intellij.libraries.gson"/>
     <module name="intellij.libraries.kotlin.reflect"/>
+    <module name="intellij.libraries.kotlinTest"/>
     <module name="intellij.libraries.kotlinx.coroutines.core"/>
+    <module name="intellij.libraries.kotlinx.coroutines.test"/>
     <module name="intellij.libraries.teamcity.service.messages"/>
     <module name="intellij.libraries.xz"/>
     <module name="intellij.platform.analysis.impl"/>
@@ -20,6 +24,7 @@
     <module name="intellij.platform.testExtensions"/>
     <module name="intellij.rd.client"/>
     <module name="intellij.rider.languages"/>
+    <module name="intellij.spellchecker"/>
     <module name="intellij.xml.impl"/>
   </dependencies>
   <!-- endregion -->
