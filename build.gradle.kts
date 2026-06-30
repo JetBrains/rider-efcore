@@ -100,7 +100,11 @@ dependencies {
     }
     
     testImplementation(libs.junit)
-    testImplementation(libs.testng)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.params)
+    testRuntimeOnly(libs.junit.launcher)
+    testRuntimeOnly(libs.junit.engine)
+    testImplementation(libs.kotlin.test)
 }
 
 val riderModel: Configuration by configurations.creating {
@@ -237,7 +241,9 @@ tasks {
     }
 
     test {
-        useTestNG()
+        // Ignore IJ Platform JUnit5 framework set up and tear down
+        systemProperty("intellij.build.test.ignoreFirstAndLastTests", "true")
+        useJUnitPlatform()
         testLogging {
             showStandardStreams = true
             exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
