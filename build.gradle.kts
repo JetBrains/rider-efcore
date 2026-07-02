@@ -93,13 +93,15 @@ dependencies {
             "intellij.rider.shared"
         )
 
+        testBundledPlugin("intellij.structureView.plugin")
+
         testFramework(TestFrameworkType.Bundled)
         // Needed in runtime, uncomment me when MRI-4132 (internal) gets resolved.
         // If you need to run tests before that's resolved, G̶o̶d̶ ̶s̶a̶v̶e̶ ̶y̶o̶u̶r̶ ̶s̶o̶u̶l̶ contact Dr. ForNeVeR.
         // testFramework(TestFrameworkType.JUnit5, "262.SNAPSHOT")
     }
-    
-    testImplementation(libs.junit)
+
+    testImplementation(libs.junit4)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.params)
     testRuntimeOnly(libs.junit.launcher)
