@@ -20,7 +20,7 @@ import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
 import java.util.UUID
 
-private class EFCoreShellCommandHandler : TerminalShellCommandHandler {
+internal class EFCoreShellCommandHandler : TerminalShellCommandHandler {
     companion object {
         // Define dotnet ef constant string and commands
         private const val DOTNET_EF = "dotnet ef"
