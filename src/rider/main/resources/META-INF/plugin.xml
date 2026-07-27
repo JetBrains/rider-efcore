@@ -35,7 +35,32 @@
   <dependencies>
     <module name="intellij.database"/>
     <module name="intellij.database.impl"/>
+    <module name="intellij.libraries.jackson"/>
+    <module name="intellij.libraries.jackson.databind"/>
+    <module name="intellij.libraries.jackson.module.kotlin"/>
+    <module name="intellij.libraries.rd.core"/>
+    <module name="intellij.libraries.rd.framework"/>
+    <module name="intellij.platform.analysis"/>
+    <module name="intellij.platform.core"/>
+    <module name="intellij.platform.core.ui"/>
+    <module name="intellij.platform.credentialStore"/>
+    <module name="intellij.platform.editor.ui"/>
+    <module name="intellij.platform.execution"/>
+    <module name="intellij.platform.execution.impl"/>
+    <module name="intellij.platform.ide"/>
+    <module name="intellij.platform.ide.core"/>
+    <module name="intellij.platform.ide.impl"/>
+    <module name="intellij.platform.ide.progress"/>
+    <module name="intellij.platform.projectModel"/>
+    <module name="intellij.platform.statistics"/>
+    <module name="intellij.platform.util.ex"/>
+    <module name="intellij.platform.util.ui"/>
     <module name="intellij.rd.client"/>
+    <module name="intellij.rd.ide.model.generated"/>
+    <module name="intellij.rd.platform"/>
+    <module name="intellij.rd.ui"/>
+    <module name="intellij.rider.icons"/>
+    <module name="intellij.rider.model.generated"/>
     <module name="intellij.rider.rdclient.dotnet"/>
     <module name="intellij.rider.shared"/>
   </dependencies>
