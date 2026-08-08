@@ -4,7 +4,6 @@
   <vendor>JetBrains</vendor>
   <depends>com.intellij.modules.rider</depends>
   <depends>com.intellij.database</depends>
-  <depends>org.jetbrains.plugins.terminal</depends>
   <resource-bundle>messages.EfCoreUiBundle</resource-bundle>
 
   <description>
@@ -33,6 +32,7 @@
 
   <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
   <dependencies>
+    <plugin id="org.jetbrains.plugins.terminal"/>
     <module name="intellij.database"/>
     <module name="intellij.database.impl"/>
     <module name="intellij.libraries.jackson"/>
