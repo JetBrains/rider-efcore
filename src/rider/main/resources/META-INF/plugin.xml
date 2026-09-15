@@ -41,6 +41,7 @@
     <module name="intellij.libraries.rd.core"/>
     <module name="intellij.libraries.rd.framework"/>
     <module name="intellij.platform.analysis"/>
+    <module name="intellij.platform.backend.workspace"/>
     <module name="intellij.platform.core"/>
     <module name="intellij.platform.core.ui"/>
     <module name="intellij.platform.credentialStore"/>
@@ -55,7 +56,10 @@
     <module name="intellij.platform.projectModel"/>
     <module name="intellij.platform.statistics"/>
     <module name="intellij.platform.util.ex"/>
+    <module name="intellij.platform.util.progress"/>
+    <module name="intellij.platform.util.text.matching"/>
     <module name="intellij.platform.util.ui"/>
+    <module name="intellij.platform.workspace.storage"/>
     <module name="intellij.rd.client"/>
     <module name="intellij.rd.ide.model.generated"/>
     <module name="intellij.rd.platform"/>
