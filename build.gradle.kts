@@ -93,7 +93,7 @@ dependencies {
             "intellij.rider.shared"
         )
 
-        testBundledPlugin("intellij.structureView.plugin")
+        testBundledPlugin("com.intellij.structureView")
 
         testFramework(TestFrameworkType.Bundled)
         // Needed in runtime, uncomment me when MRI-4132 (internal) gets resolved.
