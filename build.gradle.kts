@@ -88,6 +88,9 @@ dependencies {
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
         bundledModules(
+            "intellij.libraries.jackson",
+            "intellij.libraries.jackson.databind",
+            "intellij.libraries.jackson.module.kotlin",
             "intellij.rd.client",
             "intellij.rider.rdclient.dotnet",
             "intellij.rider.shared"
