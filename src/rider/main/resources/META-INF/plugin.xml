@@ -69,6 +69,7 @@
     <module name="intellij.rider.model.generated"/>
     <module name="intellij.rider.rdclient.dotnet"/>
     <module name="intellij.rider.shared"/>
+    <module name="intellij.terminal.execution"/>
   </dependencies>
   <!-- endregion -->
   <extensions defaultExtensionNs="com.intellij">
