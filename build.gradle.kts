@@ -88,12 +88,14 @@ dependencies {
         bundledPlugin("com.intellij.database")
         bundledPlugin("org.jetbrains.plugins.terminal")
         bundledModules(
+            "intellij.platform.execution",
+            "intellij.platform.execution.impl",
             "intellij.libraries.jackson",
             "intellij.libraries.jackson.databind",
             "intellij.libraries.jackson.module.kotlin",
             "intellij.rd.client",
             "intellij.rider.rdclient.dotnet",
-            "intellij.rider.shared"
+            "intellij.rider.shared",
         )
 
         testBundledPlugin("com.intellij.structureView")
