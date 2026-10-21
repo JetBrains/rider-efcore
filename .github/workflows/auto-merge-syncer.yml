@@ -22,3 +22,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ github.event.pull_request.html_url }}
+      # "Automatically delete head branches" doesn't cover PRs closed without merging, nor merges made by
+      # auto-merge enabled via GITHUB_TOKEN, so sweep the leftovers of previous syncer PRs here
+      - name: 🧹 Delete head branches of closed syncer PRs
+        run: |
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/plugins-sync/" --paginate --jq '.[].ref | sub("^refs/heads/"; "")')
+          open_heads=$(gh pr list -R "$GITHUB_REPOSITORY" --state open --limit 200 --json headRefName --jq '.[].headRefName')
+          gh pr list -R "$GITHUB_REPOSITORY" --state closed --author 'app/jetbrains-net-syncer' --limit 100 \
+            --json headRefName,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository | not) | .headRefName | select(startswith("plugins-sync/"))' |
+          sort -u | while read -r branch; do
+            grep -qxF "$branch" <<< "$existing" || continue
+            grep -qxF "$branch" <<< "$open_heads" && continue
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch"
+            echo "Deleted $branch"
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
