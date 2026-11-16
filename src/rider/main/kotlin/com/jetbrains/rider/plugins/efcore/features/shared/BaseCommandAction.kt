@@ -6,9 +6,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.rd.util.launchOnUi
 import com.intellij.openapi.rd.util.lifetime
-import com.intellij.openapi.rd.util.withBackgroundContext
+import com.jetbrains.rd.util.threading.coroutines.launch
 import com.jetbrains.rider.model.dotNetActiveRuntimeModel
 import com.jetbrains.rider.plugins.efcore.EfCoreUiBundle
 import com.jetbrains.rider.plugins.efcore.KnownNotificationGroups
@@ -22,6 +21,8 @@ import com.jetbrains.rider.plugins.efcore.rd.RiderEfCoreModel
 import com.jetbrains.rider.plugins.efcore.rd.ToolKind
 import com.jetbrains.rider.plugins.efcore.rd.riderEfCoreModel
 import com.jetbrains.rider.projectView.solution
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 abstract class BaseCommandAction : AnAction() {
@@ -31,13 +32,13 @@ abstract class BaseCommandAction : AnAction() {
 
     override fun actionPerformed(actionEvent: AnActionEvent) {
         val intellijProject = actionEvent.project ?: return
-        intellijProject.lifetime.launchOnUi {
-            val version = fetchEfCoreVersion(intellijProject) ?: return@launchOnUi
+        intellijProject.lifetime.launch(Dispatchers.Main) {
+            val version = fetchEfCoreVersion(intellijProject) ?: return@launch
             openDialog(actionEvent, version)
         }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     abstract fun createDialog(
         intellijProject: Project,
@@ -78,7 +79,7 @@ abstract class BaseCommandAction : AnAction() {
             val command = dialog.generateCommand()
             val cliCommand = EfCoreCliCommandFactory.getInstance(intellijProject).create(command, efCoreVersion)
             CommandUsageCollector.withCommandActivity(intellijProject, command) {
-                withBackgroundContext {
+                withContext(Dispatchers.Default) {
                     executor.execute(cliCommand)?.apply {
                         dialog.postCommandExecute(this)
                     }
