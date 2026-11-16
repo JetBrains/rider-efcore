@@ -6,36 +6,40 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessOutputType
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.rd.util.withUiContext
 import com.intellij.openapi.util.Key
 import com.intellij.terminal.TerminalExecutionConsole
+import com.jetbrains.rd.platform.util.getLogger
 import com.jetbrains.rider.run.TerminalProcessHandler
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+private val logger = getLogger<TerminalCommandExecutor>()
 
 class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(intellijProject) {
-    private val logger = logger<TerminalCommandExecutor>()
+
     private val toolWindowProvider by lazy { EfCoreConsoleToolWindowProvider.getInstance(intellijProject) }
 
-    override suspend fun doExecute(command: CliCommand): CliCommandResult? {
-        return try {
-            val processCompletion = CompletableDeferred<CliCommandResult>()
-            val processHandler = createProcessHandler(command, processCompletion)
-            withUiContext {
-                val consoleView = TerminalExecutionConsole(intellijProject, processHandler)
-                toolWindowProvider.createTab(command, consoleView)
-            }
-            logger.info("Starting process '${command.commandLine.commandLineString}'")
-            processHandler.startNotify()
-            processCompletion.await()
-        } catch (cancellation: CancellationException) {
-            null
-        }
+    override suspend fun doExecute(command: CliCommand): CliCommandResult {
+      val processCompletion = CompletableDeferred<CliCommandResult>()
+      val processHandler = createProcessHandler(command, processCompletion)
+      withContext(Dispatchers.Main) {
+          val consoleView = TerminalExecutionConsole(intellijProject, processHandler)
+          toolWindowProvider.createTab(command, consoleView)
+      }
+      logger.info("Starting process '${command.commandLine.commandLineString}'")
+      processHandler.startNotify()
+      return processCompletion.await()
     }
 
+    /**
+     * Creates the process with its stderr in the same pty as its stdout. The terminal console then gets one stream, in the order
+     * that the process writes it.
+     */
     private fun createProcessHandler(command: CliCommand,
-                                     completion: CompletableDeferred<CliCommandResult>): TerminalProcessHandler =
-        TerminalProcessHandler(intellijProject, command.commandLine, command.commandLine.commandLineString).apply {
+                                     completion: CompletableDeferred<CliCommandResult>): TerminalProcessHandler {
+        val commandLine = command.commandLine.withRedirectErrorStream(true)
+        return TerminalProcessHandler(intellijProject, commandLine, commandLine.commandLineString).apply {
             addProcessListener(object : ProcessAdapter() {
                 private val ansiDecoder = AnsiEscapeDecoder()
                 private val outputBuilder = StringBuilder()
@@ -75,4 +79,5 @@ class TerminalCommandExecutor(intellijProject: Project) : CliCommandExecutor(int
                 }
             })
         }
+    }
 }
