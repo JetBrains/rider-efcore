@@ -2,10 +2,13 @@
   <!-- region Generated dependencies - run `Generate Product Layouts` to regenerate -->
   <dependencies>
     <plugin id="com.jetbrains.rider.fsharp"/>
+    <plugin id="me.seclerp.rider.plugins.efcore"/>
     <module name="intellij.libraries.commons.compress"/>
     <module name="intellij.libraries.commons.logging"/>
     <module name="intellij.libraries.flexmark"/>
     <module name="intellij.libraries.gson"/>
+    <module name="intellij.libraries.jediterm.core"/>
+    <module name="intellij.libraries.jediterm.ui"/>
     <module name="intellij.libraries.jline"/>
     <module name="intellij.libraries.junit6"/>
     <module name="intellij.libraries.junit6.params"/>
@@ -22,6 +25,7 @@
     <module name="intellij.platform.analysis.impl"/>
     <module name="intellij.platform.backend.workspace"/>
     <module name="intellij.platform.codeStyle"/>
+    <module name="intellij.platform.consoleView"/>
     <module name="intellij.platform.core"/>
     <module name="intellij.platform.core.impl"/>
     <module name="intellij.platform.core.ui"/>
@@ -31,6 +35,7 @@
     <module name="intellij.platform.ide.impl"/>
     <module name="intellij.platform.lang.impl"/>
     <module name="intellij.platform.projectModel"/>
+    <module name="intellij.platform.terminal"/>
     <module name="intellij.platform.testExtensions"/>
     <module name="intellij.platform.util.ex"/>
     <module name="intellij.platform.workspace.storage"/>
