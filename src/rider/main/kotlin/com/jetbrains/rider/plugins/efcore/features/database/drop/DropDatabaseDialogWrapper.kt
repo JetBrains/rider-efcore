@@ -33,7 +33,7 @@ class DropDatabaseDialogWrapper(
         val dbContext = dataCtx.dbContext.value?.name
         val confirmationMessage =
             if (projectName != null && dbContext != null)
-                EfCoreUiBundle.message("drop.database.confirmation.named", projectName, dbContext)
+                EfCoreUiBundle.message("drop.database.confirmation.named", dbContext, projectName)
             else
                 EfCoreUiBundle.message("drop.database.confirmation.selected")
 
