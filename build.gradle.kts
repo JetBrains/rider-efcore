@@ -115,6 +115,12 @@ dependencies {
     testImplementation(libs.kotlin.test)
 }
 
+configurations.testRuntimeClasspath {
+    // kotlin-test adds the kotlin-stdlib of the Kotlin Gradle plugin.
+    // The tests must use the kotlin-stdlib of the IDE, which has the version of the kotlin-reflect of the IDE.
+    exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
+}
+
 val riderModel: Configuration by configurations.creating {
     isCanBeConsumed = true
     isCanBeResolved = false
